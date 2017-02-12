@@ -95,26 +95,37 @@ set_project_opts <- function(){
   if(is.null(getOption("models.dir"))) options(models.dir="Models")
   if(is.null(getOption("git.exists"))) options(git.exists=requireNamespace("git2r", quietly = TRUE))
   if(is.null(getOption("git.ignore.files"))) options(git.ignore.files=c(""))
+  if(getOption("git.exists") & is.null(getOption("user.email"))) options(user.email="user@example.org")
 }
 
-validate_session <- function(){
+validate_session <- function(fail_on_error=FALSE){
   result <- TRUE
-  message("working directory is Rstudio project directory...",appendLF = FALSE)
-  if(.rs.getProjectDirectory()!=getwd()) message("TRUE") else
-    message("FALSE") ; result <- FALSE
-  message("working directory is Rstudio project directory...",appendLF = FALSE)
-  if(file.exists(getOption("scripts.dir"))) message("TRUE") else
-    message("FALSE") ; result <- FALSE
+  msg <- function(...) if(fail_on_error) stop(...) else message(...)
+
+  if(!.rs.getProjectDirectory()==getwd())
+    msg("Working directory is not Rstudio project directory") ; result <- FALSE
+
+  if(!file.exists(getOption("scripts.dir")))
+    msg("Directory getOption(\"scripts.dir\") not found") ; result <- FALSE
+
+  if(!file.exists(getOption("models.dir")))
+    msg("Directory getOption(\"models.dir\") not found") ; result <- FALSE
+
   return(result)
 }
 
+#' project package install
+#' @export
 install_project_packages <- function(...,lib){
   if(!missing(lib)) stop("forbidden to change lib with install.local.packages()")
   if(!file.exists("ProjectLibrary") %in% dir()) stop("ProjectLibrary not detected")
   install.packages(...,lib="ProjectLibrary")
 }
 
+#' project package load
+#' @export
 project_library <- function(...){
+  .rs.unloadPackage(...)
   .rs.loadPackage(...,lib="ProjectLibrary")
 }
 
@@ -130,38 +141,42 @@ setup_file <- function(file.name){
 }
 
 #' Create new_project
+#'
+#' Creates directory structure.  User install TidyProject again in
+#'
+#' @param ... arguments passed to install function (default = install.packages())
 #' @param proj.name character string of full path to new_project
 #' @export
-new_project <- function(proj.name){ ## must be full path.
+make_project <- function(proj.name){ ## must be full path.
   ## User function: create new_project
   if(!is_full_path(proj.name)) stop("Need absolute path")
   if(file.exists(proj.name)) stop("project already exists")
-  currentwd <- getwd() ; on.exit(setwd(currentwd))
-  dir.create(proj.name)
   tryCatch({
-    file.copy(file.path(getOption("nmproject.src"),"inst","extdata","CodeLibrary","EmptyProject/."),proj.name,recursive=TRUE) ## copy empty project template
+    currentwd <- getwd() ; on.exit(setwd(currentwd))
+    dir.create(proj.name)
+    file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj.name,recursive=TRUE)
     if(!TRUE %in% file.info(proj.name)$isdir) stop(paste(proj.name,"not created")) # Test if directory exists
     ## Go into newly create project and do some configuring
     setwd(proj.name)
   },
   error=function(e){
     setwd(currentwd)
-    message("Something wrong. Reversing changes...")
+    message("Aborting. Reversing changes...")
     unlink(proj.name,recursive = TRUE)
     stop(e)
   })
   if(getOption("git.exists")){
+    bare.proj.name <- gsub(basename(proj.name),paste0(basename(proj.name),".git"),proj.name)
     tryCatch({
       r <- git2r::init(".")
-      s <- unique(c(".Rproj.user",".Rhistory",".RData","sdtab*","catab*","patab*","cotab*",
-                    "run[a-zA-Z0-9]*\\.[^m]*[^o]*[^d]*",getOption("git.ignore.files")))
+      s <- unique(c(".Rproj.user",".Rhistory",".RData",getOption("git.ignore.files")))
       write(s,".gitignore")
       paths <- unlist(git2r::status(r))
       git2r::add(r, paths)
-      git2r::config(r, user.name=user(), user.email=getOption("user.email"))
+      git2r::config(r, user.name=Sys.info()["user"], user.email=getOption("user.email"))
       git2r::commit(r, "initialise_repository")
       ## make local bare repository
-      bare.proj.name <- gsub(basename(proj.name),paste0(basename(proj.name),".git"),proj.name)
+      git2r::status()
       proj.name.full <- getwd()
       bare.proj.name.full <- paste0(proj.name.full,".git")
       git2r::clone(proj.name.full,bare.proj.name.full,bare = TRUE)
@@ -171,15 +186,18 @@ new_project <- function(proj.name){ ## must be full path.
     },
     error=function(e){
       setwd(currentwd)
-      message("Something wrong. Reversing changes...")
+      message("Aborting. Reversing changes...")
       unlink(proj.name,recursive = TRUE)
       unlink(bare.proj.name,recursive = TRUE)
       stop(e)
     })
   }
+  message("TidyProject directory created")
   message("----------------------------------------------------")
-  message(paste("1. Open Rstudio project: ",file.path(proj.name,"Analysis.Proj")))
-  message(paste0("2. From project: library(NMproject,lib=\"ProjectLibrary\")"))
+  message("")
+  message("INSTRUCTIONS:")
+  message(paste0("1. Install TidyProject package into project lib=\"",file.path(proj.name,"ProjectLibrary"),"\""))
+  message(paste("2. Open Rstudio project to start working: ",proj.name))
 }
 
 #' create bare repository
