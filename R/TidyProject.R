@@ -152,7 +152,6 @@ setup_file <- function(file.name){
 #'
 #' Creates directory structure.  User install TidyProject again in
 #'
-#' @param ... arguments passed to install function (default = install.packages())
 #' @param proj.name character string of full path to new_project
 #' @export
 make_project <- function(proj.name){ ## must be full path.

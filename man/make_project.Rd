@@ -8,8 +8,6 @@ make_project(proj.name)
 }
 \arguments{
 \item{proj.name}{character string of full path to new_project}
-
-\item{...}{arguments passed to install function (default = install.packages())}
 }
 \description{
 Creates directory structure.  User install TidyProject again in
