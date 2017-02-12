@@ -98,6 +98,7 @@ set_project_opts <- function(){
   if(getOption("git.exists") & is.null(getOption("user.email"))) options(user.email="user@example.org")
 }
 
+#' Validate TidyProject session
 validate_session <- function(fail_on_error=FALSE){
   result <- TRUE
   msg <- function(...) if(fail_on_error) stop(...) else message(...)
@@ -112,6 +113,13 @@ validate_session <- function(fail_on_error=FALSE){
     msg("Directory getOption(\"models.dir\") not found") ; result <- FALSE
 
   return(result)
+}
+
+#' Test if directory is a TidyProject
+is_tidy_project <- function(proj.path = getwd()){
+  file.exists(file.path(proj.path,getOption("scripts.dir"))) &
+    file.exists(file.path(proj.path,getOption("models.dir"))) &
+    file.exists(file.path(proj.path,"ProjectLibrary"))
 }
 
 #' project package install
@@ -175,14 +183,6 @@ make_project <- function(proj.name){ ## must be full path.
       git2r::add(r, paths)
       git2r::config(r, user.name=Sys.info()["user"], user.email=getOption("user.email"))
       git2r::commit(r, "initialise_repository")
-      ## make local bare repository
-      git2r::status()
-      proj.name.full <- getwd()
-      bare.proj.name.full <- paste0(proj.name.full,".git")
-      git2r::clone(proj.name.full,bare.proj.name.full,bare = TRUE)
-      setwd("../")
-      unlink(proj.name,recursive = TRUE)
-      git2r::clone(bare.proj.name.full,proj.name.full)
     },
     error=function(e){
       setwd(currentwd)
@@ -196,13 +196,26 @@ make_project <- function(proj.name){ ## must be full path.
   message("----------------------------------------------------")
   message("")
   message("INSTRUCTIONS:")
-  message(paste0("1. Install TidyProject package into project lib=\"",file.path(proj.name,"ProjectLibrary"),"\""))
-  message(paste("2. Open Rstudio project to start working: ",proj.name))
+  message(paste("1. Open Rstudio project to start working: ",proj.name))
+  message(paste("2. Install TidyProject package into project library"))
+
 }
 
-#' create bare repository
-#'
-
+#' create local bare repository
+#' @export
+make_local_bare <- function(proj.name=getwd()){
+  currentwd <- getwd() ; on.exit(setwd(currentwd))
+  setwd(proj.name)
+  status <- git2r::status()
+  if(FALSE %in% grepl("^\\.",status$untracked)) stop("untracked, non-hidden files detected. Create bare repositories manually.")
+  if(length(status$unstaged)>0) stop("commit changes before continuing")
+  proj.name.full <- getwd()
+  bare.proj.name.full <- paste0(proj.name.full,".git")
+  git2r::clone(proj.name.full,bare.proj.name.full,bare = TRUE)
+  setwd("../")
+  unlink(proj.name,recursive = TRUE)
+  git2r::clone(bare.proj.name.full,proj.name.full)
+}
 
 #' Test if full path
 #'
