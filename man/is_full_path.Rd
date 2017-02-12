@@ -2,7 +2,7 @@
 % Please edit documentation in R/TidyProject.R
 \name{is_full_path}
 \alias{is_full_path}
-\title{create bare repository}
+\title{Test if full path}
 \usage{
 is_full_path(x)
 }
