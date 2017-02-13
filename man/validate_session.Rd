@@ -6,6 +6,9 @@
 \usage{
 validate_session(fail_on_error = FALSE)
 }
+\arguments{
+\item{fail_on_error}{logical (default=FALSE) indicating whether function should give error on a test fail}
+}
 \description{
 Validate TidyProject session
 }

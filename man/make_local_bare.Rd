@@ -6,6 +6,9 @@
 \usage{
 make_local_bare(proj_name = getwd())
 }
+\arguments{
+\item{proj_name}{character vector indicating path to TidyProject}
+}
 \description{
 create local bare repository
 }

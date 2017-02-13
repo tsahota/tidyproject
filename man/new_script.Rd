@@ -6,6 +6,11 @@
 \usage{
 new_script(name, overwrite = FALSE)
 }
+\arguments{
+\item{name}{character indicating name of script to create}
+
+\item{overwrite}{logical indicating whether to overwrite existing file (default=FALSE)}
+}
 \description{
 Create new R script
 }

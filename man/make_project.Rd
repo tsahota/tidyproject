@@ -8,6 +8,8 @@ make_project(proj_name, project_library = TRUE)
 }
 \arguments{
 \item{proj_name}{character string of full path to new_project}
+
+\item{project_library}{TRUE (default) or FALSE indicating whether or not to create a project library}
 }
 \description{
 Creates directory structure.  User install TidyProject again in

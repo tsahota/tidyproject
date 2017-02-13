@@ -1,6 +1,7 @@
 #' Project and code management
 #'
-#' TidyProject is designed to manage directories and aid in readability and reproducibility
+#' TidyProject is designed to manage tidy project directories and
+#' facilitate reproducibility and reuse of code
 #'
 #' @section Strategy:
 #'
@@ -86,6 +87,7 @@ set_project_opts <- function(){
 }
 
 #' Validate TidyProject session
+#' @param fail_on_error logical (default=FALSE) indicating whether function should give error on a test fail
 validate_session <- function(fail_on_error=FALSE){
   result <- TRUE
   msg <- function(...) if(fail_on_error) stop(...) else message(...)
@@ -109,12 +111,15 @@ validate_session <- function(fail_on_error=FALSE){
 }
 
 #' Test if directory is a TidyProject
-is_tidy_project <- function(proj.path = getwd()){
-  file.exists(file.path(proj.path,getOption("scripts.dir"))) &
-    file.exists(file.path(proj.path,getOption("models.dir")))
+#'
+#' @param proj_path character vector indicating path to TidyProject
+is_tidy_project <- function(proj_path = getwd()){
+  file.exists(file.path(proj_path,getOption("scripts.dir"))) &
+    file.exists(file.path(proj_path,getOption("models.dir")))
 }
 
 #' Setup files
+#' @param file.name character indicating name of file to set up
 setup_file <- function(file.name){
   ## Internal function: routine procedures after creating a file.
   Sys.chmod(file.name,mode = "744")  ## 744= read-write-executable for user, read only for others
@@ -130,11 +135,12 @@ setup_file <- function(file.name){
 #' Creates directory structure.  User install TidyProject again in
 #'
 #' @param proj_name character string of full path to new_project
+#' @param project_library TRUE (default) or FALSE indicating whether or not to create a project library
+#'
 #' @export
 make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
   ## User function: create new_project
   if(!is_full_path(proj_name)) stop("Need absolute path")
-  #if(file.exists(proj_name)) stop("project already exists")
   if(!file.exists(proj_name)){
     tryCatch({
       message("Directory doesn't exist. Creating...")
@@ -192,6 +198,7 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
 }
 
 #' create local bare repository
+#' @param proj_name character vector indicating path to TidyProject
 #' @export
 make_local_bare <- function(proj_name=getwd()){
   currentwd <- getwd() ; on.exit(setwd(currentwd))
@@ -220,12 +227,14 @@ make_local_bare <- function(proj_name=getwd()){
 is_full_path <- function(x) grepl("^(~|/|\\\\|([a-zA-Z]:))",x,perl=TRUE)
 
 #' Create new R script
+#' @param name character indicating name of script to create
+#' @param overwrite logical indicating whether to overwrite existing file (default=FALSE)
 #' @export
 new_script <- function(name,overwrite=FALSE){ ## create black script with comment fields. Add new_script to git
   if(name!=basename(name)) stop("name must not be a path")
   to.path <- file.path(getOption("scripts.dir"),name)  ## destination path
   if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
-  s <- c(paste0("## ","Author: ",user()),
+  s <- c(paste0("## ","Author: ",Sys.info()["user"]),
          paste0("## ","First created: ",Sys.Date()),
          paste0("## ","Description: "),
          paste0("## ","Depends on: "),

@@ -4,7 +4,10 @@
 \alias{is_tidy_project}
 \title{Test if directory is a TidyProject}
 \usage{
-is_tidy_project(proj.path = getwd())
+is_tidy_project(proj_path = getwd())
+}
+\arguments{
+\item{proj_path}{character vector indicating path to TidyProject}
 }
 \description{
 Test if directory is a TidyProject

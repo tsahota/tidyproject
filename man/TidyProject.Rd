@@ -6,7 +6,8 @@
 \alias{TidyProject-package}
 \title{Project and code management}
 \description{
-TidyProject is designed to manage directories and aid in readability and reproducibility
+TidyProject is designed to manage tidy project directories and
+facilitate reproducibility and reuse of code
 }
 \section{Strategy}{
 

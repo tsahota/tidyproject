@@ -1,11 +1,15 @@
 Package: TidyProject
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Project and Code Management
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Authors@R: person("Tarj", "Sahota", email =
+    "tarjinder.sahota@astrazeneca.com", role = c("aut", "cre"))
+Maintainer: Tarj Sahota <tarjinder.sahota@astrazeneca.com>
+Description: TidyProject is designed to manage tidy project directories and
+  facilitate reproducibility and reuse of code
 License: What license is it under?
 LazyData: TRUE
 RoxygenNote: 5.0.1
-Suggests: testthat
+Suggests:
+  testthat,
+  git2r

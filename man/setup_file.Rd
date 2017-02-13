@@ -6,6 +6,9 @@
 \usage{
 setup_file(file.name)
 }
+\arguments{
+\item{file.name}{character indicating name of file to set up}
+}
 \description{
 Setup files
 }
