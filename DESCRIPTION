@@ -6,8 +6,8 @@ Authors@R: person("Tarj", "Sahota", email =
     "tarjinder.sahota@astrazeneca.com", role = c("aut", "cre"))
 Maintainer: Tarj Sahota <tarjinder.sahota@astrazeneca.com>
 Description: TidyProject is designed to manage tidy project directories and
-  facilitate reproducibility and reuse of code
-License: What license is it under?
+  facilitate reproducibility and reuse of code.
+License: GPL-3
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Suggests:

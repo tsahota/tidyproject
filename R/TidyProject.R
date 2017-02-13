@@ -92,10 +92,10 @@ validate_session <- function(fail_on_error=FALSE){
   result <- TRUE
   msg <- function(...) if(fail_on_error) stop(...) else message(...)
 
-  if(!.rs.getProjectDirectory()==getwd()){
-    message("Working directory is not Rstudio project directory")
-    result <- FALSE
-  }
+  # if(!.rs.getProjectDirectory()==getwd()){
+  #   message("Working directory is not Rstudio project directory")
+  #   result <- FALSE
+  # }
 
   if(!file.exists(getOption("scripts.dir"))){
     message("Directory getOption(\"scripts.dir\") not found")
