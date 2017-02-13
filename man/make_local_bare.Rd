@@ -4,7 +4,7 @@
 \alias{make_local_bare}
 \title{create local bare repository}
 \usage{
-make_local_bare(proj.name = getwd())
+make_local_bare(proj_name = getwd())
 }
 \description{
 create local bare repository

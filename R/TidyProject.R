@@ -47,10 +47,8 @@
 NULL
 
 ## Names:
+##  tidyproject (change to this)
 ##  TidyProject
-##  TidyCode
-##  TidyLittleProject
-##  StructuredProject
 
 ## Description
 ## Three components 1) ProjectTemplate 2) packrat 3) code_library 4) script creations stuff
@@ -74,17 +72,6 @@ NULL
 ##  Can be modified by the user via a configuration file.
 ##  Important that NMproject and other packages are installed locally.
 
-## PROBLEM: what if NMproject is no longer compatible with TidyProject?
-##  Can we install TidyProject locally too?
-##  Needs to be a project info object/settings - can look into ProjectTemplate
-
-## How to install a local package?
-##  install.packages(,lib.loc="ProjectLibrary")
-##  library(...,lib="ProjectLibrary")
-
-## Downsides:
-##  a bit annoying to have to do.  Could I make a wrapper script?
-
 #' Set project options
 set_project_opts <- function(){
   ## Internal function: will set all global variables
@@ -103,38 +90,28 @@ validate_session <- function(fail_on_error=FALSE){
   result <- TRUE
   msg <- function(...) if(fail_on_error) stop(...) else message(...)
 
-  if(!.rs.getProjectDirectory()==getwd())
-    msg("Working directory is not Rstudio project directory") ; result <- FALSE
+  if(!.rs.getProjectDirectory()==getwd()){
+    message("Working directory is not Rstudio project directory")
+    result <- FALSE
+  }
 
-  if(!file.exists(getOption("scripts.dir")))
-    msg("Directory getOption(\"scripts.dir\") not found") ; result <- FALSE
+  if(!file.exists(getOption("scripts.dir"))){
+    message("Directory getOption(\"scripts.dir\") not found")
+    result <- FALSE
+  }
 
-  if(!file.exists(getOption("models.dir")))
-    msg("Directory getOption(\"models.dir\") not found") ; result <- FALSE
-
-  return(result)
+  if(!file.exists(getOption("models.dir"))){
+    message("Directory getOption(\"models.dir\") not found")
+    result <- FALSE
+  }
+  if(!result) msg("TidyProject session validation failed.")
+  return(invisible(result))
 }
 
 #' Test if directory is a TidyProject
 is_tidy_project <- function(proj.path = getwd()){
   file.exists(file.path(proj.path,getOption("scripts.dir"))) &
-    file.exists(file.path(proj.path,getOption("models.dir"))) &
-    file.exists(file.path(proj.path,"ProjectLibrary"))
-}
-
-#' project package install
-#' @export
-install_project_packages <- function(...,lib){
-  if(!missing(lib)) stop("forbidden to change lib with install.local.packages()")
-  if(!file.exists("ProjectLibrary") %in% dir()) stop("ProjectLibrary not detected")
-  install.packages(...,lib="ProjectLibrary")
-}
-
-#' project package load
-#' @export
-project_library <- function(...){
-  .rs.unloadPackage(...)
-  .rs.loadPackage(...,lib="ProjectLibrary")
+    file.exists(file.path(proj.path,getOption("models.dir")))
 }
 
 #' Setup files
@@ -152,28 +129,40 @@ setup_file <- function(file.name){
 #'
 #' Creates directory structure.  User install TidyProject again in
 #'
-#' @param proj.name character string of full path to new_project
+#' @param proj_name character string of full path to new_project
 #' @export
-make_project <- function(proj.name){ ## must be full path.
+make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
   ## User function: create new_project
-  if(!is_full_path(proj.name)) stop("Need absolute path")
-  if(file.exists(proj.name)) stop("project already exists")
-  tryCatch({
-    currentwd <- getwd() ; on.exit(setwd(currentwd))
-    dir.create(proj.name)
-    file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj.name,recursive=TRUE)
-    if(!TRUE %in% file.info(proj.name)$isdir) stop(paste(proj.name,"not created")) # Test if directory exists
-    ## Go into newly create project and do some configuring
-    setwd(proj.name)
-  },
-  error=function(e){
-    setwd(currentwd)
-    message("Aborting. Reversing changes...")
-    unlink(proj.name,recursive = TRUE)
-    stop(e)
-  })
+  if(!is_full_path(proj_name)) stop("Need absolute path")
+  #if(file.exists(proj_name)) stop("project already exists")
+  if(!file.exists(proj_name)){
+    tryCatch({
+      message("Directory doesn't exist. Creating...")
+      dir.create(proj_name)
+      file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj_name,recursive=TRUE)
+      if(!TRUE %in% file.info(proj_name)$isdir) stop(paste(proj_name,"not created"))
+      if(!project_library) unlink(file.path(proj_name,"ProjectLibrary"),recursive = TRUE)
+    },
+    error=function(e){
+      message("Aborting. Reversing changes...")
+      unlink(proj_name,recursive = TRUE)
+      stop(e)
+    })
+  } else {
+    message("Directory exists. Merging...")
+    file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj_name,recursive=TRUE,overwrite = FALSE)
+    if(!project_library) {
+      contents <- dir(file.path(proj_name,"ProjectLibrary"),include.dirs = TRUE,all.files = TRUE)
+      contents <- contents[!contents %in% c(".","..")]
+      contents <- contents[!grepl("Readme\\.txt$",contents)]
+      if(length(contents)>0) stop("ProjectLibrary not empty. Will not delete. Rerun with project_library=TRUE")
+      unlink(file.path(proj_name,"ProjectLibrary"),recursive = TRUE)
+    }
+  }
   if(getOption("git.exists")){
-    bare.proj.name <- gsub(basename(proj.name),paste0(basename(proj.name),".git"),proj.name)
+    currentwd <- getwd() ; on.exit(setwd(currentwd))
+    setwd(proj_name)
+    bare_proj_name <- gsub(basename(proj_name),paste0(basename(proj_name),".git"),proj_name)
     tryCatch({
       r <- git2r::init(".")
       s <- unique(c(".Rproj.user",".Rhistory",".RData",getOption("git.ignore.files")))
@@ -186,34 +175,36 @@ make_project <- function(proj.name){ ## must be full path.
     error=function(e){
       setwd(currentwd)
       message("Aborting. Reversing changes...")
-      unlink(proj.name,recursive = TRUE)
-      unlink(bare.proj.name,recursive = TRUE)
+      unlink(proj_name,recursive = TRUE)
+      unlink(bare_proj_name,recursive = TRUE)
       stop(e)
     })
   }
-  message("TidyProject directory created")
+  message(paste("TidyProject directory ready:",proj_name))
   message("----------------------------------------------------")
   message("")
   message("INSTRUCTIONS:")
-  message(paste("1. Open Rstudio project to start working: ",proj.name))
-  message(paste("2. Install TidyProject package into project library"))
-
+  message(paste("1. Open Rstudio project to start working: ",proj_name))
+  if(project_library){
+    message(paste("2. (recommended) Install TidyProject package in project library"))
+    message(paste("   (to use disable project library, rerun make_project() with project_library=FALSE)"))
+  }
 }
 
 #' create local bare repository
 #' @export
-make_local_bare <- function(proj.name=getwd()){
+make_local_bare <- function(proj_name=getwd()){
   currentwd <- getwd() ; on.exit(setwd(currentwd))
-  setwd(proj.name)
+  setwd(proj_name)
   status <- git2r::status()
-  if(FALSE %in% grepl("^\\.",status$untracked)) stop("untracked, non-hidden files detected. Create bare repositories manually.")
+  if(length(status$untracked)>0) stop("untracked files detected. Create bare repositories manually.")
   if(length(status$unstaged)>0) stop("commit changes before continuing")
-  proj.name.full <- getwd()
-  bare.proj.name.full <- paste0(proj.name.full,".git")
-  git2r::clone(proj.name.full,bare.proj.name.full,bare = TRUE)
+  proj_name_full <- getwd()
+  bare_proj_name_full <- paste0(proj_name_full,".git")
+  git2r::clone(proj_name_full,bare_proj_name_full,bare = TRUE)
   setwd("../")
-  unlink(proj.name,recursive = TRUE)
-  git2r::clone(bare.proj.name.full,proj.name.full)
+  unlink(proj_name,recursive = TRUE)
+  git2r::clone(bare_proj_name_full,proj_name_full)
 }
 
 #' Test if full path
@@ -227,3 +218,25 @@ make_local_bare <- function(proj.name=getwd()){
 #' }
 
 is_full_path <- function(x) grepl("^(~|/|\\\\|([a-zA-Z]:))",x,perl=TRUE)
+
+#' Create new R script
+#' @export
+new_script <- function(name,overwrite=FALSE){ ## create black script with comment fields. Add new_script to git
+  if(name!=basename(name)) stop("name must not be a path")
+  to.path <- file.path(getOption("scripts.dir"),name)  ## destination path
+  if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
+  s <- c(paste0("## ","Author: ",user()),
+         paste0("## ","First created: ",Sys.Date()),
+         paste0("## ","Description: "),
+         paste0("## ","Depends on: "),
+         paste0("## ","Keywords: "),
+         "","########################################",
+         "## load packages and source functions here","",
+         paste0("library(TidyProject)"),
+         "","########################################",
+         "## main script here","")
+  writeLines(s,to.path)
+  setup_file(to.path)
+  file.edit(to.path) ## open file
+}
+

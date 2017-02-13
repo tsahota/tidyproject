@@ -4,10 +4,10 @@
 \alias{make_project}
 \title{Create new_project}
 \usage{
-make_project(proj.name)
+make_project(proj_name, project_library = TRUE)
 }
 \arguments{
-\item{proj.name}{character string of full path to new_project}
+\item{proj_name}{character string of full path to new_project}
 }
 \description{
 Creates directory structure.  User install TidyProject again in
