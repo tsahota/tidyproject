@@ -205,7 +205,6 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
   message(paste("1. Open Rstudio project to start working: ",proj_name))
   if(project_library){
     message(paste("2. (recommended) Install TidyProject package in project library"))
-    message(paste("   (to use disable project library, rerun make_project() with project_library=FALSE)"))
   }
 }
 
