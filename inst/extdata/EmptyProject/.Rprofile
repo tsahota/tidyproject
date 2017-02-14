@@ -1,13 +1,14 @@
 if(file.exists("ProjectLibrary")){
-  .libPaths(c(file.path("ProjectLibrary"),.libPaths()))
+  user.lib <- Sys.getenv("R_LIBS_USER")
+  if(!user.lib == "") user.lib <- normalizePath(user.lib)
+  currentlibPaths <- .libPaths()
+  .libPaths(c("ProjectLibrary",currentlibPaths[!currentlibPaths %in% user.lib]))
   message(paste("TidyProject package library set to: ",normalizePath("ProjectLibrary")))
   if(file.exists(file.path("ProjectLibrary","TidyProject"))) {
     library("TidyProject")
     message("TidyProject loaded")
   } else {
     message("TidyProject package is not installed in project library")
-    message("It is stongly recommended to (re)install into project library e.g.")
-    message("   install.packages(\"TidyProject\") OR ")
-    message("   install.packages(\"path/to/TidyProject/source\",repo=NULL)")
+    message("Recommended: install into project library (e.g. install.packages(\"TidyProject\"))")
   }
 }

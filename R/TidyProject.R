@@ -139,7 +139,8 @@ setup_file <- function(file.name){
 make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
   ## User function: create new_project
   if(!is_full_path(proj_name)) stop("Need absolute path")
-  if(!file.exists(proj_name)){
+  new_proj <- !file.exists(proj_name)
+  if(new_proj){
     tryCatch({
       message("Directory doesn't exist. Creating...")
       dir.create(proj_name)
@@ -154,6 +155,15 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
     })
   } else {
     message("Directory exists. Merging...")
+    ## find common files that wont be overwritten.
+    all_templates <- dir(system.file("extdata/EmptyProject",package="TidyProject"),include.dirs = TRUE,all.files = TRUE,recursive = TRUE)
+    all_existing <- dir(proj_name,include.dirs = TRUE,all.files = TRUE,recursive = TRUE)
+
+    merge_conf <- intersect(all_templates,all_existing)
+    message("\n---Merge conflict on files/folders (will not replace)---:\n")
+    message(paste(merge_conf,collapse = "\n"))
+    message("")
+
     file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj_name,recursive=TRUE,overwrite = FALSE)
     if(!project_library) {
       contents <- dir(file.path(proj_name,"ProjectLibrary"),include.dirs = TRUE,all.files = TRUE)
@@ -169,12 +179,16 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
     bare_proj_name <- gsub(basename(proj_name),paste0(basename(proj_name),".git"),proj_name)
     tryCatch({
       r <- git2r::init(".")
-      s <- unique(c(".Rproj.user",".Rhistory",".RData",getOption("git.ignore.files")))
-      write(s,".gitignore")
+      if(!file.exists(".gitignore")){
+        s <- unique(c(".Rproj.user",".Rhistory",".RData",getOption("git.ignore.files")))
+        write(s,".gitignore")
+      }
       paths <- unlist(git2r::status(r))
-      git2r::add(r, paths)
-      git2r::config(r, user.name=Sys.info()["user"], user.email=getOption("user.email"))
-      git2r::commit(r, "initialise_repository")
+      if(length(git2r::reflog(r,verbose = FALSE))==0){
+        git2r::add(r, paths)
+        git2r::config(r, user.name=Sys.info()["user"], user.email=getOption("user.email"))
+        git2r::commit(r, "initialise_repository")
+      }
     },
     error=function(e){
       setwd(currentwd)
