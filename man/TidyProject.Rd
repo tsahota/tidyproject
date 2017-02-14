@@ -40,13 +40,11 @@ Compatible with git - optional
 }
 \examples{
 \dontrun{
-new_project("~/AZDXXXX/PKAE1")          ## creates new_project
+make_project("~/AZDXXXX/PKAE1")         ## creates new_project
 code_library()                          ## display summary of code_library
 copy_script("nm.log.R")                 ## copy_script from code_library to project
 preview("nm.log.R")                     ## preview file in code_library
 
-copy_control("ADVAN2.mod","run1.mod")   ## copy template from code_library
-copy_control("run1.mod","run2.mod")     ## create run2.mod from run1.mod
 new_script("test.R")                    ## Creates empty test.R
 copy_script("output.data.R")            ## copies from code_library
 copy_script("../pathto/script.R")       ## copies from other location
