@@ -74,7 +74,7 @@ NULL
 set_project_opts <- function(){
   ## Internal function: will set all global variables
   ## put as much AZ specific code in here.
-  #if(is.null(getOption("code_library.loc"))) options(code_library.loc= system.file("extdata/CodeLibrary",package = "TidyProject"))
+  #if(is.null(getOption("code_library_paths"))) options(code_library_paths= system.file("extdata/CodeLibrary",package = "TidyProject"))
   if(is.null(getOption("code_library_paths"))) options(code_library_paths=c(""))
   if(is.null(getOption("scripts.dir"))) options(scripts.dir="Scripts")
   if(is.null(getOption("models.dir"))) options(models.dir="Models")
@@ -258,3 +258,169 @@ new_script <- function(name,overwrite=FALSE){ ## create black script with commen
   file.edit(to.path) ## open file
 }
 
+## how to have multiple paths on the code_library
+## Can add them in order to the search path
+
+#' Create a recursive dependency_tree of file names
+#'
+#' Used by copy_script. Creates an an ordered vector of script dependencies.
+dependency_tree <- function(from, ## a file name (full path or a script in current directory)
+                            already.got=NULL){
+  ## This is a difficult to understand function - it's recursive
+  if(!file.exists(from)) stop("can't find \"from\" file")
+  suppressWarnings(s0 <- readLines(from))
+  depends.on <- s0[grepl("^[#; ]*Depends on: (.*)$",s0)]
+  depends.on <- gsub("^[#; ]*Depends on: (.*)$","\\1",depends.on)
+  if(length(depends.on)==0) return()
+  depends.on <- strsplit(depends.on,",")[[1]]
+  depends.on <- gsub("^\\s(.*)$","\\1",depends.on)
+  if(!identical(depends.on,basename(depends.on))) stop("Can't read dependencies as full paths")
+  if(length(intersect(depends.on,c(basename(from),already.got)))>0) stop("Circular dependency detected")
+  ## recursively call function
+  depends.on <- c(unlist(sapply(depends.on,function(i)dependency_tree(file.path(dirname(from),i),depends.on))),
+                  depends.on)
+  names(depends.on) <- NULL
+  depends.on
+}
+
+#' copy_script
+#' @export
+copy_script <- function(from,to,dependencies=TRUE,stamp.copy=TRUE,overwrite=FALSE,comment_char="#"){
+  ## User function: copies script from one location (e.g. code_library) to project scripts directory
+  if(missing(to)) to <- basename(from)
+  if(to!=basename(to)) stop("name must not be a path")
+  to.path <- file.path(getOption("scripts.dir"),to)  ## destination path
+  if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
+
+  from <- locate_file(from,c(getOption("scripts.dir"),
+                             getOption("code_library_paths")))
+
+  ## assume dependencies are in the same directory: dirname(from)
+  ## dependencies should not be from current directory
+  if(dependencies){
+    depends.on <- dependency_tree(from)
+    if(length(depends.on)>0) message("Copying dependencies...")
+    for(i in depends.on) {
+      if(file.exists(file.path(getOption("scripts.dir"),i))) message(paste("Dependency",file.path(getOption("scripts.dir"),i),"already exists. Will not overwrite")) else
+        copy_script(file.path(dirname(from),i),dependencies=FALSE)
+    }
+  }
+  suppressWarnings(s0 <- readLines(from))
+  ## modify text at top of "from"
+  if(dirname(from)==".") from.path <- file.path(getwd(),from) else from.path <- from
+  if(stamp.copy) s <- c(paste0(comment_char,comment_char," Copied from ",from.path," (",Sys.time(),") by ",user()),s0) else
+    s <- s0
+  writeLines(s,to.path)
+  setup_file(to.path)
+}
+
+#' List scripts
+#'
+#' @param folder string describing folder to search recursively in
+#' @param extn character (can be regex) giving extension to limit search to
+#' @param recursive by default TRUE
+#' @examples
+#' \dontrun{
+#' ls_scripts("~/AZD6094/PK_liver4/") %>%
+#'   info_scripts("Description") %>%
+#'   filter(grepl("mod",DESCRIPTION))
+#' }
+#' @export
+
+ls_scripts <- function(folder=".",extn="r|R|mod",recursive=TRUE){
+  file.name <- paste0("\\.(",extn,")$")
+  dir0 <- dir(folder,recursive=recursive)
+  file.path(gsub("^(.*[^/])/*$","\\1",folder),dir0[grepl(file.name,dir0)])
+}
+
+#' List information about scripts
+#'
+#' @param files vector string of file names/paths
+#' @param fields vector string of field tags to display
+#' @examples
+#' \dontrun{
+#' ls_scripts("~/AZD6094/PK_liver4/") %>%
+#'   info_scripts("Description") %>%
+#'   filter(grepl("mod",DESCRIPTION))
+#' }
+#' @export
+info_scripts <- function(files,fields=c("Description","Keywords")){
+  res <- plyr::ldply(files,function(file.name){ ## per file
+    suppressWarnings({
+      s <- readLines(file.name)
+      ## make data.frame
+      ## e.g. Description Keywords
+      #           XXXX      YYYY
+      field.vals <- as.data.frame(lapply(fields,function(field){
+        field <- gsub(paste0("^.*",field,": (.*)$"),"\\1",s[grepl(paste0("^.*",field,": "),s)])
+        if(length(field)==0) field <- NA
+        field <- field[1]  ## in case multiple, take only first
+        as.character(field)
+      }))
+      names(field.vals) <- fields
+    })
+    field.vals
+  })
+  cbind(data.frame(FOLDER=dirname(files),NAME=basename(files)),res)
+}
+
+#' Search for string in files
+#'
+#' @param files vector string of file names/paths
+#' @param text string (can be regex) to search for
+#' @export
+
+search_scripts <- function(files,text){
+  res <- unlist(sapply(files,function(file.name){
+    suppressWarnings(s <- readLines(file.name))
+    if(suppressWarnings(length(grep(text,s))==0)) return(NULL) else return(file.name)
+  }))
+  names(res) <- NULL
+  res
+}
+
+#' Show Code Library
+#'
+#' @param extn vector string of extensions to include
+#' @export
+code_library <- function(extn="mod|R|scm") {
+  files <- ls_scripts(extn,folder=getOption("code_library_paths"),
+                      recursive=TRUE)
+  info_scripts(files,fields = "Description")
+}
+
+
+#' Preview code_library file
+#' @param name character indicating script in code_library to preview
+#' @export
+preview <- function(name) {  ## preview files in code_library
+  d <- code_library()
+  if(is.numeric(name)) path <- file.path(d$FOLDER[name],d$NAME[name]) else {
+    if(!name %in% d$NAME) stop("file not found in code_library")
+    pos <- match(name,d$NAME)
+    path <- file.path(d$FOLDER[pos],d$NAME[pos])
+  }
+  file.show(path)
+}
+
+
+#' Locate file from search path
+#'
+#' Finds first file in search.path that exists
+#' @param x string for file name
+#' @param search.path vector of strings giving search path
+#' @return Path of located file.  Returns error if file not found.
+#' @examples
+#' \dontrun{
+#' locate_file("script.R",c(".","Scripts")) ## looks in current working directory, then Scripts folder
+#' }
+locate_file <- function(x,search.path=c(".")){
+  ## internal function: locate_file from an ordered vector of directories
+  x0 <- x
+  if(file.exists(x0)) return(x0)
+  for(dir in search.path){
+    x <- file.path(dir,basename(x0))
+    if(file.exists(x)) return(x)
+  }
+  stop(paste(x0,"file not found"))
+}
