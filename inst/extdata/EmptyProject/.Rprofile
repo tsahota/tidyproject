@@ -1,8 +1,5 @@
 if(file.exists("ProjectLibrary")){
-  .user_lib <- Sys.getenv("R_LIBS_USER")
-  if(!.user_lib == "") .user_lib <- normalizePath(.user_lib)
-  .currentlibPaths <- .libPaths()
-  .libPaths(c("ProjectLibrary",.currentlibPaths[!.currentlibPaths %in% .user_lib]))
+  .libPaths(c("ProjectLibrary",.Library.site,.Library))
   message(paste("TidyProject package library set to: ",normalizePath("ProjectLibrary")))
   if(file.exists(file.path("ProjectLibrary","TidyProject"))) {
     library("TidyProject")

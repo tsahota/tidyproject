@@ -56,7 +56,6 @@ NULL
 ##  Definition of an external code_library
 ##   Search and copying functionality
 ##  new_code_file, copy_code_file
-##
 
 ## It can refer to a code.library.
 ## make a search path for this.
@@ -138,7 +137,6 @@ setup_file <- function(file.name){
 #' @export
 make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
   ## User function: create new_project
-  if(!is_full_path(proj_name)) stop("Need absolute path")
   new_proj <- !file.exists(proj_name)
   if(new_proj){
     tryCatch({
