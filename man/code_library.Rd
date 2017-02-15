@@ -4,10 +4,12 @@
 \alias{code_library}
 \title{Show Code Library}
 \usage{
-code_library(extn = "mod|R|scm")
+code_library(extn = "mod|R|scm", fields = "Description")
 }
 \arguments{
 \item{extn}{vector string of extensions to include}
+
+\item{fields}{character vector of fields to extract}
 }
 \description{
 Show Code Library

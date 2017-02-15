@@ -200,7 +200,7 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
   message("INSTRUCTIONS:")
   message(paste("1. Open Rstudio project to start working: ",proj_name))
   if(project_library){
-    message(paste("2. (recommended) Install TidyProject package in project library"))
+    message(paste("2. (optional) Install TidyProject package in project library"))
   }
 }
 
@@ -380,11 +380,13 @@ search_scripts <- function(files,text){
 #' Show Code Library
 #'
 #' @param extn vector string of extensions to include
+#' @param fields character vector of fields to extract
 #' @export
-code_library <- function(extn="mod|R|scm") {
+code_library <- function(extn="mod|R|scm",fields = "Description") {
+  if(!is.null(getOption("code_library_path"))) message("No code library available. Attach one with")
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
-  info_scripts(files,fields = "Description")
+  info_scripts(files,fields = fields)
 }
 
 
@@ -424,16 +426,81 @@ locate_file <- function(x,search.path=c(".")){
 }
 
 
+#' Display code library search path
+#'
+#' @export
+
+code_library_path <- function() getOption("code_library_path")
+
 #' Attach code library
 #'
 #' Attaches a path(s) to to the code library search path
 #'
 #' @param path character vector with paths to attach to
-#' @param replace logical (default = FALSE) indicating if entire code library search path is replaced,
-#' or if only appending to beginning of current search path
 #' @export
 
-attach_code_library <- function(path,replace=FALSE){
-  if(replace) options("code_library_path"=unique(path)) else
+attach_code_library <- function(path){
     options("code_library_path"=unique(c(path,getOption("code_library_path"))))
+}
+
+#' Replaces code library
+#'
+#' Replace code library search path with path(s)
+#'
+#' @param path character vector with paths to attach to
+#' @export
+
+replace_code_library <- function(path){
+  options("code_library_path"=unique(path))
+}
+
+
+#' Make R session record
+#'
+#' Create a record of the R version and package versions used in a particular NMproject
+#'
+#' @export
+Renvironment_info <- function(){
+
+  scripts.dir <- getOption("scripts.dir")
+  scripts <- ls_scripts(scripts.dir)
+
+  text <- lapply(scripts,readLines)
+  text <- unlist(text)
+
+  lib_statements1 <- text[grep("\\blibrary\\([^)]+\\)",text)]
+  lib_statements1 <- gsub(".*(library\\([^)]+\\)).*","\\1",lib_statements1)
+  ## remove reasons why lib_statements1 may be different (e.g. spaces)
+  lib_statements1 <- gsub("\\s","",lib_statements1)
+  lib_statements1 <- gsub("\\\\","",lib_statements1) ## no statement should have \\
+  lib_statements1 <- unique(lib_statements1)
+
+  lib_statements2 <- text[grep("\\brequire\\([^)]+\\)",text)]
+  lib_statements2 <- gsub(".*(require\\([^)]+\\)).*","\\1",lib_statements2)
+  ## remove reasons why lib_statements2 may be different (e.g. spaces)
+  lib_statements2 <- gsub("\\s","",lib_statements2)
+  lib_statements2 <- gsub("\\\\","",lib_statements2) ## no statement should have \\
+  lib_statements2 <- unique(lib_statements2)
+
+  lib_statements3 <- text[grep("\\w+\\s*::",text)]
+  lib_statements3 <- gsub(".*[ (+-](\\w+)\\s*::.*","\\1",lib_statements3)
+  lib_statements3 <- gsub("\\s","",lib_statements3)
+  lib_statements3 <- unique(lib_statements3)
+  lib_statements3 <- paste0("library(",lib_statements3,")")
+
+  lib_statements <- c(lib_statements1,lib_statements2,lib_statements3)
+
+  script <- c(
+    "## This script will generate a sessionInfo for project",
+    "",
+    "## Load all packages ",
+    lib_statements,
+    "",
+    "write(sessionInfo(),file=\"RenvironmentInfo.txt\")"
+  )
+
+  write(script,file=file.path(scripts.dir,"RenvironmentInfo.R"))
+  message(paste0("script produced: ",file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
+  message("view file and source to produce RenvironmentInfo.txt")
+
 }
