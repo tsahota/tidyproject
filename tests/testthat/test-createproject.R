@@ -33,3 +33,10 @@ test_that("Project is created",{
   cleanup(proj_name)
 })
 
+test_that("Project is created",{
+  cleanup(proj_name)
+  make_project(proj_name)
+  currentwd <- getwd() ; on.exit(setwd(currentwd))
+  setwd(proj_name)
+  expect_true(file.exists("ProjectLibrary"))
+})

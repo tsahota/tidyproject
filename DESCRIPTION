@@ -6,10 +6,10 @@ Authors@R: person("Tarj", "Sahota", email =
     "tarjinder.sahota@astrazeneca.com", role = c("aut", "cre"))
 Maintainer: Tarj Sahota <tarjinder.sahota@astrazeneca.com>
 Description: TidyProject is designed to manage tidy project directories and
-  facilitate reproducibility and reuse of code.
+    facilitate reproducibility and reuse of code.
 License: GPL-3 | file LICENSE
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Suggests:
-  testthat,
-  git2r
+    testthat,
+    git2r
