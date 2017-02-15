@@ -4,7 +4,7 @@
 \alias{new_script}
 \title{Create new R script}
 \usage{
-new_script(name, overwrite = FALSE)
+new_script(name, overwrite = FALSE, silent = FALSE)
 }
 \arguments{
 \item{name}{character indicating name of script to create}

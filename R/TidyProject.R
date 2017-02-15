@@ -74,8 +74,6 @@ NULL
 set_project_opts <- function(){
   ## Internal function: will set all global variables
   ## put as much AZ specific code in here.
-  #if(is.null(getOption("code_library_paths"))) options(code_library_paths= system.file("extdata/CodeLibrary",package = "TidyProject"))
-  if(is.null(getOption("code_library_paths"))) options(code_library_paths=c(""))
   if(is.null(getOption("scripts.dir"))) options(scripts.dir="Scripts")
   if(is.null(getOption("models.dir"))) options(models.dir="Models")
   if(is.null(getOption("git.exists"))) options(git.exists=requireNamespace("git2r", quietly = TRUE))
@@ -239,7 +237,7 @@ is_full_path <- function(x) grepl("^(~|/|\\\\|([a-zA-Z]:))",x,perl=TRUE)
 #' @param name character indicating name of script to create
 #' @param overwrite logical indicating whether to overwrite existing file (default=FALSE)
 #' @export
-new_script <- function(name,overwrite=FALSE){ ## create black script with comment fields. Add new_script to git
+new_script <- function(name,overwrite=FALSE,silent=FALSE){ ## create black script with comment fields. Add new_script to git
   if(name!=basename(name)) stop("name must not be a path")
   to.path <- file.path(getOption("scripts.dir"),name)  ## destination path
   if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
@@ -255,7 +253,7 @@ new_script <- function(name,overwrite=FALSE){ ## create black script with commen
          "## main script here","")
   writeLines(s,to.path)
   setup_file(to.path)
-  file.edit(to.path) ## open file
+  if(!silent) file.edit(to.path)
 }
 
 ## how to have multiple paths on the code_library
@@ -293,7 +291,7 @@ copy_script <- function(from,to,dependencies=TRUE,stamp.copy=TRUE,overwrite=FALS
   if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
 
   from <- locate_file(from,c(getOption("scripts.dir"),
-                             getOption("code_library_paths")))
+                             getOption("code_library_path")))
 
   ## assume dependencies are in the same directory: dirname(from)
   ## dependencies should not be from current directory
@@ -308,7 +306,7 @@ copy_script <- function(from,to,dependencies=TRUE,stamp.copy=TRUE,overwrite=FALS
   suppressWarnings(s0 <- readLines(from))
   ## modify text at top of "from"
   if(dirname(from)==".") from.path <- file.path(getwd(),from) else from.path <- from
-  if(stamp.copy) s <- c(paste0(comment_char,comment_char," Copied from ",from.path," (",Sys.time(),") by ",user()),s0) else
+  if(stamp.copy) s <- c(paste0(comment_char,comment_char," Copied from ",from.path," (",Sys.time(),") by ",Sys.info()["user"]),s0) else
     s <- s0
   writeLines(s,to.path)
   setup_file(to.path)
@@ -384,7 +382,7 @@ search_scripts <- function(files,text){
 #' @param extn vector string of extensions to include
 #' @export
 code_library <- function(extn="mod|R|scm") {
-  files <- ls_scripts(extn,folder=getOption("code_library_paths"),
+  files <- ls_scripts(extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
   info_scripts(files,fields = "Description")
 }
@@ -423,4 +421,19 @@ locate_file <- function(x,search.path=c(".")){
     if(file.exists(x)) return(x)
   }
   stop(paste(x0,"file not found"))
+}
+
+
+#' Attach code library
+#'
+#' Attaches a path(s) to to the code library search path
+#'
+#' @param path character vector with paths to attach to
+#' @param replace logical (default = FALSE) indicating if entire code library search path is replaced,
+#' or if only appending to beginning of current search path
+#' @export
+
+attach_code_library <- function(path,replace=FALSE){
+  if(replace) options("code_library_path"=unique(path)) else
+    options("code_library_path"=unique(c(path,getOption("code_library_path"))))
 }

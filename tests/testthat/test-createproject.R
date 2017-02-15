@@ -15,15 +15,7 @@ test_that("Project is created",{
   cleanup(proj_name)
 
   expect_false(file.exists(proj_name))
-  expect_error(make_project(basename(proj_name)))
 
-  make_project(proj_name)
-
-  expect_true(file.exists(proj_name))
-  expect_true(is_tidy_project(proj_name))
-  expect_true(file.exists(file.path(proj_name,"ProjectLibrary")))
-
-  cleanup(proj_name)
   make_project(proj_name,project_library = FALSE)
 
   expect_true(is_tidy_project(proj_name))
@@ -31,12 +23,68 @@ test_that("Project is created",{
   expect_false(file.exists(file.path(proj_name,"ProjectLibrary")))
 
   cleanup(proj_name)
+
+  make_project(proj_name)
+
+  expect_true(file.exists(proj_name))
+  expect_true(is_tidy_project(proj_name))
+  expect_true(file.exists(file.path(proj_name,"ProjectLibrary")))
+
+  #cleanup(proj_name)
 })
 
-test_that("Project is created",{
-  cleanup(proj_name)
-  make_project(proj_name)
+test_that("global variables look OK",{
+
+  expect_true(!is.null(getOption("scripts.dir")))
+  expect_true(!is.null(getOption("models.dir")))
+
+})
+
+test_that(".Rprofile works",{
+
   currentwd <- getwd() ; on.exit(setwd(currentwd))
   setwd(proj_name)
+
+  expect_true(file.exists(".Rprofile"))
+  .libPathsOld <- .libPaths()
+  source(".Rprofile")
+
+  expect_true(normalizePath(.libPaths()[1])==normalizePath("ProjectLibrary"))
+  expect_false(normalizePath(Sys.getenv("R_LIBS_USER")) %in% .libPaths())
+
+})
+
+test_that("Project has basic functionality",{
+  currentwd <- getwd() ; on.exit(setwd(currentwd))
+  setwd(proj_name)
+
   expect_true(file.exists("ProjectLibrary"))
+
+  new_script("test.R",silent = TRUE)
+  expect_true(file.exists(file.path(getOption("scripts.dir"),"test.R")))
+
+  dir.create("code_lib_test")
+
+  code_library_path_old <- getOption("code_library_path")
+  expect_true(is.null(code_library_path_old))
+
+  attach_code_library("code_lib_test")
+  expect_true(normalizePath("code_lib_test") %in% normalizePath(getOption("code_library_path")))
+
+  write("test",file=file.path("code_lib_test","test2.R"))
+
+  expect_true(file.exists(file.path("code_lib_test","test2.R")))
+
+  clib <- code_library()
+  expect_true("data.frame" %in% class(clib))
+  expect_true(nrow(clib)==1)
+
+  copy_script("test2.R")
+  expect_true(file.exists(file.path(getOption("scripts.dir"),"test2.R")))
+
+  file_contents <- readLines(file.path(getOption("scripts.dir"),"test2.R"))
+  expect_true(length(file_contents)==2)
+
+  attach_code_library(NULL,replace = TRUE)
+  expect_true(is.null(getOption("code_library_path")))
 })
