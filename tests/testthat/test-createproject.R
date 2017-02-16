@@ -71,6 +71,7 @@ test_that("Code library",{
 
   dir.create("code_lib_test")
 
+  replace_code_library(NULL)
   code_library_path_old <- getOption("code_library_path")
   expect_true(is.null(code_library_path_old))
 
@@ -108,7 +109,7 @@ test_that("Code library",{
   expect_true(file.exists(file.path(getOption("scripts.dir"),"test2.R")))
 
   file_contents <- readLines(file.path(getOption("scripts.dir"),"test2.R"))
-  expect_true(length(file_contents)==3)
+  expect_true(length(file_contents)>2)
 
   replace_code_library(NULL)
   expect_true(is.null(getOption("code_library_path")))
