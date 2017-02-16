@@ -5,6 +5,6 @@ if(file.exists("ProjectLibrary")){
     library("TidyProject")
     message("TidyProject loaded")
   } else {
-    warning("TidyProject package is not installed in project library")
+    message("TidyProject package is not installed in project library")
   }
 }

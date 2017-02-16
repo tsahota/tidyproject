@@ -285,13 +285,20 @@ dependency_tree <- function(from, ## a file name (full path or a script in curre
 #' @export
 copy_script <- function(from,to,dependencies=TRUE,stamp.copy=TRUE,overwrite=FALSE,comment_char="#"){
   ## User function: copies script from one location (e.g. code_library) to project scripts directory
+  onlyfrom <- missing(to)
   if(missing(to)) to <- basename(from)
   if(to!=basename(to)) stop("name must not be a path")
   to.path <- file.path(getOption("scripts.dir"),to)  ## destination path
   if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
 
-  from <- locate_file(from,c(getOption("scripts.dir"),
-                             getOption("code_library_path")))
+  if(onlyfrom){
+    search_path <- getOption("code_library_path")
+  } else {
+    search_path <- c(getOption("scripts.dir"),
+                     getOption("code_library_path"))
+  }
+
+  from <- locate_file(from,search_path = search_path)
 
   ## assume dependencies are in the same directory: dirname(from)
   ## dependencies should not be from current directory
@@ -383,7 +390,10 @@ search_scripts <- function(files,text){
 #' @param fields character vector of fields to extract
 #' @export
 code_library <- function(extn="mod|R|scm",fields = "Description") {
-  if(!is.null(getOption("code_library_path"))) message("No code library available. Attach one with")
+  if(is.null(getOption("code_library_path"))) {
+    message("No code library available. Attach one with")
+    return(data.frame())
+  }
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
   info_scripts(files,fields = fields)
@@ -406,19 +416,19 @@ preview <- function(name) {  ## preview files in code_library
 
 #' Locate file from search path
 #'
-#' Finds first file in search.path that exists
+#' Finds first file in search_path that exists
 #' @param x string for file name
-#' @param search.path vector of strings giving search path
+#' @param search_path vector of strings giving search path
 #' @return Path of located file.  Returns error if file not found.
 #' @examples
 #' \dontrun{
 #' locate_file("script.R",c(".","Scripts")) ## looks in current working directory, then Scripts folder
 #' }
-locate_file <- function(x,search.path=c(".")){
+locate_file <- function(x,search_path=c(".")){
   ## internal function: locate_file from an ordered vector of directories
   x0 <- x
   if(file.exists(x0)) return(x0)
-  for(dir in search.path){
+  for(dir in search_path){
     x <- file.path(dir,basename(x0))
     if(file.exists(x)) return(x)
   }
@@ -486,7 +496,7 @@ Renvironment_info <- function(){
   lib_statements3 <- gsub(".*[ (+-](\\w+)\\s*::.*","\\1",lib_statements3)
   lib_statements3 <- gsub("\\s","",lib_statements3)
   lib_statements3 <- unique(lib_statements3)
-  lib_statements3 <- paste0("library(",lib_statements3,")")
+  if(length(lib_statements3)>0) lib_statements3 <- paste0("library(",lib_statements3,")")
 
   lib_statements <- c(lib_statements1,lib_statements2,lib_statements3)
 
@@ -496,7 +506,7 @@ Renvironment_info <- function(){
     "## Load all packages ",
     lib_statements,
     "",
-    "write(sessionInfo(),file=\"RenvironmentInfo.txt\")"
+    "writeLines(capture.output(sessionInfo()), \"RenvironmentInfo.txt\")"
   )
 
   write(script,file=file.path(scripts.dir,"RenvironmentInfo.R"))

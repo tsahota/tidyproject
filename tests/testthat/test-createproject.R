@@ -63,28 +63,63 @@ test_that("Project has basic functionality",{
   new_script("test.R",silent = TRUE)
   expect_true(file.exists(file.path(getOption("scripts.dir"),"test.R")))
 
+})
+
+test_that("Code library",{
+  currentwd <- getwd() ; on.exit(setwd(currentwd))
+  setwd(proj_name)
+
   dir.create("code_lib_test")
 
   code_library_path_old <- getOption("code_library_path")
   expect_true(is.null(code_library_path_old))
 
+  expect_message(code_library())
+  x <- code_library()
+  expect_true(is.data.frame(x) & nrow(x)==0)
+
   attach_code_library("code_lib_test")
+  expect_true(code_library_path()=="code_lib_test")
   expect_true(normalizePath("code_lib_test") %in% normalizePath(getOption("code_library_path")))
 
-  write("test",file=file.path("code_lib_test","test2.R"))
+  write(c("## Description: abc",
+          "## Depends on: "),file=file.path("code_lib_test","test2.R"))
+
+  write(c("## Description: def",
+          "## Depends on: test2.R"),file=file.path("code_lib_test","test3.R"))
+
+  write(c("## Description: hij",
+          "## Depends on: test2.R, test3.R"),file=file.path("code_lib_test","test4.R"))
+
+  write(c("## Description: klm",
+          "## Depends on: "),file=file.path("code_lib_test","test5.R"))
 
   expect_true(file.exists(file.path("code_lib_test","test2.R")))
 
   clib <- code_library()
   expect_true("data.frame" %in% class(clib))
-  expect_true(nrow(clib)==1)
+  expect_true(nrow(clib)==4)
+
+  clib <- code_library(fields = "Depends on")
+  expect_true("data.frame" %in% class(clib))
+  expect_true(nrow(clib)==4)
 
   copy_script("test2.R")
   expect_true(file.exists(file.path(getOption("scripts.dir"),"test2.R")))
 
   file_contents <- readLines(file.path(getOption("scripts.dir"),"test2.R"))
-  expect_true(length(file_contents)==2)
+  expect_true(length(file_contents)==3)
 
-  attach_code_library(NULL,replace = TRUE)
+  replace_code_library(NULL)
   expect_true(is.null(getOption("code_library_path")))
+})
+
+test_that("R session stamp",{
+
+  currentwd <- getwd() ; on.exit(setwd(currentwd))
+  setwd(proj_name)
+  Renvironment_info()
+  expect_true(file.exists(file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
+  source(file.path(getOption("scripts.dir"),"RenvironmentInfo.R"))
+
 })
