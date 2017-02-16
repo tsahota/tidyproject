@@ -4,18 +4,18 @@
 \alias{locate_file}
 \title{Locate file from search path}
 \usage{
-locate_file(x, search.path = c("."))
+locate_file(x, search_path = c("."))
 }
 \arguments{
 \item{x}{string for file name}
 
-\item{search.path}{vector of strings giving search path}
+\item{search_path}{vector of strings giving search path}
 }
 \value{
 Path of located file.  Returns error if file not found.
 }
 \description{
-Finds first file in search.path that exists
+Finds first file in search_path that exists
 }
 \examples{
 \dontrun{
