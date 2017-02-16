@@ -4,7 +4,5 @@ if(file.exists("ProjectLibrary")){
   if(file.exists(file.path("ProjectLibrary","TidyProject"))) {
     library("TidyProject")
     message("TidyProject loaded")
-  } else {
-    message("TidyProject package is not installed in project library")
   }
 }

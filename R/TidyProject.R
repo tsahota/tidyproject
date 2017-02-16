@@ -313,7 +313,7 @@ copy_script <- function(from,to,dependencies=TRUE,stamp.copy=TRUE,overwrite=FALS
   suppressWarnings(s0 <- readLines(from))
   ## modify text at top of "from"
   if(dirname(from)==".") from.path <- file.path(getwd(),from) else from.path <- from
-  if(stamp.copy) s <- c(paste0(comment_char,comment_char," Copied from ",from.path," (",Sys.time(),") by ",Sys.info()["user"]),s0) else
+  if(stamp.copy) s <- c(paste0(comment_char,comment_char," Copied from ",normalizePath(from.path),"\n##  (",Sys.time(),") by ",Sys.info()["user"]),s0) else
     s <- s0
   writeLines(s,to.path)
   setup_file(to.path)
@@ -366,7 +366,7 @@ info_scripts <- function(files,fields=c("Description","Keywords")){
     })
     field.vals
   })
-  cbind(data.frame(FOLDER=dirname(files),NAME=basename(files)),res)
+  cbind(data.frame(FOLDER=short_path(dirname(files)),NAME=basename(files)),res)
 }
 
 #' Search for string in files
@@ -391,7 +391,7 @@ search_scripts <- function(files,text){
 #' @export
 code_library <- function(extn="mod|R|scm",fields = "Description") {
   if(is.null(getOption("code_library_path"))) {
-    message("No code library available. Attach one with")
+    message("No directories attached. Attach with attach_code_library(\"path/to/dir/of/scripts\")")
     return(data.frame())
   }
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
@@ -506,11 +506,29 @@ Renvironment_info <- function(){
     "## Load all packages ",
     lib_statements,
     "",
-    "writeLines(capture.output(sessionInfo()), \"RenvironmentInfo.txt\")"
+    "txt <- c(paste0(\"## Created at \",Sys.time(),\" by \",Sys.info()[\"user\"],\"\\n\"))",
+    "txt <- c(txt,capture.output(sessionInfo()))",
+    "writeLines(txt, \"RenvironmentInfo.txt\")"
   )
 
   write(script,file=file.path(scripts.dir,"RenvironmentInfo.R"))
-  message(paste0("script produced: ",file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
-  message("view file and source to produce RenvironmentInfo.txt")
+  message(paste0("Script produced:           ",file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
+  source(file.path(getOption("scripts.dir"),"RenvironmentInfo.R"))
+  message(paste0("Environment info produced: RenvironmentInfo.txt"))
 
+}
+
+
+#' shorten path name
+short_path <- function(x){
+  ans <- strsplit(x,.Platform$file.sep)[[1]]
+  if(length(ans)>5) ans.short <- c(ans[1:3],"..",ans[(length(ans)-1):length(ans)]) else ans.short <- ans
+  do.call(file.path,as.list(ans.short))
+}
+
+#' rate my code
+#' @export
+
+rate_my_code <- function(){
+  stop("under construction")
 }
