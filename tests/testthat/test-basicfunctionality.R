@@ -10,7 +10,12 @@ cleanup <- function(proj_name){
 
 test_that("Project has basic functionality",{
 
-  cleanup(proj_name) ; make_project(proj_name)
+  currentwd <- getwd()
+  make_project(proj_name)
+  on.exit({
+    setwd(currentwd)
+    cleanup(proj_name)
+  })
 
   setwd(proj_name)
 
@@ -23,7 +28,12 @@ test_that("Project has basic functionality",{
 
 test_that("R session stamp",{
 
-  cleanup(proj_name) ; make_project(proj_name)
+  currentwd <- getwd()
+  make_project(proj_name)
+  on.exit({
+    setwd(currentwd)
+    cleanup(proj_name)
+  })
 
   setwd(proj_name)
   Renvironment_info()

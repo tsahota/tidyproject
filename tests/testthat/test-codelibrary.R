@@ -10,7 +10,12 @@ cleanup <- function(proj_name){
 
 test_that("Code library",{
 
-  cleanup(proj_name) ; make_project(proj_name)
+  currentwd <- getwd()
+  make_project(proj_name)
+  on.exit({
+    setwd(currentwd)
+    cleanup(proj_name)
+  })
 
   setwd(proj_name)
 
@@ -60,5 +65,4 @@ test_that("Code library",{
   replace_code_library(NULL)
   expect_true(is.null(getOption("code_library_path")))
 
-  cleanup(proj_name)
 })

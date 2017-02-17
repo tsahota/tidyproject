@@ -188,9 +188,11 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
     },
     error=function(e){
       setwd(currentwd)
-      message("Aborting. Reversing changes...")
-      unlink(proj_name,recursive = TRUE)
-      unlink(bare_proj_name,recursive = TRUE)
+      if(new_proj){
+        message("Aborting. Reversing changes...")
+        unlink(proj_name,recursive = TRUE)
+        unlink(bare_proj_name,recursive = TRUE)
+      }
       stop(e)
     })
   }
