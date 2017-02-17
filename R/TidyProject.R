@@ -120,7 +120,6 @@ setup_file <- function(file.name){
   Sys.chmod(file.name,mode = "744")  ## 744= read-write-executable for user, read only for others
   if(getOption("git.exists")) {
     git2r::add(git2r::repository("."),file.name)
-    #system_cmd(paste("git add",file.name))    ## add to git repository. Need git installed
     message(paste(file.name,"added to git"))
   } else message(paste(file.name,"created"))
 }
