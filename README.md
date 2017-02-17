@@ -1,5 +1,7 @@
 # TidyProject
 
+[![Travis-CI Build Status](https://travis-ci.org/tsahota/TidyProject.svg?branch=master)](https://travis-ci.org/tsahota/TidyProject)
+
 A light package providing:
  
 * Directory structure: a light, tidy project template for data analysis projects.
