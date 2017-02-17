@@ -97,11 +97,11 @@ test_that("Code library",{
 
   expect_true(file.exists(file.path("code_lib_test","test2.R")))
 
-  clib <- code_library()
+  clib <- code_library(silent=TRUE)
   expect_true("data.frame" %in% class(clib))
   expect_true(nrow(clib)==4)
 
-  clib <- code_library(fields = "Depends on")
+  clib <- code_library(fields = "Depends on",silent=TRUE)
   expect_true("data.frame" %in% class(clib))
   expect_true(nrow(clib)==4)
 

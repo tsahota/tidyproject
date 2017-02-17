@@ -4,12 +4,17 @@
 \alias{code_library}
 \title{Show Code Library}
 \usage{
-code_library(extn = "mod|R|scm", fields = "Description")
+code_library(extn = "r|R", fields = "Description", viewer = FALSE,
+  silent = FALSE)
 }
 \arguments{
 \item{extn}{vector string of extensions to include}
 
 \item{fields}{character vector of fields to extract}
+
+\item{viewer}{logical indicating if viewer should be used to display results (default=FALSE)}
+
+\item{silent}{logical indicating if results should be return silently (default=FALSE)}
 }
 \description{
 Show Code Library

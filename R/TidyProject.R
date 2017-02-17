@@ -342,6 +342,8 @@ ls_scripts <- function(folder=".",extn="r|R|mod",recursive=TRUE){
 #'
 #' @param files vector string of file names/paths
 #' @param fields vector string of field tags to display
+#' @param viewer logical indicating if Rstudio viewer should be used (default = TRUE)
+#' @param silent run in quiet mode (default=FALSE)
 #' @examples
 #' \dontrun{
 #' ls_scripts("~/AZD6094/PK_liver4/") %>%
@@ -349,7 +351,7 @@ ls_scripts <- function(folder=".",extn="r|R|mod",recursive=TRUE){
 #'   filter(grepl("mod",DESCRIPTION))
 #' }
 #' @export
-info_scripts <- function(files,fields=c("Description","Keywords")){
+info_scripts <- function(files,fields=c("Description","Keywords"),viewer=FALSE,silent=FALSE){
   res <- plyr::ldply(files,function(file.name){ ## per file
     suppressWarnings({
       s <- readLines(file.name)
@@ -366,7 +368,11 @@ info_scripts <- function(files,fields=c("Description","Keywords")){
     })
     field.vals
   })
-  cbind(data.frame(FOLDER=short_path(dirname(files)),NAME=basename(files)),res)
+  d <- cbind(data.frame(FOLDER=short_path(dirname(files)),NAME=basename(files)),res)
+  if(!silent){
+    if(viewer) View(d,"available files") else print(d)
+  }
+  invisible(cbind(data.frame(FOLDER=dirname(files),NAME=basename(files)),res))
 }
 
 #' Search for string in files
@@ -388,15 +394,17 @@ search_scripts <- function(files,text){
 #'
 #' @param extn vector string of extensions to include
 #' @param fields character vector of fields to extract
+#' @param viewer logical indicating if viewer should be used to display results (default=FALSE)
+#' @param silent logical indicating if results should be return silently (default=FALSE)
 #' @export
-code_library <- function(extn="mod|R|scm",fields = "Description") {
+code_library <- function(extn="r|R",fields = "Description",viewer=FALSE,silent=FALSE) {
   if(is.null(getOption("code_library_path"))) {
     message("No directories attached. Attach with attach_code_library(\"path/to/dir/of/scripts\")")
     return(data.frame())
   }
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
-  info_scripts(files,fields = fields)
+  info_scripts(files,fields = fields,viewer=viewer,silent=silent)
 }
 
 
@@ -404,7 +412,7 @@ code_library <- function(extn="mod|R|scm",fields = "Description") {
 #' @param name character indicating script in code_library to preview
 #' @export
 preview <- function(name) {  ## preview files in code_library
-  d <- code_library()
+  d <- code_library(viewer=FALSE,silent=TRUE)
   if(is.numeric(name)) path <- file.path(d$FOLDER[name],d$NAME[name]) else {
     if(!name %in% d$NAME) stop("file not found in code_library")
     pos <- match(name,d$NAME)
@@ -429,7 +437,7 @@ locate_file <- function(x,search_path=c(".")){
   x0 <- x
   if(file.exists(x0)) return(x0)
   for(dir in search_path){
-    x <- file.path(dir,basename(x0))
+    x <- normalizePath(file.path(dir,basename(x0)))
     if(file.exists(x)) return(x)
   }
   stop(paste(x0,"file not found"))
@@ -450,7 +458,7 @@ code_library_path <- function() getOption("code_library_path")
 #' @export
 
 attach_code_library <- function(path){
-    options("code_library_path"=unique(c(path,getOption("code_library_path"))))
+  options("code_library_path"=unique(c(path,getOption("code_library_path"))))
 }
 
 #' Replaces code library
@@ -512,6 +520,7 @@ Renvironment_info <- function(){
   )
 
   write(script,file=file.path(scripts.dir,"RenvironmentInfo.R"))
+  suppressMessages(setup_file(file.path(scripts.dir,"RenvironmentInfo.R")))
   message(paste0("Script produced:           ",file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
   source(file.path(getOption("scripts.dir"),"RenvironmentInfo.R"))
   message(paste0("Environment info produced: RenvironmentInfo.txt"))

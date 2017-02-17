@@ -4,12 +4,17 @@
 \alias{info_scripts}
 \title{List information about scripts}
 \usage{
-info_scripts(files, fields = c("Description", "Keywords"))
+info_scripts(files, fields = c("Description", "Keywords"), viewer = FALSE,
+  silent = FALSE)
 }
 \arguments{
 \item{files}{vector string of file names/paths}
 
 \item{fields}{vector string of field tags to display}
+
+\item{viewer}{logical indicating if Rstudio viewer should be used (default = TRUE)}
+
+\item{silent}{run in quiet mode (default=FALSE)}
 }
 \description{
 List information about scripts
