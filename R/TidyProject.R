@@ -545,10 +545,16 @@ Renvironment_info <- function(){
     lib_statements,
     "",
     "txt <- c(paste0(\"Created at \",Sys.time(),\" by \",Sys.info()[\"user\"],\"\\n\"))",
-    "txt <- c(txt,\"###### devtools::session_info output ######\")",
-    "x <- devtools::session_info(include_base = TRUE)",
-    "x$platform$running <- sessionInfo()$running",
-    "txt <- c(txt,capture.output(print(x)))",
+    "",
+    "###### devtools::session_info output ######",
+    "#txt <- c(txt,\"###### devtools::session_info output ######\")",
+    "#x <- devtools::session_info(include_base = TRUE)",
+    "#x$platform$running <- sessionInfo()$running",
+    "#txt <- c(txt,capture.output(print(x)))",
+    "",
+    "###### utils::sessionInfo output ######",
+    "txt <- c(txt,capture.output(sessionInfo()))",
+    "",
     "writeLines(txt, \"RenvironmentInfo.txt\")"
   )
 
