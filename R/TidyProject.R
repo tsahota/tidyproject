@@ -423,7 +423,13 @@ search_scripts <- function(files,text){
 #' @export
 code_library <- function(extn="r|R",fields = "Description",viewer=FALSE,silent=FALSE) {
   if(is.null(getOption("code_library_path"))) {
-    message("No directories attached. Attach with attach_code_library(\"path/to/dir/of/scripts\")")
+    message("No directories attached. To attach add the following command:")
+    message("  options(code_library_paths=c(\"dir/of/scripts1\",\"dir/of/scripts2\",...))")
+    message("     1. (for this session only) in the console")
+    message("     2. (for this user) to ~/.Rprofile")
+    message(paste0("     3. (for all users) to ",file.path(R.home(component = "home"), "etc", "Rprofile.site")))
+
+    message(" 2. Attach for this user by putting command in ~/.Rprofile:")
     return(data.frame())
   }
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
@@ -479,7 +485,6 @@ code_library_path <- function() getOption("code_library_path")
 #' Attaches a path(s) to to the code library search path
 #'
 #' @param path character vector with paths to attach to
-#' @export
 
 attach_code_library <- function(path){
   options("code_library_path"=unique(c(path,getOption("code_library_path"))))
@@ -490,7 +495,6 @@ attach_code_library <- function(path){
 #' Replace code library search path with path(s)
 #'
 #' @param path character vector with paths to attach to
-#' @export
 
 replace_code_library <- function(path){
   options("code_library_path"=unique(path))
