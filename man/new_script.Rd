@@ -4,12 +4,14 @@
 \alias{new_script}
 \title{Create new R script}
 \usage{
-new_script(name, overwrite = FALSE, silent = FALSE)
+new_script(name, overwrite = FALSE, open_file = TRUE)
 }
 \arguments{
 \item{name}{character indicating name of script to create}
 
-\item{overwrite}{logical indicating whether to overwrite existing file (default=FALSE)}
+\item{overwrite}{logical. Whether to overwrite existing file (default = FALSE)}
+
+\item{open_file}{logical. Whether function should open script (default = TRUE)}
 }
 \description{
 Create new R script

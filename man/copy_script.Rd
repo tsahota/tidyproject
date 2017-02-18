@@ -4,10 +4,23 @@
 \alias{copy_script}
 \title{copy_script}
 \usage{
-copy_script(from, to, dependencies = TRUE, stamp.copy = TRUE,
+copy_script(from, to, dependencies = TRUE, stamp_copy = TRUE,
   overwrite = FALSE, comment_char = "#")
 }
+\arguments{
+\item{from}{character. file name or path of file to copy}
+
+\item{to}{character. file name file to create}
+
+\item{dependencies}{logical. Default = TRUE. will script copy dependencies}
+
+\item{stamp_copy}{logical. Create a commented timestamp at beginning of file}
+
+\item{overwrite}{logical. Overwrite "to" file if exists?}
+
+\item{comment_char}{character. Comment character}
+}
 \description{
-copy_script
+Copies a script and dependencies from one location (will search code library) to scripts directory
 }
 

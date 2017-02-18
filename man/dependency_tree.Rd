@@ -4,9 +4,16 @@
 \alias{dependency_tree}
 \title{Create a recursive dependency_tree of file names}
 \usage{
-dependency_tree(from, already.got = NULL)
+dependency_tree(from, already_got = NULL)
+}
+\arguments{
+\item{from}{character. file name or path of file to copy}
+
+\item{already_got}{logical. Default = NULL. If true will terminate loop
+
+Used by copy_script. Creates an an ordered vector of script dependencies.}
 }
 \description{
-Used by copy_script. Creates an an ordered vector of script dependencies.
+Create a recursive dependency_tree of file names
 }
 

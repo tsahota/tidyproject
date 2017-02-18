@@ -64,6 +64,7 @@ test_that(".Rprofile works",{
 
   expect_true(file.exists(".Rprofile"))
   .libPathsOld <- .libPaths()
+  on.exit(.libPaths(.libPathsOld),add = TRUE)
   source(".Rprofile")
 
   expect_false(normalizePath(Sys.getenv("R_LIBS_USER")) %in% .libPaths())
