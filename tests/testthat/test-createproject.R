@@ -53,6 +53,9 @@ test_that("global variables look OK",{
 
 test_that(".Rprofile works",{
 
+  testthat::skip_on_travis()
+  testthat::skip_on_cran()
+
   currentwd <- getwd()
   make_project(proj_name)
   on.exit({
@@ -62,12 +65,12 @@ test_that(".Rprofile works",{
 
   setwd(proj_name)
 
-  expect_true(file.exists(".Rprofile"))
   .libPathsOld <- .libPaths()
   on.exit(.libPaths(.libPathsOld),add = TRUE)
+
   source(".Rprofile")
 
-  expect_false(normalizePath(Sys.getenv("R_LIBS_USER")) %in% .libPaths())
+  expect_true(normalizePath("ProjectLibrary") %in% .libPaths())
 
 })
 
