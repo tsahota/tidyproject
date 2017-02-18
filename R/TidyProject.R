@@ -265,7 +265,7 @@ new_script <- function(name,overwrite=FALSE,open_file=TRUE){ ## create black scr
          "## main script here","")
   writeLines(s,to.path)
   setup_file(to.path)
-  if(!open_file) get("file.edit")(to.path)
+  if(open_file) get("file.edit")(to.path)
 }
 
 ## how to have multiple paths on the code_library

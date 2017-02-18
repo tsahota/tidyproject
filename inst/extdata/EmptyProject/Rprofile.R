@@ -1,3 +1,4 @@
+if(file.exists(file.path("~",".Rprofile"))) source(file.path("~",".Rprofile"))
 if(file.exists("ProjectLibrary")){
   if(length(.Library.site) == 0){
     .libPaths(c("ProjectLibrary",.libPaths()))
@@ -8,4 +9,3 @@ if(file.exists("ProjectLibrary")){
     message("TidyProject loaded")
   }
 }
-if(file.exists(file.path("~",".Rprofile"))) source(file.path("~",".Rprofile"))
