@@ -255,7 +255,7 @@ new_script <- function(name,overwrite=FALSE,open_file=TRUE){ ## create black scr
          "## main script here","")
   writeLines(s,to.path)
   setup_file(to.path)
-  if(!open_file) file.edit(to.path)
+  if(!open_file) get("file.edit")(to.path)
 }
 
 ## how to have multiple paths on the code_library
@@ -384,7 +384,7 @@ info_scripts <- function(files,fields=c("Description","Keywords"),viewer=FALSE,s
   })
   d <- cbind(data.frame(FOLDER=short_path(dirname(files)),NAME=basename(files)),res)
   if(!silent){
-    if(viewer) View(d,"available files") else print(d)
+    if(viewer) get("View")(d,"available files") else print(d)
   }
   invisible(cbind(data.frame(FOLDER=dirname(files),NAME=basename(files)),res))
 }
@@ -523,13 +523,18 @@ Renvironment_info <- function(){
   lib_statements <- c(lib_statements1,lib_statements2,lib_statements3)
 
   script <- c(
-    "## This script will generate a sessionInfo for project",
+    "## Sourcing this script generate a sessionInfo for project",
+    "## It will load all packages referenced in the scripts library",
+    "## ",
     "",
     "## Load all packages ",
     lib_statements,
     "",
-    "txt <- c(paste0(\"## Created at \",Sys.time(),\" by \",Sys.info()[\"user\"],\"\\n\"))",
-    "txt <- c(txt,capture.output(sessionInfo()))",
+    "txt <- c(paste0(\"Created at \",Sys.time(),\" by \",Sys.info()[\"user\"],\"\\n\"))",
+    "txt <- c(txt,\"###### devtools::session_info output ######\")",
+    "x <- devtools::session_info(include_base = TRUE)",
+    "x$platform$running <- sessionInfo()$running",
+    "txt <- c(txt,print(x))",
     "writeLines(txt, \"RenvironmentInfo.txt\")"
   )
 
