@@ -21,7 +21,7 @@ test_that("Project has basic functionality",{
 
   expect_true(file.exists("ProjectLibrary"))
 
-  new_script("test.R",silent = TRUE)
+  new_script("test.R",open_file = FALSE)
   expect_true(file.exists(file.path(getOption("scripts.dir"),"test.R")))
 
 })

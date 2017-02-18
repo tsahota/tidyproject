@@ -236,9 +236,10 @@ is_full_path <- function(x) grepl("^(~|/|\\\\|([a-zA-Z]:))",x,perl=TRUE)
 
 #' Create new R script
 #' @param name character indicating name of script to create
-#' @param overwrite logical indicating whether to overwrite existing file (default=FALSE)
+#' @param overwrite logical. Whether to overwrite existing file (default = FALSE)
+#' @param open_file logical. Whether function should open script (default = TRUE)
 #' @export
-new_script <- function(name,overwrite=FALSE,silent=FALSE){ ## create black script with comment fields. Add new_script to git
+new_script <- function(name,overwrite=FALSE,open_file=TRUE){ ## create black script with comment fields. Add new_script to git
   if(name!=basename(name)) stop("name must not be a path")
   to.path <- file.path(getOption("scripts.dir"),name)  ## destination path
   if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
@@ -254,7 +255,7 @@ new_script <- function(name,overwrite=FALSE,silent=FALSE){ ## create black scrip
          "## main script here","")
   writeLines(s,to.path)
   setup_file(to.path)
-  if(!silent) file.edit(to.path)
+  if(!open_file) file.edit(to.path)
 }
 
 ## how to have multiple paths on the code_library
@@ -262,9 +263,12 @@ new_script <- function(name,overwrite=FALSE,silent=FALSE){ ## create black scrip
 
 #' Create a recursive dependency_tree of file names
 #'
+#' @param from character. file name or path of file to copy
+#' @param already_got logical. Default = NULL. If true will terminate loop
+#'
 #' Used by copy_script. Creates an an ordered vector of script dependencies.
 dependency_tree <- function(from, ## a file name (full path or a script in current directory)
-                            already.got=NULL){
+                            already_got=NULL){
   ## This is a difficult to understand function - it's recursive
   if(!file.exists(from)) stop("can't find \"from\" file")
   suppressWarnings(s0 <- readLines(from))
@@ -274,7 +278,7 @@ dependency_tree <- function(from, ## a file name (full path or a script in curre
   depends.on <- strsplit(depends.on,",")[[1]]
   depends.on <- gsub("^\\s(.*)$","\\1",depends.on)
   if(!identical(depends.on,basename(depends.on))) stop("Can't read dependencies as full paths")
-  if(length(intersect(depends.on,c(basename(from),already.got)))>0) stop("Circular dependency detected")
+  if(length(intersect(depends.on,c(basename(from),already_got)))>0) stop("Circular dependency detected")
   ## recursively call function
   depends.on <- c(unlist(sapply(depends.on,function(i)dependency_tree(file.path(dirname(from),i),depends.on))),
                   depends.on)
@@ -283,8 +287,17 @@ dependency_tree <- function(from, ## a file name (full path or a script in curre
 }
 
 #' copy_script
+#'
+#' Copies a script and dependencies from one location (will search code library) to scripts directory
+#'
+#' @param from character. file name or path of file to copy
+#' @param to character. file name file to create
+#' @param dependencies logical. Default = TRUE. will script copy dependencies
+#' @param stamp_copy logical. Create a commented timestamp at beginning of file
+#' @param overwrite logical. Overwrite "to" file if exists?
+#' @param comment_char character. Comment character
 #' @export
-copy_script <- function(from,to,dependencies=TRUE,stamp.copy=TRUE,overwrite=FALSE,comment_char="#"){
+copy_script <- function(from,to,dependencies=TRUE,stamp_copy=TRUE,overwrite=FALSE,comment_char="#"){
   ## User function: copies script from one location (e.g. code_library) to project scripts directory
   onlyfrom <- missing(to)
   if(missing(to)) to <- basename(from)
@@ -314,7 +327,7 @@ copy_script <- function(from,to,dependencies=TRUE,stamp.copy=TRUE,overwrite=FALS
   suppressWarnings(s0 <- readLines(from))
   ## modify text at top of "from"
   if(dirname(from)==".") from.path <- file.path(getwd(),from) else from.path <- from
-  if(stamp.copy) s <- c(paste0(comment_char,comment_char," Copied from ",normalizePath(from.path),"\n##  (",Sys.time(),") by ",Sys.info()["user"]),s0) else
+  if(stamp_copy) s <- c(paste0(comment_char,comment_char," Copied from ",normalizePath(from.path),"\n##  (",Sys.time(),") by ",Sys.info()["user"]),s0) else
     s <- s0
   writeLines(s,to.path)
   setup_file(to.path)
@@ -530,6 +543,8 @@ Renvironment_info <- function(){
 
 
 #' shorten path name
+#'
+#' @param x character. Path to shorten.
 short_path <- function(x){
   ans <- strsplit(x,.Platform$file.sep)[[1]]
   if(length(ans)>5) ans.short <- c(ans[1:3],"..",ans[(length(ans)-1):length(ans)]) else ans.short <- ans

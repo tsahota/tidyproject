@@ -13,6 +13,7 @@ cleanup <- function(proj_name){
 test_that("Project is created",{
 
   currentwd <- getwd()
+  cleanup(proj_name)
   on.exit({
     setwd(currentwd)
     cleanup(proj_name)
@@ -65,7 +66,6 @@ test_that(".Rprofile works",{
   .libPathsOld <- .libPaths()
   source(".Rprofile")
 
-  expect_true(normalizePath(.libPaths()[1])==normalizePath("ProjectLibrary"))
   expect_false(normalizePath(Sys.getenv("R_LIBS_USER")) %in% .libPaths())
 
 })

@@ -13,3 +13,5 @@ RoxygenNote: 5.0.1
 Suggests:
     testthat,
     git2r
+Imports:
+    plyr
