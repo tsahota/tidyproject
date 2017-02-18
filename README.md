@@ -2,6 +2,8 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/tsahota/TidyProject.svg?branch=master)](https://travis-ci.org/tsahota/TidyProject)
 
+[![Coverage Status](https://coveralls.io/repos/github/tsahota/TidyProject/badge.svg?branch=master)](https://coveralls.io/github/tsahota/TidyProject?branch=master)
+
 A light package providing:
  
 * Directory structure: a light, tidy project template for data analysis projects.
