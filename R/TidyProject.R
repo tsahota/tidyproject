@@ -189,7 +189,7 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
         write(s,".gitignore")
       }
       paths <- unlist(git2r::status(r))
-      if(length(git2r::reflog(r,verbose = FALSE))==0){
+      if(length(git2r::reflog(r))==0){
         git2r::add(r, paths)
         git2r::config(r, user.name=Sys.info()["user"], user.email=getOption("user.email"))
         git2r::commit(r, "initialise_repository")
