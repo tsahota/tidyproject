@@ -8,3 +8,4 @@ if(file.exists("ProjectLibrary")){
     message("TidyProject loaded")
   }
 }
+if(file.exists(file.path("~",".Rprofile"))) source(file.path("~",".Rprofile"))

@@ -68,7 +68,6 @@ test_that(".Rprofile works",{
   .libPathsOld <- .libPaths()
   on.exit(.libPaths(.libPathsOld),add = TRUE)
 
-
   source(".Rprofile")
 
   expect_true(normalizePath("ProjectLibrary") %in% .libPaths())

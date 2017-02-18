@@ -16,11 +16,8 @@ test_that("Project has basic functionality",{
     setwd(currentwd)
     cleanup(proj_name)
   })
-   print(getwd())
 
   setwd(proj_name)
-   print(getwd())
-   print(dir(all.files = TRUE))
 
   expect_true(file.exists("ProjectLibrary"))
 

@@ -544,7 +544,7 @@ Renvironment_info <- function(){
     "txt <- c(txt,\"###### devtools::session_info output ######\")",
     "x <- devtools::session_info(include_base = TRUE)",
     "x$platform$running <- sessionInfo()$running",
-    "txt <- c(txt,print(x))",
+    "txt <- c(txt,capture.output(print(x)))",
     "writeLines(txt, \"RenvironmentInfo.txt\")"
   )
 
