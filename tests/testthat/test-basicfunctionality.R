@@ -16,8 +16,11 @@ test_that("Project has basic functionality",{
     setwd(currentwd)
     cleanup(proj_name)
   })
+   print(getwd())
 
   setwd(proj_name)
+   print(getwd())
+   print(dir(all.files = TRUE))
 
   expect_true(file.exists("ProjectLibrary"))
 
@@ -38,6 +41,6 @@ test_that("R session stamp",{
   setwd(proj_name)
   Renvironment_info()
   expect_true(file.exists(file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
-  source(file.path(getOption("scripts.dir"),"RenvironmentInfo.R"))
+  expect_true(file.exists("RenvironmentInfo.txt"))
 
 })

@@ -140,6 +140,9 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
       message("Directory doesn't exist. Creating...")
       dir.create(proj_name)
       file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj_name,recursive=TRUE)
+      result <- file.rename(file.path(proj_name,"Rprofile.R"),file.path(proj_name,".Rprofile"))
+      if(!result) stop("something wrong with .Rprofile creation") else
+        unlink(file.path(proj_name,"Rprofile.R"))
       if(!TRUE %in% file.info(proj_name)$isdir) stop(paste(proj_name,"not created"))
       if(!project_library) unlink(file.path(proj_name,"ProjectLibrary"),recursive = TRUE)
     },
@@ -160,6 +163,13 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
     message("")
 
     file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj_name,recursive=TRUE,overwrite = FALSE)
+    ## if the file is there don't overwrite.
+    if(file.exists(file.path(proj_name,".Rprofile")))
+      message(".Rprofile already present, creating Rprofile.R instead") else {
+        result <- file.rename(file.path(proj_name,"Rprofile.R"),file.path(proj_name,".Rprofile"))
+        if(!result) stop("something wrong with .Rprofile creation") else
+          unlink(file.path(proj_name,"Rprofile.R"))
+      }
     if(!project_library) {
       contents <- dir(file.path(proj_name,"ProjectLibrary"),include.dirs = TRUE,all.files = TRUE)
       contents <- contents[!contents %in% c(".","..")]
