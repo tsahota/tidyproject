@@ -307,7 +307,7 @@ copy_script <- function(from,to,dependencies=TRUE,
 
     if(length(from)==0) stop(paste(from0,"not found"))
     if(length(from)>1 & use_code_library)
-      stop("Matched more than one file with that name in code library.\n Try:\n  1) specifying full path OR\n  2) ensuring getOption(\"code_library_paths\") points to non-overlapping directories")
+      stop("Matched more than one file with that name in code library.\n Try:\n  1) specifying full path OR\n  2) ensuring getOption(\"code_library_path\") points to non-overlapping directories")
     if(length(from)>1 & !use_code_library)
       stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
   }
@@ -440,11 +440,11 @@ search_scripts <- function(files,text){
 #' @param viewer logical indicating if viewer should be used to display results (default=FALSE)
 #' @param silent logical indicating if results should be return silently (default=FALSE)
 #' @export
-code_library <- function(extn="r|R",fields = "Description",viewer=FALSE,silent=FALSE){
+code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FALSE){
   if(is.null(getOption("code_library_path"))) {
     if(!silent){
       message("No directories attached. To attach add the following command:")
-      message("  options(code_library_paths=c(\"dir/of/scripts1\",\"dir/of/scripts2\",...))")
+      message("  options(code_library_path=c(\"dir/of/scripts1\",\"dir/of/scripts2\",...))")
       message("     1. (for this session only) in the console")
       message("     2. (for this user) to ~/.Rprofile")
       message(paste0("     3. (for all users) to ",file.path(R.home(component = "home"), "etc", "Rprofile.site")))
@@ -458,9 +458,10 @@ code_library <- function(extn="r|R",fields = "Description",viewer=FALSE,silent=F
   tryCatch({
     info_scripts(files,fields = fields,viewer=viewer,silent=silent,base_dirs=getOption("code_library_path"))
   },error=function(e){
-    if(grepl("duplicate file",e$message)) e$message <- paste0(e$message,".\n  Check getOption(\"code_library_paths\") points to non-overlapping folders")
+    if(grepl("duplicate file",e$message)) e$message <- paste0(e$message,".\n  Check getOption(\"code_library_path\") points to non-overlapping folders")
     stop(e)
   })
+  if(!silent) message("\nDo not source scripts from the code library,\n copy them to your project with copy_script")
 }
 
 
