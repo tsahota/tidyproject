@@ -43,31 +43,6 @@
 
 NULL
 
-## Names:
-##  tidyproject (change to this)
-##  TidyProject
-
-## Description
-## Three components 1) ProjectTemplate 2) packrat 3) code_library 4) script creations stuff
-##  Project template but simpler directory structure.
-##  Packrat but option for local install vs global install.
-##  Definition of an external code_library
-##   Search and copying functionality
-##  new_code_file, copy_code_file
-
-## It can refer to a code.library.
-## make a search path for this.
-## You can store this anywhere and build it up.
-
-## The code library is external - this is easier to understand.  And not that bad
-##  The code will not directly use anything that's not in the library.
-
-## Make a code_library_search_path: this will search all the library code.
-
-## NMproject comes with it's own library.  This is installed in the package
-##  Can be modified by the user via a configuration file.
-##  Important that NMproject and other packages are installed locally.
-
 #' Set project options
 set_project_opts <- function(){
   ## Internal function: will set all global variables
@@ -84,11 +59,6 @@ set_project_opts <- function(){
 validate_session <- function(fail_on_error=FALSE){
   result <- TRUE
   msg <- function(...) if(fail_on_error) stop(...) else message(...)
-
-  # if(!.rs.getProjectDirectory()==getwd()){
-  #   message("Working directory is not Rstudio project directory")
-  #   result <- FALSE
-  # }
 
   if(!file.exists(getOption("scripts.dir"))){
     message("Directory getOption(\"scripts.dir\") not found")
