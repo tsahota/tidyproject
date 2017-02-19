@@ -456,12 +456,13 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
   tryCatch({
-    info_scripts(files,fields = fields,viewer=viewer,silent=silent,base_dirs=getOption("code_library_path"))
+    info <- info_scripts(files,fields = fields,viewer=viewer,silent=silent,base_dirs=getOption("code_library_path"))
   },error=function(e){
     if(grepl("duplicate file",e$message)) e$message <- paste0(e$message,".\n  Check getOption(\"code_library_path\") points to non-overlapping folders")
     stop(e)
   })
   if(!silent) message("\nDo not source scripts from the code library,\n copy them to your project with copy_script")
+  return(invisible(info))
 }
 
 

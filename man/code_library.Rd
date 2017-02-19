@@ -4,7 +4,7 @@
 \alias{code_library}
 \title{Show Code Library}
 \usage{
-code_library(extn = "r|R", fields = "Description", viewer = FALSE,
+code_library(extn = "r|R", fields = "Description", viewer = TRUE,
   silent = FALSE)
 }
 \arguments{

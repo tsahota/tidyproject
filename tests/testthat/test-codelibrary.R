@@ -50,11 +50,9 @@ test_that("Code library",{
 
   clib <- code_library(silent=TRUE)
   expect_true("data.frame" %in% class(clib))
-  expect_true(nrow(clib)==4)
 
   clib <- code_library(fields = "Depends on",silent=TRUE)
   expect_true("data.frame" %in% class(clib))
-  expect_true(nrow(clib)==4)
 
   copy_script("test2.R")
   expect_true(file.exists(file.path(getOption("scripts.dir"),"test2.R")))
