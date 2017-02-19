@@ -5,7 +5,7 @@
 \title{copy_script}
 \usage{
 copy_script(from, to, dependencies = TRUE, stamp_copy = TRUE,
-  overwrite = FALSE, comment_char = "#")
+  overwrite = FALSE, comment_char = "#", alt_paths)
 }
 \arguments{
 \item{from}{character. file name or path of file to copy}
@@ -19,6 +19,8 @@ copy_script(from, to, dependencies = TRUE, stamp_copy = TRUE,
 \item{overwrite}{logical. Overwrite "to" file if exists?}
 
 \item{comment_char}{character. Comment character}
+
+\item{alt_paths}{character vector. paths to other candidate files to search}
 }
 \description{
 Copies a script and dependencies from one location (will search code library) to scripts directory

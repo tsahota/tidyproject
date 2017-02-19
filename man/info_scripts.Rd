@@ -5,7 +5,7 @@
 \title{List information about scripts}
 \usage{
 info_scripts(files, fields = c("Description", "Keywords"), viewer = FALSE,
-  silent = FALSE)
+  silent = FALSE, base_dirs = NULL, shorten_paths = TRUE)
 }
 \arguments{
 \item{files}{vector string of file names/paths}
@@ -15,6 +15,10 @@ info_scripts(files, fields = c("Description", "Keywords"), viewer = FALSE,
 \item{viewer}{logical indicating if Rstudio viewer should be used (default = TRUE)}
 
 \item{silent}{run in quiet mode (default=FALSE)}
+
+\item{base_dirs}{character vector. group files together that belong to these directory paths}
+
+\item{shorten_paths}{logical. Default = TRUE. Long paths will be shortened if true in displayed output (not returned object)}
 }
 \description{
 List information about scripts

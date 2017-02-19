@@ -15,19 +15,11 @@ facilitate reproducibility and reuse of code
 \itemize{
  \item Code management
  \itemize{
-  \item{Project structure: Defines standardised directory structure for NONMEM projects}
-  \item{Code: Automates and enforces standards on control comments
-  \itemize{
-   \item Beginning of code: Description, author, date,...
-   \item $THETA/$OMEGA/$SIGMA: Parameter names, units, transformations)}
-  }
+  \item{Project structure: Defines standardised directory structure for statistical projects}
   \item{Long term reproducibility: Local (project level) installation of packages}
-  \item{Code sharing/reuse: editable model library + search functionality}
+  \item{Code sharing/reuse: code library + search functionality}
  }
 }
-
-Compatible with git - optional
-#'
 }
 
 \section{Options}{
@@ -37,13 +29,18 @@ Compatible with git - optional
 \code{models.dir} = names of the "models" directory in the project
 
 \code{git.exists} = \code{TRUE} if git is installed (only works on unix currently)
+
+\code{code_library_path} = character vector. paths of directories containing code files
+
+To modify these options use the options() interface.
+To modify these values permanently set options() in ~/.Rprofile or R_HOME/etc/Rprofile.site
 }
 \examples{
 \dontrun{
 make_project("~/AZDXXXX/PKAE1")         ## creates new_project
 code_library()                          ## display summary of code_library
-copy_script("nm.log.R")                 ## copy_script from code_library to project
-preview("nm.log.R")                     ## preview file in code_library
+preview("template1.R")                  ## preview file in code_library
+copy_script("template1.R")              ## copy_script from code_library to project
 
 new_script("test.R")                    ## Creates empty test.R
 copy_script("output.data.R")            ## copies from code_library

@@ -7,7 +7,7 @@
 short_path(x)
 }
 \arguments{
-\item{x}{character. Path to shorten.}
+\item{x}{character vector. Path to shorten.}
 }
 \description{
 shorten path name

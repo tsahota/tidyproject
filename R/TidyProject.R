@@ -304,23 +304,43 @@ dependency_tree <- function(from, ## a file name (full path or a script in curre
 #' @param stamp_copy logical. Create a commented timestamp at beginning of file
 #' @param overwrite logical. Overwrite "to" file if exists?
 #' @param comment_char character. Comment character
+#' @param alt_paths character vector. paths to other candidate files to search
 #' @export
-copy_script <- function(from,to,dependencies=TRUE,stamp_copy=TRUE,overwrite=FALSE,comment_char="#"){
+copy_script <- function(from,to,dependencies=TRUE,
+                        stamp_copy=TRUE,overwrite=FALSE,comment_char="#",alt_paths){
   ## User function: copies script from one location (e.g. code_library) to project scripts directory
+  if(missing(from)) stop("need \"from\" argument")
   onlyfrom <- missing(to)
   if(missing(to)) to <- basename(from)
   if(to!=basename(to)) stop("name must not be a path")
   to.path <- file.path(getOption("scripts.dir"),to)  ## destination path
   if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
 
-  if(onlyfrom){
-    search_path <- getOption("code_library_path")
-  } else {
-    search_path <- c(getOption("scripts.dir"),
-                     getOption("code_library_path"))
-  }
+  use_code_library <- missing(alt_paths)
 
-  from <- locate_file(from,search_path = search_path)
+  if(onlyfrom) from_path <- locate_file(from,search_path = c()) else
+    from_path <- locate_file(from,search_path = getOption("scripts.dir"))
+
+  if(length(from_path)==0){ ## if file is not found directory or in scripts.dir
+    ## look in code_library()
+
+    if(use_code_library){
+      ## define alt_locations to be code_library
+      d <- code_library(viewer=FALSE,silent=TRUE)
+      alt_paths <- file.path(d$FOLDER,d$NAME)
+    }
+
+    ## use grep to figure out how many matches.
+    matches <- grepl(paste0(from,"$"),alt_paths)
+    from0 <- from
+    from <- alt_paths[matches]
+
+    if(length(from)==0) stop(paste(from0,"not found"))
+    if(length(from)>1 & use_code_library)
+      stop("Matched more than one file with that name in code library.\n Try:\n  1) specifying full path OR\n  2) ensuring getOption(\"code_library_paths\") points to non-overlapping directories")
+    if(length(from)>1 & !use_code_library)
+      stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
+  }
 
   ## assume dependencies are in the same directory: dirname(from)
   ## dependencies should not be from current directory
@@ -329,7 +349,7 @@ copy_script <- function(from,to,dependencies=TRUE,stamp_copy=TRUE,overwrite=FALS
     if(length(depends.on)>0) message("Copying dependencies...")
     for(i in depends.on) {
       if(file.exists(file.path(getOption("scripts.dir"),i))) message(paste("Dependency",file.path(getOption("scripts.dir"),i),"already exists. Will not overwrite")) else
-        copy_script(file.path(dirname(from),i),dependencies=FALSE)
+        copy_script(file.path(dirname(from),i),dependencies=FALSE,alt_paths=alt_paths)
     }
   }
   suppressWarnings(s0 <- readLines(from))
@@ -366,6 +386,8 @@ ls_scripts <- function(folder=".",extn="r|R|mod",recursive=TRUE){
 #' @param fields vector string of field tags to display
 #' @param viewer logical indicating if Rstudio viewer should be used (default = TRUE)
 #' @param silent run in quiet mode (default=FALSE)
+#' @param base_dirs character vector. group files together that belong to these directory paths
+#' @param shorten_paths logical. Default = TRUE. Long paths will be shortened if true in displayed output (not returned object)
 #' @examples
 #' \dontrun{
 #' ls_scripts("~/AZD6094/PK_liver4/") %>%
@@ -373,7 +395,8 @@ ls_scripts <- function(folder=".",extn="r|R|mod",recursive=TRUE){
 #'   filter(grepl("mod",DESCRIPTION))
 #' }
 #' @export
-info_scripts <- function(files,fields=c("Description","Keywords"),viewer=FALSE,silent=FALSE){
+info_scripts <- function(files,fields=c("Description","Keywords"),
+                         viewer=FALSE,silent=FALSE,base_dirs=NULL,shorten_paths=TRUE){
   res <- plyr::ldply(files,function(file.name){ ## per file
     suppressWarnings({
       s <- readLines(file.name)
@@ -390,11 +413,39 @@ info_scripts <- function(files,fields=c("Description","Keywords"),viewer=FALSE,s
     })
     field.vals
   })
-  d <- cbind(data.frame(FOLDER=short_path(dirname(files)),NAME=basename(files)),res)
-  if(!silent){
-    if(viewer) get("View")(d,"available files") else print(d)
+  d <- cbind(data.frame(FULL=normalizePath(files),
+                        FOLDER=normalizePath(dirname(files)),
+                        NAME=basename(files),stringsAsFactors = FALSE),res)
+
+  if(!is.null(base_dirs)){
+    base_dirs <- normalizePath(base_dirs)
+
+    all_matches <- unlist(lapply(base_dirs,function(base_dir){
+      grep(paste0("^",base_dir),d$FULL)
+    }))
+
+    if(length(unique(all_matches))!=length(all_matches)) stop("duplicate file matches found. Check base directories are not subsets of one another")
+
+    for(base_dir in base_dirs){
+      match_base <- grepl(paste0("^",base_dir),d$FULL)
+
+      d$FOLDER[match_base] <- gsub(paste0("^(",base_dir,").*$"),"\\1",d$FULL[match_base])
+      d$NAME[match_base] <- gsub(paste0("^",base_dir,.Platform$file.sep,"(.*)$"),"\\1",d$FULL[match_base])
+    }
   }
-  invisible(cbind(data.frame(FOLDER=dirname(files),NAME=basename(files)),res))
+
+  d <- cbind(data.frame(FOLDER=d$FOLDER,NAME=d$NAME,stringsAsFactors = FALSE),res)
+
+  if(shorten_paths){
+    ds <- cbind(data.frame(FOLDER=short_path(d$FOLDER),NAME=d$NAME,stringsAsFactors = FALSE),res)
+  } else {
+    ds <- d
+  }
+
+  if(!silent){
+    if(viewer) get("View")(ds,"available files") else print(ds)
+  }
+  invisible(d)
 }
 
 #' Search for string in files
@@ -419,20 +470,27 @@ search_scripts <- function(files,text){
 #' @param viewer logical indicating if viewer should be used to display results (default=FALSE)
 #' @param silent logical indicating if results should be return silently (default=FALSE)
 #' @export
-code_library <- function(extn="r|R",fields = "Description",viewer=FALSE,silent=FALSE) {
+code_library <- function(extn="r|R",fields = "Description",viewer=FALSE,silent=FALSE){
   if(is.null(getOption("code_library_path"))) {
-    message("No directories attached. To attach add the following command:")
-    message("  options(code_library_paths=c(\"dir/of/scripts1\",\"dir/of/scripts2\",...))")
-    message("     1. (for this session only) in the console")
-    message("     2. (for this user) to ~/.Rprofile")
-    message(paste0("     3. (for all users) to ",file.path(R.home(component = "home"), "etc", "Rprofile.site")))
+    if(!silent){
+      message("No directories attached. To attach add the following command:")
+      message("  options(code_library_paths=c(\"dir/of/scripts1\",\"dir/of/scripts2\",...))")
+      message("     1. (for this session only) in the console")
+      message("     2. (for this user) to ~/.Rprofile")
+      message(paste0("     3. (for all users) to ",file.path(R.home(component = "home"), "etc", "Rprofile.site")))
 
-    message(" 2. Attach for this user by putting command in ~/.Rprofile:")
+      message(" 2. Attach for this user by putting command in ~/.Rprofile:")
+    }
     return(data.frame())
   }
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
-  info_scripts(files,fields = fields,viewer=viewer,silent=silent)
+  tryCatch({
+    info_scripts(files,fields = fields,viewer=viewer,silent=silent,base_dirs=getOption("code_library_path"))
+  },error=function(e){
+    if(grepl("duplicate file",e$message)) e$message <- paste0(e$message,".\n  Check getOption(\"code_library_paths\") points to non-overlapping folders")
+    stop(e)
+  })
 }
 
 
@@ -441,8 +499,11 @@ code_library <- function(extn="r|R",fields = "Description",viewer=FALSE,silent=F
 #' @export
 preview <- function(name) {  ## preview files in code_library
   d <- code_library(viewer=FALSE,silent=TRUE)
-  if(is.numeric(name)) path <- file.path(d$FOLDER[name],d$NAME[name]) else {
+  if(is.numeric(name)) {
+    path <- file.path(d$FOLDER[name],d$NAME[name])
+  } else {
     if(!name %in% d$NAME) stop("file not found in code_library")
+    if(length(which(d$NAME %in% name)) > 1) stop("Matched more than one file with that name.\n Try preview() again using the row no. of the file in code_library()")
     pos <- match(name,d$NAME)
     path <- file.path(d$FOLDER[pos],d$NAME[pos])
   }
@@ -468,7 +529,7 @@ locate_file <- function(x,search_path=c(".")){
     x <- normalizePath(file.path(dir,basename(x0)))
     if(file.exists(x)) return(x)
   }
-  stop(paste(x0,"file not found"))
+  return(character())
 }
 
 
@@ -567,11 +628,14 @@ Renvironment_info <- function(){
 
 #' shorten path name
 #'
-#' @param x character. Path to shorten.
+#' @param x character vector. Path to shorten.
 short_path <- function(x){
-  ans <- strsplit(x,.Platform$file.sep)[[1]]
-  if(length(ans)>5) ans.short <- c(ans[1:3],"..",ans[(length(ans)-1):length(ans)]) else ans.short <- ans
-  do.call(file.path,as.list(ans.short))
+  split_paths <- strsplit(x,.Platform$file.sep)#[[1]]
+  short_paths <- lapply(split_paths,function(split_path){
+    if(length(split_path)>5) split_path.short <- c(split_path[1:3],"..",split_path[(length(split_path)-1):length(split_path)]) else split_path.short <- split_path
+    do.call(file.path,as.list(split_path.short))
+  })
+  unlist(short_paths)
 }
 
 #' rate my code
