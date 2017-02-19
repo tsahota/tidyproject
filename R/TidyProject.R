@@ -455,7 +455,7 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
     }
     return(data.frame())
   }
-  files <- ls_scripts(extn,folder=getOption("code_library_path"),
+  files <- ls_scripts(extn=extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
   if(viewer==FALSE & !return_info) {
     return(files)
@@ -482,7 +482,7 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
 #' @param name character indicating script in code_library to preview
 #' @export
 preview <- function(name) {  ## preview files in code_library
-  d <- code_library(viewer=FALSE,silent=TRUE,return_info = TRUE)
+  d <- code_library(extn = ".*",viewer=FALSE,silent=TRUE,return_info = TRUE)
   if(is.numeric(name)) {
     path <- file.path(d$FOLDER[name],d$NAME[name])
   } else {
