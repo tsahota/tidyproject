@@ -48,10 +48,13 @@ test_that("Code library",{
 
   expect_true(file.exists(file.path("code_lib_test","test2.R")))
 
-  clib <- code_library(silent=TRUE)
-  expect_true("data.frame" %in% class(clib))
+  clib <- code_library(viewer=FALSE,silent=TRUE)
+  expect_true("character" %in% class(clib))
 
-  clib <- code_library(fields = "Depends on",silent=TRUE)
+  clib <- code_library(viewer=FALSE,fields = "Depends on",silent=TRUE)
+  expect_true("character" %in% class(clib))
+
+  clib <- code_library(viewer=FALSE,silent=TRUE,return_info = TRUE)
   expect_true("data.frame" %in% class(clib))
 
   copy_script("test2.R")

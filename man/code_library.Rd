@@ -5,7 +5,7 @@
 \title{Show Code Library}
 \usage{
 code_library(extn = "r|R", fields = "Description", viewer = TRUE,
-  silent = FALSE)
+  silent = FALSE, return_info = FALSE)
 }
 \arguments{
 \item{extn}{vector string of extensions to include}
@@ -14,7 +14,9 @@ code_library(extn = "r|R", fields = "Description", viewer = TRUE,
 
 \item{viewer}{logical indicating if viewer should be used to display results (default=FALSE)}
 
-\item{silent}{logical indicating if results should be return silently (default=FALSE)}
+\item{silent}{logical indicating if messages should be silenced (default=FALSE)}
+
+\item{return_info}{logical (default = FALSE). Return data.frame of results (FALSE= returns file paths)}
 }
 \description{
 Show Code Library

@@ -296,8 +296,7 @@ copy_script <- function(from,to,dependencies=TRUE,
 
     if(use_code_library){
       ## define alt_locations to be code_library
-      d <- code_library(viewer=FALSE,silent=TRUE)
-      alt_paths <- file.path(d$FOLDER,d$NAME)
+      alt_paths <- code_library(viewer=FALSE,silent=TRUE,return_info = FALSE)
     }
 
     ## use grep to figure out how many matches.
@@ -440,9 +439,10 @@ search_scripts <- function(files,text){
 #' @param extn vector string of extensions to include
 #' @param fields character vector of fields to extract
 #' @param viewer logical indicating if viewer should be used to display results (default=FALSE)
-#' @param silent logical indicating if results should be return silently (default=FALSE)
+#' @param silent logical indicating if messages should be silenced (default=FALSE)
+#' @param return_info logical (default = FALSE). Return data.frame of results (FALSE= returns file paths)
 #' @export
-code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FALSE){
+code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FALSE,return_info=FALSE){
   if(is.null(getOption("code_library_path"))) {
     if(!silent){
       message("No directories attached. To attach add the following command:")
@@ -457,14 +457,24 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
   }
   files <- ls_scripts(extn,folder=getOption("code_library_path"),
                       recursive=TRUE)
+  if(viewer==FALSE & !return_info) {
+    return(files)
+  }
   tryCatch({
     info <- info_scripts(files,fields = fields,viewer=viewer,silent=silent,base_dirs=getOption("code_library_path"))
   },error=function(e){
     if(grepl("duplicate file",e$message)) e$message <- paste0(e$message,".\n  Check getOption(\"code_library_path\") points to non-overlapping folders")
     stop(e)
   })
-  if(!silent) message("\nDo not source scripts from the code library,\n copy them to your project with copy_script")
-  return(invisible(info))
+  if(!silent) message("\nNOTE: Do not source scripts from the code library,\n copy them to your project with copy_script")
+  if(return_info){
+    if(silent) return_ob <- invisible(info) else return_ob <- info
+  } else {
+    return_ob <- normalizePath(files)
+  }
+  if(viewer==FALSE) return(info)
+  if(viewer==TRUE) return(invisible(files))
+
 }
 
 
@@ -472,7 +482,7 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
 #' @param name character indicating script in code_library to preview
 #' @export
 preview <- function(name) {  ## preview files in code_library
-  d <- code_library(viewer=FALSE,silent=TRUE)
+  d <- code_library(viewer=FALSE,silent=TRUE,return_info = TRUE)
   if(is.numeric(name)) {
     path <- file.path(d$FOLDER[name],d$NAME[name])
   } else {
