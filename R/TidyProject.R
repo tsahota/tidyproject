@@ -367,7 +367,7 @@ ls_scripts <- function(folder=".",extn="r|R|mod",recursive=TRUE){
 #' @export
 info_scripts <- function(files,fields=c("Description","Keywords"),
                          viewer=FALSE,silent=FALSE,base_dirs=NULL,shorten_paths=TRUE){
-  res <- plyr::ldply(files,function(file.name){ ## per file
+  res <- lapply(files,function(file.name){ ## per file
     suppressWarnings({
       s <- readLines(file.name)
       ## make data.frame
@@ -383,6 +383,8 @@ info_scripts <- function(files,fields=c("Description","Keywords"),
     })
     field.vals
   })
+  res <- do.call(rbind,res)
+
   d <- cbind(data.frame(FULL=normalizePath(files),
                         FOLDER=normalizePath(dirname(files)),
                         NAME=basename(files),stringsAsFactors = FALSE),res)
