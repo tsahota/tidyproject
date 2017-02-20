@@ -313,10 +313,14 @@ copy_script <- function(from,to,dependencies=TRUE,
 #' }
 #' @export
 
-ls_scripts <- function(folder=".",extn="r|R|mod",recursive=TRUE){
-  file.name <- paste0("\\.(",extn,")$")
-  dir0 <- dir(folder,recursive=recursive)
-  file.path(gsub("^(.*[^/])/*$","\\1",folder),dir0[grepl(file.name,dir0)])
+ls_scripts <- function(folder=".",extn="r|R",recursive=TRUE){
+  if(is.null(extn)){
+    output <- dir(folder,recursive=recursive,full.names = TRUE)
+  } else {
+    file_match <- paste0("\\.(",extn,")$")
+    output <- dir(folder,recursive=recursive,full.names = TRUE,pattern=file_match)
+  }
+  return(normalizePath(output))
 }
 
 #' List information about scripts
@@ -404,6 +408,14 @@ search_scripts <- function(files,text){
   res
 }
 
+#' List files in code library
+#'
+#' @export
+
+ls_code_library <- function(){
+  ls_scripts(extn=".*",folder=getOption("code_library_path"),recursive=TRUE)
+}
+
 #' Show Code Library
 #'
 #' @param extn vector string of extensions to include
@@ -425,9 +437,12 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
     }
     return(data.frame())
   }
-  files <- ls_scripts(extn=extn,folder=getOption("code_library_path"),
-                      recursive=TRUE)
-  if(viewer==FALSE & !return_info) {
+
+  files <- ls_code_library()
+  file_match <- paste0("\\.(",extn,")$")
+  files <- files[grepl(file_match,files)]
+
+  if(viewer==FALSE & !return_info){
     return(files)
   }
   tryCatch({
@@ -447,20 +462,32 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
 
 }
 
+#' Test if full path
+#'
+#' @param x string giving file/path name
+#' @return TRUE only when path starts with ~, /, \\ or X: (i.e. when x is a full path), FALSE otherwise
+#' @examples
+#' \dontrun{
+#' is_full_path("file.text.ext")
+#' is_full_path("/path/to/file.text.ext")
+#' }
+
+is_full_path <- function(x) grepl("^(~|/|\\\\|([a-zA-Z]:))",x,perl=TRUE)
 
 #' Preview code_library file
 #' @param name character indicating script in code_library to preview
 #' @export
 preview <- function(name) {  ## preview files in code_library
-  d <- code_library(extn = ".*",viewer=FALSE,silent=TRUE,return_info = TRUE)
-  if(is.numeric(name)) {
-    path <- file.path(d$FOLDER[name],d$NAME[name])
-  } else {
-    if(!name %in% d$NAME) stop("file not found in code_library")
-    if(length(which(d$NAME %in% name)) > 1) stop("Matched more than one file with that name.\n Try preview() again using the row no. of the file in code_library()")
-    pos <- match(name,d$NAME)
-    path <- file.path(d$FOLDER[pos],d$NAME[pos])
+  if(is_full_path(name)){
+    if(!file.exists(name)) stop("file not found")
+    file.show(name)
+    return()
   }
+  d <- code_library(viewer=FALSE,silent=TRUE,return_info = TRUE)
+  if(!name %in% d$NAME) stop("file not found in code_library")
+  if(length(which(d$NAME %in% name)) > 1) stop("Matched more than one file with that name.\n Try preview() again with full path")
+  pos <- match(name,d$NAME)
+  path <- file.path(d$FOLDER[pos],d$NAME[pos])
   file.show(path)
 }
 
