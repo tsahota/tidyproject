@@ -54,25 +54,6 @@ set_project_opts <- function(){
   if(getOption("git.exists") & is.null(getOption("user.email"))) options(user.email="user@example.org")
 }
 
-#' Validate TidyProject session
-#' @param fail_on_error logical (default=FALSE) indicating whether function should give error on a test fail
-validate_session <- function(fail_on_error=FALSE){
-  result <- TRUE
-  msg <- function(...) if(fail_on_error) stop(...) else message(...)
-
-  if(!file.exists(getOption("scripts.dir"))){
-    message("Directory getOption(\"scripts.dir\") not found")
-    result <- FALSE
-  }
-
-  if(!file.exists(getOption("models.dir"))){
-    message("Directory getOption(\"models.dir\") not found")
-    result <- FALSE
-  }
-  if(!result) msg("TidyProject session validation failed.")
-  return(invisible(result))
-}
-
 #' Test if directory is a TidyProject
 #'
 #' @param proj_path character vector indicating path to TidyProject

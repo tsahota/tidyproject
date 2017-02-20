@@ -68,12 +68,13 @@ test_that("global variables look OK",{
   expect_true(!is.null(getOption("scripts.dir")))
   expect_true(!is.null(getOption("models.dir")))
 
+  set_project_opts()
 })
 
 test_that(".Rprofile works",{
 
-  testthat::skip_on_travis()
-  testthat::skip_on_cran()
+  #testthat::skip_on_travis()
+  #testthat::skip_on_cran()
 
   currentwd <- getwd()
   make_project(proj_name)
