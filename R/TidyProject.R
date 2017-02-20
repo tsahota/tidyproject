@@ -78,7 +78,8 @@ validate_session <- function(fail_on_error=FALSE){
 #' @param proj_path character vector indicating path to TidyProject
 is_tidy_project <- function(proj_path = getwd()){
   file.exists(file.path(proj_path,getOption("scripts.dir"))) &
-    file.exists(file.path(proj_path,getOption("models.dir")))
+    file.exists(file.path(proj_path,getOption("models.dir"))) #&
+    #normalizePath(get(".rs.getProjectDirectory")())==normalizePath(proj_path)
 }
 
 #' Setup files
