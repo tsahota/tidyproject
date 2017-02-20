@@ -28,12 +28,31 @@ test_that("Project is created",{
   expect_false(file.exists(file.path(proj_name,"ProjectLibrary")))
 
   cleanup(proj_name)
-
   make_project(proj_name)
 
   expect_true(file.exists(proj_name))
   expect_true(is_tidy_project(proj_name))
   expect_true(file.exists(file.path(proj_name,"ProjectLibrary")))
+
+  make_project(proj_name) ## merges directories
+  expect_true(file.exists(file.path(proj_name,"Rprofile.R")))
+
+  make_project(proj_name,project_library = FALSE)
+  expect_false(file.exists(file.path(proj_name,"ProjectLibrary")))
+
+})
+
+test_that("make bare repository",{
+
+  currentwd <- getwd()
+  make_project(proj_name)
+  on.exit({
+    setwd(currentwd)
+    cleanup(proj_name)
+  })
+
+  make_local_bare(proj_name)
+  expect_true(file.exists(paste0(proj_name,".git")))
 
 })
 

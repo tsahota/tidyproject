@@ -63,7 +63,20 @@ test_that("Code library",{
   file_contents <- readLines(file.path(getOption("scripts.dir"),"test2.R"))
   expect_true(length(file_contents)>2)
 
+  info <- info_scripts(code_library(viewer = FALSE))
+  expect_true("data.frame" %in% class(info))
+
+  matched.file <- search_scripts(code_library(viewer = FALSE),"hi")
+  expect_true(normalizePath(matched.file)==normalizePath(file.path("code_lib_test","test4.R")))
+
+  matched.file <- search_scripts(code_library(viewer = FALSE),"nomatch")
+  expect_true(length(matched.file)==0)
+
+  preview("test4.R")
+
   replace_code_library(NULL)
   expect_true(is.null(getOption("code_library_path")))
 
+
 })
+

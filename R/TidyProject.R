@@ -200,18 +200,6 @@ make_local_bare <- function(proj_name=getwd()){
   git2r::clone(bare_proj_name_full,proj_name_full)
 }
 
-#' Test if full path
-#'
-#' @param x string giving file/path name
-#' @return TRUE only when path starts with ~, /, \\ or X: (i.e. when x is a full path), FALSE otherwise
-#' @examples
-#' \dontrun{
-#' is_full_path("file.text.ext")
-#' is_full_path("/path/to/file.text.ext")
-#' }
-
-is_full_path <- function(x) grepl("^(~|/|\\\\|([a-zA-Z]:))",x,perl=TRUE)
-
 #' Create new R script
 #' @param name character indicating name of script to create
 #' @param overwrite logical. Whether to overwrite existing file (default = FALSE)
