@@ -16,4 +16,3 @@ Suggests:
     testthat,
     git2r
 Imports:
-    packrat
