@@ -550,7 +550,7 @@ Renvironment_info <- function(){
 
   scripts.dir <- getOption("scripts.dir")
   scripts <- ls_scripts(scripts.dir)
-  scripts <- scripts[!grepl("RenvironmentInfo\\.R$",scripts)]
+  scripts <- scripts[!grepl("Renvironment_info\\.R$",scripts)]
 
   text <- lapply(scripts,readLines)
   text <- unlist(text)
@@ -596,30 +596,30 @@ Renvironment_info <- function(){
     "###### utils::sessionInfo output ######",
     "txt <- c(txt,capture.output(sessionInfo()))",
     "",
-    "writeLines(txt, \"RenvironmentInfo.txt\")"
+    "writeLines(txt, \"Renvironment_info.txt\")"
   )
 
-  write(script,file=file.path(scripts.dir,"RenvironmentInfo.R"))
-  suppressMessages(setup_file(file.path(scripts.dir,"RenvironmentInfo.R")))
-  message(paste0("Script produced:           ",file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
-  source(file.path(getOption("scripts.dir"),"RenvironmentInfo.R"))
-  message(paste0("Environment info produced: RenvironmentInfo.txt"))
+  write(script,file=file.path(scripts.dir,"Renvironment_info.R"))
+  suppressMessages(setup_file(file.path(scripts.dir,"Renvironment_info.R")))
+  message(paste0("Script produced:           ",file.path(getOption("scripts.dir"),"Renvironment_info.R")))
+  source(file.path(getOption("scripts.dir"),"Renvironment_info.R"))
+  message(paste0("Environment info produced: Renvironment_info.txt"))
 
 }
 
 
 # Renvironment_info <- function(){
 #   #if(!requireNamespace("packrat", quietly = TRUE)) stop("function requires packrat to be installed")
-# 
+#
 #   dependent_packages <- dirDependencies(".")
 #   sessionInfo(package = dependent_packages)
-# 
+#
 #   txt <- c(paste0("Created at ",Sys.time()," by ",Sys.info()["user"],"\n"))
 #   txt <- c(txt,capture.output(sessionInfo()))
 #   writeLines(txt, "Renvironment_info.txt")
-# 
+#
 #   message(paste0("Environment info produced: Renvironment_info.txt"))
-# 
+#
 # }
 
 
