@@ -388,7 +388,7 @@ info_scripts <- function(files,fields=c("Description","Keywords"),
   }
 
   if(!silent){
-    if(viewer) get("View")(ds,"available files") else print(ds)
+    if(viewer) get("View")(ds,"available files")# else print(ds)
   }
   invisible(d)
 }
@@ -570,6 +570,8 @@ Renvironment_info <- function(){
   lib_statements2 <- unique(lib_statements2)
 
   lib_statements3 <- text[grep("\\w+\\s*::",text)]
+  lib_statements3 <- unlist(strsplit(lib_statements3,"[^a-zA-Z:]",perl = TRUE))
+  lib_statements3 <- lib_statements3[grepl("^.*\\w+::\\w+.*$",lib_statements3)]
   lib_statements3 <- gsub("^.*\\b(\\w+)\\s*::.*$","\\1",lib_statements3)
   lib_statements3 <- gsub("\\s","",lib_statements3)
   lib_statements3 <- unique(lib_statements3)
