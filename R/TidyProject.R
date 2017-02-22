@@ -546,11 +546,11 @@ replace_code_library <- function(path){
 #'
 #' @export
 
+
 Renvironment_info <- function(){
 
   scripts.dir <- getOption("scripts.dir")
   scripts <- ls_scripts(scripts.dir)
-  scripts <- scripts[!grepl("Renvironment_info\\.R$",scripts)]
 
   text <- lapply(scripts,readLines)
   text <- unlist(text)
@@ -579,32 +579,13 @@ Renvironment_info <- function(){
 
   lib_statements <- c(lib_statements1,lib_statements2,lib_statements3)
 
-  script <- c(
-    "## Sourcing this script generate a sessionInfo for project",
-    "## It will load all packages referenced in the scripts library",
-    "## ",
-    "",
-    "## Load all packages ",
-    lib_statements,
-    "",
-    "txt <- c(paste0(\"Created at \",Sys.time(),\" by \",Sys.info()[\"user\"],\"\\n\"))",
-    "",
-    "###### devtools::session_info output ######",
-    "#txt <- c(txt,\"###### devtools::session_info output ######\")",
-    "#x <- devtools::session_info(include_base = TRUE)",
-    "#x$platform$running <- sessionInfo()$running",
-    "#txt <- c(txt,capture.output(print(x)))",
-    "",
-    "###### utils::sessionInfo output ######",
-    "txt <- c(txt,capture.output(sessionInfo()))",
-    "",
-    "writeLines(txt, \"Renvironment_info.txt\")"
-  )
+  lib_statements
+  pkgs <- gsub("library\\((.*)\\)","\\1",lib_statements)
+  pkgs <- gsub("require\\((.*)\\)","\\1",pkgs)
 
-  write(script,file=file.path(scripts.dir,"Renvironment_info.R"))
-  suppressMessages(setup_file(file.path(scripts.dir,"Renvironment_info.R")))
-  message(paste0("Script produced:           ",file.path(getOption("scripts.dir"),"Renvironment_info.R")))
-  source(file.path(getOption("scripts.dir"),"Renvironment_info.R"))
+  txt <- c(paste0("Created at ",Sys.time()," by ",Sys.info()["user"],"\n"))
+  txt <- c(txt,capture.output(sessionInfo(package = pkgs)))
+  writeLines(txt, "Renvironment_info.txt")
   message(paste0("Environment info produced: Renvironment_info.txt"))
 
 }
