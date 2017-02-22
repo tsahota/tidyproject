@@ -36,8 +36,12 @@ test_that("R session stamp",{
   })
 
   setwd(proj_name)
+
+  write(c("## Description: abc",
+          "## Depends on: ",
+          "library(TidyProject)"),file=file.path(getOption("scripts.dir"),"test.R"))
+
   Renvironment_info()
-  expect_true(file.exists(file.path(getOption("scripts.dir"),"RenvironmentInfo.R")))
-  expect_true(file.exists("RenvironmentInfo.txt"))
+  expect_true(file.exists("Renvironment_info.txt"))
 
 })
