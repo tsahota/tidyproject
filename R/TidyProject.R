@@ -340,23 +340,25 @@ ls_scripts <- function(folder=".",extn="r|R",recursive=TRUE){
 #' @export
 info_scripts <- function(files,fields=c("Description","Keywords"),
                          viewer=FALSE,silent=FALSE,base_dirs=NULL,shorten_paths=TRUE){
-  res <- lapply(files,function(file.name){ ## per file
-    suppressWarnings({
-      s <- readLines(file.name)
-      ## make data.frame
-      ## e.g. Description Keywords
-      #           XXXX      YYYY
-      field.vals <- as.data.frame(lapply(fields,function(field){
-        field <- gsub(paste0("^.*",field,": (.*)$"),"\\1",s[grepl(paste0("^.*",field,": "),s)])
-        if(length(field)==0) field <- NA
-        field <- field[1]  ## in case multiple, take only first
-        as.character(field)
-      }))
-      names(field.vals) <- fields
+  if(length(fields)>0){
+    res <- lapply(files,function(file.name){ ## per file
+      suppressWarnings({
+        s <- readLines(file.name)
+        ## make data.frame
+        ## e.g. Description Keywords
+        #           XXXX      YYYY
+        field.vals <- as.data.frame(lapply(fields,function(field){
+          field <- gsub(paste0("^.*",field,": (.*)$"),"\\1",s[grepl(paste0("^.*",field,": "),s)])
+          if(length(field)==0) field <- NA
+          field <- field[1]  ## in case multiple, take only first
+          as.character(field)
+        }))
+        names(field.vals) <- fields
+      })
+      field.vals
     })
-    field.vals
-  })
-  res <- do.call(rbind,res)
+    res <- do.call(rbind,res)
+  } else res <- data.frame(row.names = seq_along(files))
 
   d <- cbind(data.frame(FULL=normalizePath(files),
                         FOLDER=normalizePath(dirname(files)),
@@ -483,7 +485,7 @@ preview <- function(name) {  ## preview files in code_library
     file.show(name)
     return()
   }
-  d <- code_library(viewer=FALSE,silent=TRUE,return_info = TRUE)
+  d <- code_library(extn = ".*",viewer=FALSE,silent=TRUE,return_info = TRUE,fields=c())
   if(!name %in% d$NAME) stop("file not found in code_library")
   if(length(which(d$NAME %in% name)) > 1) stop("Matched more than one file with that name.\n Try preview() again with full path")
   pos <- match(name,d$NAME)
