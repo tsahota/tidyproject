@@ -2,7 +2,7 @@
 % Please edit documentation in R/TidyProject.R
 \name{copy_script}
 \alias{copy_script}
-\title{copy_script}
+\title{Copy script to project directory}
 \usage{
 copy_script(from, to, dependencies = TRUE, stamp_copy = TRUE,
   overwrite = FALSE, comment_char = "#", alt_paths)
@@ -23,6 +23,7 @@ copy_script(from, to, dependencies = TRUE, stamp_copy = TRUE,
 \item{alt_paths}{character vector. paths to other candidate files to search}
 }
 \description{
-Copies a script and dependencies from one location (will search code library) to scripts directory
+Will search code library and copy script and dependencies into scripts directory.
+Script will also be stamped with source location, time and user information
 }
 

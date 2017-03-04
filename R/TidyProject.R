@@ -189,8 +189,8 @@ make_local_bare <- function(proj_name=getwd()){
 #' @export
 new_script <- function(name,overwrite=FALSE,open_file=TRUE){ ## create black script with comment fields. Add new_script to git
   if(name!=basename(name)) stop("name must not be a path")
-  to.path <- file.path(getOption("scripts.dir"),name)  ## destination path
-  if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
+  to_path <- file.path(getOption("scripts.dir"),name)  ## destination path
+  if(file.exists(to_path) & !overwrite) stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
   s <- c(paste0("## ","Author: ",Sys.info()["user"]),
          paste0("## ","First created: ",Sys.Date()),
          paste0("## ","Description: "),
@@ -201,9 +201,9 @@ new_script <- function(name,overwrite=FALSE,open_file=TRUE){ ## create black scr
          paste0("library(TidyProject)"),
          "","########################################",
          "## main script here","")
-  writeLines(s,to.path)
-  setup_file(to.path)
-  if(open_file) get("file.edit")(to.path)
+  writeLines(s,to_path)
+  setup_file(to_path)
+  if(open_file) get("file.edit")(to_path)
 }
 
 ## how to have multiple paths on the code_library
@@ -234,9 +234,10 @@ dependency_tree <- function(from, ## a file name (full path or a script in curre
   depends.on
 }
 
-#' copy_script
+#' Copy script to project directory
 #'
-#' Copies a script and dependencies from one location (will search code library) to scripts directory
+#' Will search code library and copy script and dependencies into scripts directory.
+#' Script will also be stamped with source location, time and user information
 #'
 #' @param from character. file name or path of file to copy
 #' @param to character. file name file to create
@@ -253,8 +254,8 @@ copy_script <- function(from,to,dependencies=TRUE,
   onlyfrom <- missing(to)
   if(missing(to)) to <- basename(from)
   if(to!=basename(to)) stop("name must not be a path")
-  to.path <- file.path(getOption("scripts.dir"),to)  ## destination path
-  if(file.exists(to.path) & !overwrite) stop(paste(to.path, "already exists. Rerun with overwrite = TRUE"))
+  to_path <- file.path(getOption("scripts.dir"),to)  ## destination path
+  if(file.exists(to_path) & !overwrite) stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
 
   use_code_library <- missing(alt_paths)
 
@@ -273,24 +274,61 @@ copy_script <- function(from,to,dependencies=TRUE,
       stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
   }
   from <- from_path
-  ## assume dependencies are in the same directory: dirname(from)
-  ## dependencies should not be from current directory
+  ## assume dependencies are in the same directory: dirname(from_path)
+  ## dependencies should not be from_path current directory
   if(dependencies){
-    depends.on <- dependency_tree(from)
+    depends.on <- dependency_tree(from_path)
     if(length(depends.on)>0) message("Copying dependencies...")
     for(i in depends.on) {
       if(file.exists(file.path(getOption("scripts.dir"),i))) message(paste("Dependency",file.path(getOption("scripts.dir"),i),"already exists. Will not overwrite")) else
-        copy_script(file.path(dirname(from),i),dependencies=FALSE,alt_paths=alt_paths)
+        copy_script(file.path(dirname(from_path),i),dependencies=FALSE,alt_paths=alt_paths)
     }
   }
-  suppressWarnings(s0 <- readLines(from))
-  ## modify text at top of "from"
-  if(dirname(from)==".") from.path <- file.path(getwd(),from) else from.path <- from
-  if(stamp_copy) s <- c(paste0(comment_char,comment_char," Copied from ",normalizePath(from.path),"\n##  (",Sys.time(),") by ",Sys.info()["user"]),s0) else
+  suppressWarnings(s0 <- readLines(from_path))
+  ## modify text at top of "from_path"
+  if(stamp_copy) s <- c(paste0(comment_char,comment_char," Copied from ",from_path,"\n##  (",Sys.time(),") by ",Sys.info()["user"]),s0) else
     s <- s0
-  writeLines(s,to.path)
-  setup_file(to.path)
+  writeLines(s,to_path)
+  setup_file(to_path)
 }
+
+#' Copy file to project directory
+#'
+#' Will copy any file from an external location (e.g. code library) into project
+#' No modification of that file will take place
+#'
+#' @param from character. file name or path of file to copy
+#' @param to character. file name file to create
+#' @param overwrite logical. Overwrite "to" file if exists?
+#' @param alt_paths character vector. paths to other candidate files to search
+#' @export
+
+copy_file <- function(from,dest_dir,overwrite=FALSE,alt_paths){
+  ## dest_dir is the location direcdest_dirry
+  if(!file.info(dest_dir)$isdir) stop("dest_dir needs to be a destination directory")
+  if(missing(from)) stop("need \"from\" argument")
+  dest_dir_path <- normalizePath(dest_dir)  ## destination path
+  
+  use_code_library <- missing(alt_paths)
+  
+  from_path <- locate_file(from,search_path = NULL)
+  
+  if(length(from_path)==0){ ## if file is not found directory or directory
+    if(use_code_library) alt_paths <- getOption("code_library_path")
+    
+    from_path <- locate_file(from,search_path = alt_paths,recursive = TRUE)
+    
+    if(length(from_path)==0) stop(paste(from,"not found"))
+    if(length(from_path)>1 & use_code_library)
+      stop("Matched more than one file with that name in code library.\n Try:\n  1) specifying full path OR\n  2) ensuring getOption(\"code_library_path\") points to non-overlapping directories")
+    if(length(from_path)>1 & !use_code_library)
+      stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
+  }
+
+  file.copy(from_path,dest_dir_path,overwrite = overwrite)
+  setup_file(file.path(dest_dir_path,basename(from_path)))
+}
+
 
 #' List scripts
 #'
