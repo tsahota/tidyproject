@@ -4,12 +4,14 @@
 \alias{locate_file}
 \title{Locate file from search path}
 \usage{
-locate_file(x, search_path = c("."))
+locate_file(x, search_path = c("."), recursive = FALSE)
 }
 \arguments{
 \item{x}{string for file name}
 
 \item{search_path}{vector of strings giving search path}
+
+\item{recursive}{logical. Default TRUE. whether to do recusive search or not}
 }
 \value{
 Path of located file.  Returns error if file not found.

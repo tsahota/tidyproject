@@ -4,7 +4,7 @@
 \alias{info_scripts}
 \title{List information about scripts}
 \usage{
-info_scripts(files, fields = c("Description", "Keywords"), viewer = FALSE,
+info_scripts(files, fields = c("Description"), viewer = TRUE,
   silent = FALSE, base_dirs = NULL, shorten_paths = TRUE)
 }
 \arguments{

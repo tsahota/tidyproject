@@ -65,8 +65,8 @@ is_tidy_project <- function(proj_path = getwd()){
 
 #' Setup files
 #' @param file.name character indicating name of file to set up
+#' @export
 setup_file <- function(file.name){
-  ## Internal function: routine procedures after creating a file.
   Sys.chmod(file.name,mode = "744")  ## 744= read-write-executable for user, read only for others
   if(getOption("git.exists")) {
     git2r::add(git2r::repository("."),file.name)
@@ -258,29 +258,21 @@ copy_script <- function(from,to,dependencies=TRUE,
 
   use_code_library <- missing(alt_paths)
 
-  if(onlyfrom) from_path <- locate_file(from,search_path = c()) else
+  if(onlyfrom) from_path <- locate_file(from,search_path = NULL) else
     from_path <- locate_file(from,search_path = getOption("scripts.dir"))
 
   if(length(from_path)==0){ ## if file is not found directory or in scripts.dir
-    ## look in code_library()
+    if(use_code_library) alt_paths <- getOption("code_library_path")
+    
+    from_path <- locate_file(from,search_path = alt_paths,recursive = TRUE)
 
-    if(use_code_library){
-      ## define alt_locations to be code_library
-      alt_paths <- code_library(viewer=FALSE,silent=TRUE,return_info = FALSE)
-    }
-
-    ## use grep to figure out how many matches.
-    matches <- grepl(paste0(from,"$"),alt_paths)
-    from0 <- from
-    from <- alt_paths[matches]
-
-    if(length(from)==0) stop(paste(from0,"not found"))
-    if(length(from)>1 & use_code_library)
+    if(length(from_path)==0) stop(paste(from,"not found"))
+    if(length(from_path)>1 & use_code_library)
       stop("Matched more than one file with that name in code library.\n Try:\n  1) specifying full path OR\n  2) ensuring getOption(\"code_library_path\") points to non-overlapping directories")
-    if(length(from)>1 & !use_code_library)
+    if(length(from_path)>1 & !use_code_library)
       stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
   }
-
+  from <- from_path
   ## assume dependencies are in the same directory: dirname(from)
   ## dependencies should not be from current directory
   if(dependencies){
@@ -338,20 +330,18 @@ ls_scripts <- function(folder=".",extn="r|R",recursive=TRUE){
 #'   filter(grepl("mod",DESCRIPTION))
 #' }
 #' @export
-info_scripts <- function(files,fields=c("Description","Keywords"),
-                         viewer=FALSE,silent=FALSE,base_dirs=NULL,shorten_paths=TRUE){
+info_scripts <- function(files,fields=c("Description"),
+                         viewer=TRUE,silent=FALSE,base_dirs=NULL,shorten_paths=TRUE){
   if(length(fields)>0){
     res <- lapply(files,function(file.name){ ## per file
       suppressWarnings({
-        s <- readLines(file.name)
-        ## make data.frame
-        ## e.g. Description Keywords
-        #           XXXX      YYYY
+        s <- readLines(file.name,n = 30)
         field.vals <- as.data.frame(lapply(fields,function(field){
-          field <- gsub(paste0("^.*",field,": (.*)$"),"\\1",s[grepl(paste0("^.*",field,": "),s)])
-          if(length(field)==0) field <- NA
-          field <- field[1]  ## in case multiple, take only first
-          as.character(field)
+          field <- gsub(paste0("^.*",field,": (.*)$"),"\\1",
+                        s[grepl(paste0("^.*",field,": "),s,ignore.case = TRUE)],ignore.case = TRUE)
+          field <- field[!field %in% ""]
+          if(length(field)==0) return(as.character(NA))
+          field[1]  ## in case multiple, take only first
         }))
         names(field.vals) <- fields
       })
@@ -426,7 +416,7 @@ ls_code_library <- function(){
 #' @param silent logical indicating if messages should be silenced (default=FALSE)
 #' @param return_info logical (default = FALSE). Return data.frame of results (FALSE= returns file paths)
 #' @export
-code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FALSE,return_info=FALSE){
+code_library <- function(extn=NULL,fields = "Description",viewer=TRUE,silent=FALSE,return_info=FALSE){
   if(is.null(getOption("code_library_path"))) {
     if(!silent){
       message("No directories attached. To attach add the following command:")
@@ -441,8 +431,10 @@ code_library <- function(extn="r|R",fields = "Description",viewer=TRUE,silent=FA
   }
 
   files <- ls_code_library()
-  file_match <- paste0("\\.(",extn,")$")
-  files <- files[grepl(file_match,files)]
+  if(!is.null(extn)){
+    file_match <- paste0("\\.(",extn,")$")
+    files <- files[grepl(file_match,files)]
+  }
 
   if(viewer==FALSE & !return_info){
     return(files)
@@ -499,20 +491,22 @@ preview <- function(name) {  ## preview files in code_library
 #' Finds first file in search_path that exists
 #' @param x string for file name
 #' @param search_path vector of strings giving search path
+#' @param recursive logical. Default TRUE. whether to do recusive search or not
 #' @return Path of located file.  Returns error if file not found.
+#' 
+#' @export
 #' @examples
 #' \dontrun{
 #' locate_file("script.R",c(".","Scripts")) ## looks in current working directory, then Scripts folder
 #' }
-locate_file <- function(x,search_path=c(".")){
+locate_file <- function(x,search_path=c("."),recursive=FALSE){
   ## internal function: locate_file from an ordered vector of directories
-  x0 <- x
-  if(file.exists(x0)) return(x0)
-  for(dir in search_path){
-    x <- normalizePath(file.path(dir,basename(x0)))
-    if(file.exists(x)) return(x)
-  }
-  return(character())
+  if(is.null(x)) if(file.exists(x)) return(normalizePath(x))
+  all_files <- unlist(lapply(search_path,function(dir){
+    x <- list.files(path=dir,all.files = TRUE,full.names = TRUE,recursive = recursive)
+    if(length(x)>0) return(normalizePath(x)) else return(character())
+  }))
+  all_files[grepl(paste0(x,"$"),all_files)]
 }
 
 
