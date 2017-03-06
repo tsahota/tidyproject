@@ -9,11 +9,11 @@ copy_file(from, dest_dir, overwrite = FALSE, alt_paths)
 \arguments{
 \item{from}{character. file name or path of file to copy}
 
+\item{dest_dir}{character. file name file to create}
+
 \item{overwrite}{logical. Overwrite "to" file if exists?}
 
 \item{alt_paths}{character vector. paths to other candidate files to search}
-
-\item{to}{character. file name file to create}
 }
 \description{
 Will copy any file from an external location (e.g. code library) into project

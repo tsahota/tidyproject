@@ -264,7 +264,7 @@ copy_script <- function(from,to,dependencies=TRUE,
 
   if(length(from_path)==0){ ## if file is not found directory or in scripts.dir
     if(use_code_library) alt_paths <- getOption("code_library_path")
-    
+
     from_path <- locate_file(from,search_path = alt_paths,recursive = TRUE)
 
     if(length(from_path)==0) stop(paste(from,"not found"))
@@ -298,7 +298,7 @@ copy_script <- function(from,to,dependencies=TRUE,
 #' No modification of that file will take place
 #'
 #' @param from character. file name or path of file to copy
-#' @param to character. file name file to create
+#' @param dest_dir character. file name file to create
 #' @param overwrite logical. Overwrite "to" file if exists?
 #' @param alt_paths character vector. paths to other candidate files to search
 #' @export
@@ -308,16 +308,16 @@ copy_file <- function(from,dest_dir,overwrite=FALSE,alt_paths){
   if(!file.info(dest_dir)$isdir) stop("dest_dir needs to be a destination directory")
   if(missing(from)) stop("need \"from\" argument")
   dest_dir_path <- normalizePath(dest_dir)  ## destination path
-  
+
   use_code_library <- missing(alt_paths)
-  
+
   from_path <- locate_file(from,search_path = NULL)
-  
+
   if(length(from_path)==0){ ## if file is not found directory or directory
     if(use_code_library) alt_paths <- getOption("code_library_path")
-    
+
     from_path <- locate_file(from,search_path = alt_paths,recursive = TRUE)
-    
+
     if(length(from_path)==0) stop(paste(from,"not found"))
     if(length(from_path)>1 & use_code_library)
       stop("Matched more than one file with that name in code library.\n Try:\n  1) specifying full path OR\n  2) ensuring getOption(\"code_library_path\") points to non-overlapping directories")
@@ -531,7 +531,7 @@ preview <- function(name) {  ## preview files in code_library
 #' @param search_path vector of strings giving search path
 #' @param recursive logical. Default TRUE. whether to do recusive search or not
 #' @return Path of located file.  Returns error if file not found.
-#' 
+#'
 #' @export
 #' @examples
 #' \dontrun{
