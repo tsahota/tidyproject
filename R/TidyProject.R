@@ -621,7 +621,7 @@ Renvironment_info <- function(){
   pkgs <- gsub("require\\((.*)\\)","\\1",pkgs)
 
   txt <- c(paste0("Created at ",Sys.time()," by ",Sys.info()["user"],"\n"))
-  txt <- c(txt,capture.output(sessionInfo(package = pkgs)))
+  txt <- c(txt,utils::capture.output(utils::sessionInfo(package = pkgs)))
   writeLines(txt, "Renvironment_info.txt")
   message(paste0("Environment info produced: Renvironment_info.txt"))
 
