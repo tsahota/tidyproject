@@ -56,6 +56,12 @@ Renvironment_info()
 
 This will search your scripts in your "Scripts" directory for package dependencies and output version and environment information into Renvironment_info.txt of the main directory.
 
+Check your TidyProject is set up correctly by typing the following:
+
+```R
+check_session()
+```
+
 ### Add a code library
 
 If you have a directory of scripts somewhere (scripts can be in subdirectories) add it with the following:
