@@ -83,4 +83,4 @@ copy_script("nameofscript.R")
 ```
 Attach multiple code libraries with `options(code_library_path=c("path/to/code/repo1","path/to/code/repo2")")`.
 
-To avoid having to do this each R session, add your `options` command to your user "~/.Rprofile" (or "$R_HOME/etc/Rprofile.site" if you want this to apply for all users).
+To avoid having to do this each R session, add your `options` command to your user "~/.Rprofile" (or "R_HOME/etc/Rprofile.site" if you want this to apply for all users).

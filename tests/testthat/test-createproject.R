@@ -23,7 +23,7 @@ test_that("Project is created",{
 
   make_project(proj_name,project_library = FALSE)
 
-  expect_true(is_tidy_project(proj_name))
+  expect_true(is_tidyproject(proj_name))
   expect_true(file.exists(proj_name))
   expect_false(file.exists(file.path(proj_name,"ProjectLibrary")))
 
@@ -31,7 +31,7 @@ test_that("Project is created",{
   make_project(proj_name)
 
   expect_true(file.exists(proj_name))
-  expect_true(is_tidy_project(proj_name))
+  expect_true(is_tidyproject(proj_name))
   expect_true(file.exists(file.path(proj_name,"ProjectLibrary")))
 
   make_project(proj_name) ## merges directories

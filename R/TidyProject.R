@@ -54,19 +54,21 @@ set_project_opts <- function(){
   if(getOption("git.exists") & is.null(getOption("user.email"))) options(user.email="user@example.org")
 }
 
-#' Test if directory is a TidyProject
-#'
-#' @param proj_path character vector indicating path to TidyProject
-is_tidy_project <- function(proj_path = getwd()){
-  file.exists(file.path(proj_path,getOption("scripts.dir"))) &
-    file.exists(file.path(proj_path,getOption("models.dir"))) #&
-  #normalizePath(get(".rs.getProjectDirectory")())==normalizePath(proj_path)
+is_tidyproject <- function(directory = getwd()){
+  file.exists(scripts_dir(directory)) &
+    file.exists(models_dir(directory))
+}
+
+check_if_tidyproject <- function(directory = getwd()){
+  if(!is_tidyproject(directory)) stop("directory not a tidyproject")
+  return(TRUE)
 }
 
 #' Setup files
 #' @param file.name character indicating name of file to set up
 #' @export
 setup_file <- function(file.name){
+  check_if_tidyproject()
   Sys.chmod(file.name,mode = "744")  ## 744= read-write-executable for user, read only for others
   if(getOption("git.exists")) {
     git2r::add(git2r::repository("."),file.name)
@@ -188,8 +190,9 @@ make_local_bare <- function(proj_name=getwd()){
 #' @param open_file logical. Whether function should open script (default = TRUE)
 #' @export
 new_script <- function(name,overwrite=FALSE,open_file=TRUE){ ## create black script with comment fields. Add new_script to git
+  check_if_tidyproject()
   if(name!=basename(name)) stop("name must not be a path")
-  to_path <- file.path(getOption("scripts.dir"),name)  ## destination path
+  to_path <- file.path(scripts_dir(),name)  ## destination path
   if(file.exists(to_path) & !overwrite) stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
   s <- c(paste0("## ","Author: ",Sys.info()["user"]),
          paste0("## ","First created: ",Sys.Date()),
@@ -246,21 +249,23 @@ dependency_tree <- function(from, ## a file name (full path or a script in curre
 #' @param overwrite logical. Overwrite "to" file if exists?
 #' @param comment_char character. Comment character
 #' @param alt_paths character vector. paths to other candidate files to search
+#' @param proj_path character. Default = current working directory. path to tidyproject
 #' @export
 copy_script <- function(from,to,dependencies=TRUE,
-                        stamp_copy=TRUE,overwrite=FALSE,comment_char="#",alt_paths){
+                        stamp_copy=TRUE,overwrite=FALSE,comment_char="#",alt_paths,proj_path="."){
   ## User function: copies script from one location (e.g. code_library) to project scripts directory
+  check_if_tidyproject(proj_path)
   if(missing(from)) stop("need \"from\" argument")
   onlyfrom <- missing(to)
   if(missing(to)) to <- basename(from)
   if(to!=basename(to)) stop("name must not be a path")
-  to_path <- file.path(getOption("scripts.dir"),to)  ## destination path
+  to_path <- file.path(scripts_dir(proj_path),to)  ## destination path
   if(file.exists(to_path) & !overwrite) stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
 
   use_code_library <- missing(alt_paths)
 
   if(onlyfrom) from_path <- locate_file(from,search_path = NULL) else
-    from_path <- locate_file(from,search_path = getOption("scripts.dir"))
+    from_path <- locate_file(from,search_path = scripts_dir(proj_path))
 
   if(length(from_path)==0){ ## if file is not found directory or in scripts.dir
     if(use_code_library) alt_paths <- getOption("code_library_path")
@@ -280,7 +285,7 @@ copy_script <- function(from,to,dependencies=TRUE,
     depends.on <- dependency_tree(from_path)
     if(length(depends.on)>0) message("Copying dependencies...")
     for(i in depends.on) {
-      if(file.exists(file.path(getOption("scripts.dir"),i))) message(paste("Dependency",file.path(getOption("scripts.dir"),i),"already exists. Will not overwrite")) else
+      if(file.exists(file.path(scripts_dir(proj_path),i))) message(paste("Dependency",file.path(getOption("scripts.dir"),i),"already exists. Will not overwrite")) else
         copy_script(file.path(dirname(from_path),i),dependencies=FALSE,alt_paths=alt_paths)
     }
   }
@@ -307,7 +312,7 @@ copy_file <- function(from,dest_dir,overwrite=FALSE,alt_paths){
   ## dest_dir is the location direcdest_dirry
   if(!file.info(dest_dir)$isdir) stop("dest_dir needs to be a destination directory")
   if(missing(from)) stop("need \"from\" argument")
-  dest_dir_path <- normalizePath(dest_dir)  ## destination path
+  dest_dir_path <- normalizePath(dest_dir)
 
   use_code_library <- missing(alt_paths)
 
@@ -326,7 +331,6 @@ copy_file <- function(from,dest_dir,overwrite=FALSE,alt_paths){
   }
 
   file.copy(from_path,dest_dir_path,overwrite = overwrite)
-  setup_file(file.path(dest_dir_path,basename(from_path)))
 }
 
 
@@ -582,9 +586,8 @@ replace_code_library <- function(path){
 
 
 Renvironment_info <- function(){
-
-  scripts.dir <- getOption("scripts.dir")
-  scripts <- ls_scripts(scripts.dir)
+  check_if_tidyproject()
+  scripts <- ls_scripts(scripts_dir())
 
   text <- lapply(scripts,readLines)
   text <- unlist(text)
@@ -624,7 +627,6 @@ Renvironment_info <- function(){
 
 }
 
-
 # Renvironment_info <- function(){
 #   #if(!requireNamespace("packrat", quietly = TRUE)) stop("function requires packrat to be installed")
 #
@@ -652,18 +654,84 @@ short_path <- function(x){
   unlist(short_paths)
 }
 
-#' rate my code
+
+#' Check tidyproject for best practice compliance
 #'
-#' @param script_file character. script file to assess
+#' @param proj_name character. default = current working directory. path to directory.
+#' @param silent logical. default = FALSE. suppress messages or not
+#' @param check_rstudio logical (default = FALSE). Check rstudio studio project directory
 #' @export
 
-#rate_my_code <- function(script_file){
-#  message("Nothing much here. Under construction")
-#}
+check_session <- function(proj_name=getwd(),silent=FALSE,check_rstudio=TRUE){
+  drstudio.exists <- FALSE
+  if(check_rstudio & exists(".rs.getProjectDirectory")){
+    drstudio.exists <- FALSE
+    drstudio <- do_test("rstudio working dir = current working dir"={
+      res <- normalizePath(get(".rs.getProjectDirectory")()) == normalizePath(".")
+      if(res) return(TRUE) else return(paste0(FALSE,": switch to main dir"))
+    },silent = silent)
+    if(drstudio$result[drstudio$test=="rstudio working dir = current working dir"])
+      stop("FAILED: working directory should be current working directory. setwd() is discouraged")
+  }
 
-#' rate my code
-#' @export
+  d <- do_test("directory is a tidyproject"=
+                 is_tidyproject(proj_name),
+               "contains Renvironment_info"=
+                 file.exists(file.path(proj_name,"Renvironment_info.txt")),
+               "up to date Renvironment_info"={
+                 script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
+                 if(length(script_times)==0) return("No scripts")
+                 if(!file.exists(file.path(proj_name,"Renvironment_info.txt"))) return("no Renvironment_info.txt")
+                 envir_time <- file.info(file.path(proj_name,"Renvironment_info.txt"))$mtime
+                 time_diff <- difftime(envir_time,max(script_times))
+                 result <- time_diff>=0
+                 if(result) return(TRUE)
+                 paste0(result,": ",signif(time_diff,2)," ",attr(time_diff,"units"))
+               },
+               "Project library setup"={
+                 if(file.exists(file.path(proj_name,"ProjectLibrary"))){
+                   res <- normalizePath(file.path(proj_name,"ProjectLibrary")) == normalizePath(.libPaths()[1])
+                   return(res)
+                 } else return(paste0(FALSE,": no project library"))
+               },
+               silent=silent)
+  if(drstudio.exists) d <- rbind(drstudio,d)
+  invisible(d)
+}
 
-#rate_my_project <- function(proj_name=getwd()){
-#  is_tidy_project
-#}
+# rate_my_script <- function(script_name,silent=FALSE){
+#   tools::file_ext(script_name)=="R"
+#   browser()
+# }
+
+do_test <- function(...,silent=FALSE){
+  x <- match.call(expand.dots = FALSE)$`...`
+
+  eval_x <- logical(length=length(x))
+  for(i in seq_along(x)){
+    eval_x[i] <- eval(parse(text = deparse(x[[i]])),envir = parent.frame())
+  }
+  names(eval_x) <- names(x)
+
+  ## check outputs
+  lengths <- sapply(eval_x,length)
+  if(any(lengths!=1)) stop(paste("Following tests not return single value:\n",paste(names(eval_x)[lengths!=1],sep="\n")))
+
+  if(!silent) for(test_name in names(eval_x)){
+    message(substr(paste(test_name,paste(rep(".",600),collapse = "")),1,50),appendLF = FALSE)
+    message(eval_x[[test_name]])
+  }
+
+  d <- data.frame(test=names(eval_x),result=unlist(eval_x))
+  row.names(d) <- NULL
+  invisible(d)
+}
+
+scripts_dir <- function(proj_name=getwd()){
+  normalizePath(file.path(proj_name,getOption("scripts.dir")),mustWork = FALSE)
+}
+
+models_dir <- function(proj_name=getwd()){
+  normalizePath(file.path(proj_name,getOption("models.dir")),mustWork = FALSE)
+}
+

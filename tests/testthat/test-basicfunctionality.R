@@ -20,9 +20,13 @@ test_that("Project has basic functionality",{
   setwd(proj_name)
 
   expect_true(file.exists("ProjectLibrary"))
-
+#browser()
   new_script("test.R",open_file = FALSE)
   expect_true(file.exists(file.path(getOption("scripts.dir"),"test.R")))
+
+  Renvironment_info()
+  res <- check_session(check_rstudio=FALSE)
+  expect_true(is.data.frame(res))
 
 })
 
