@@ -3,15 +3,15 @@
 [![Travis-CI Build Status](https://travis-ci.org/tsahota/TidyProject.svg?branch=master)](https://travis-ci.org/tsahota/TidyProject)
 [![Coverage Status](https://coveralls.io/repos/github/tsahota/TidyProject/badge.svg?branch=master)](https://coveralls.io/github/tsahota/TidyProject?branch=master)
 
-Build *Institutional Memory and Learning*:
+## Build Institutional Memory and Learning:
  
-####Institutional Memory:
+#### Memory:
 * Consistent and tidy directory structure for all your projects
 * Long term reproducibility:
   * Project library for each project: stores packages alongside project code (like packrat but lighter): 
   * Version control (git) compatibility: roll back your projects when needed.
 
-####Institutional Learning:
+#### Learning:
 * Code library: Store and share scripts, functions, templates in an ever improving repository of code
 * Search code library for keywords or raw text
 
