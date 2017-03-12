@@ -2,6 +2,7 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/tsahota/tidyproject.svg?branch=master)](https://travis-ci.org/tsahota/tidyproject)
 [![Coverage Status](https://coveralls.io/repos/github/tsahota/tidyproject/badge.svg?branch=master)](https://coveralls.io/github/tsahota/tidyproject?branch=master)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/NA/NA?branch=master&svg=true)](https://ci.appveyor.com/project/NA/NA)
 
 ## Build Institutional Memory and Learning:
  
