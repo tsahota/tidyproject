@@ -1,4 +1,4 @@
 library(testthat)
-library(TidyProject)
+library(tidyproject)
 
-test_check("TidyProject")
+test_check("tidyproject")

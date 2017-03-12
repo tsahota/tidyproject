@@ -1,4 +1,4 @@
-library(TidyProject)
+library(tidyproject)
 
 context("creating project")
 

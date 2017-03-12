@@ -1,7 +1,7 @@
-# TidyProject
+# tidyproject
 
-[![Travis-CI Build Status](https://travis-ci.org/tsahota/TidyProject.svg?branch=master)](https://travis-ci.org/tsahota/TidyProject)
-[![Coverage Status](https://coveralls.io/repos/github/tsahota/TidyProject/badge.svg?branch=master)](https://coveralls.io/github/tsahota/TidyProject?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/tsahota/tidyproject.svg?branch=master)](https://travis-ci.org/tsahota/tidyproject)
+[![Coverage Status](https://coveralls.io/repos/github/tsahota/tidyproject/badge.svg?branch=master)](https://coveralls.io/github/tsahota/tidyproject?branch=master)
 
 ## Build Institutional Memory and Learning:
  
@@ -19,26 +19,26 @@
 
 ```R
 install.packages("devtools")
-devtools::install_github("tsahota/TidyProject")
+devtools::install_github("tsahota/tidyproject")
 ```
 
 ## Quick Tutorial
 
 ### Make a project
-Make a TidyProject with
+Make a tidyproject with
 
 ```R
 make_project("path/to/directory")
 ```
-Open the newly created Rstudio project with File -> Open Project. **Warning: do not use setwd() to open TidyProjects.**
+Open the newly created Rstudio project with File -> Open Project. **Warning: do not use setwd() to open tidyprojects.**
 
 You should see a new directory structure.  Opening the Rstudio project reconfigures default libraries to use the project library, e.g. try installing a package now:
 
 ```R
-devtools::install_github("tsahota/TidyProject")
+devtools::install_github("tsahota/tidyproject")
 ```
 
-This package is now in your "ProjectLibrary" subdirectory. Loading packages from this TidyProject (e.g. with `library`), will cause packages in this specific project library load. If you want to switch projects, use Rstudio's "open project".  Using setwd() is strongly discouraged.
+This package is now in your "ProjectLibrary" subdirectory. Loading packages from this tidyproject (e.g. with `library`), will cause packages in this specific project library load. If you want to switch projects, use Rstudio's "open project".  Using setwd() is strongly discouraged.
 
 ### Make a script
 Create a new script:
@@ -48,7 +48,7 @@ new_script("scriptname.R")
 ```
 This will pre-fill some comments and store the script in your "Scripts" subdirectory.
 
-Check your TidyProject is set up correctly by typing the following:
+Check your tidyproject is set up correctly by typing the following:
 
 ```R
 check_session()

@@ -1,6 +1,6 @@
 #' Project and code management
 #'
-#' TidyProject is designed to manage tidy project directories and
+#' tidyproject is designed to manage tidy project directories and
 #' facilitate reproducibility and reuse of code
 #'
 #' @section Strategy:
@@ -39,7 +39,7 @@
 #' copy_script("../pathto/script.R")       ## copies from other location
 #' }
 #' @docType package
-#' @name TidyProject
+#' @name tidyproject
 
 NULL
 
@@ -78,7 +78,7 @@ setup_file <- function(file.name){
 
 #' Create new_project
 #'
-#' Creates directory structure.  User install TidyProject again in
+#' Creates directory structure.  User install tidyproject again in
 #'
 #' @param proj_name character string of full path to new_project
 #' @param project_library TRUE (default) or FALSE indicating whether or not to create a project library
@@ -91,7 +91,7 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
     tryCatch({
       message("Directory doesn't exist. Creating...")
       dir.create(proj_name)
-      file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj_name,recursive=TRUE)
+      file.copy(file.path(system.file("extdata/EmptyProject",package="tidyproject"),"."),proj_name,recursive=TRUE)
       result <- file.rename(file.path(proj_name,"Rprofile.R"),file.path(proj_name,".Rprofile"))
       if(!result) stop("something wrong with .Rprofile creation") else
         unlink(file.path(proj_name,"Rprofile.R"))
@@ -106,7 +106,7 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
   } else {
     message("Directory exists. Merging...")
     ## find common files that wont be overwritten.
-    all_templates <- dir(system.file("extdata/EmptyProject",package="TidyProject"),include.dirs = TRUE,all.files = TRUE,recursive = TRUE)
+    all_templates <- dir(system.file("extdata/EmptyProject",package="tidyproject"),include.dirs = TRUE,all.files = TRUE,recursive = TRUE)
     all_existing <- dir(proj_name,include.dirs = TRUE,all.files = TRUE,recursive = TRUE)
 
     merge_conf <- intersect(all_templates,all_existing)
@@ -114,7 +114,7 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
     message(paste(merge_conf,collapse = "\n"))
     message("")
 
-    file.copy(file.path(system.file("extdata/EmptyProject",package="TidyProject"),"."),proj_name,recursive=TRUE,overwrite = FALSE)
+    file.copy(file.path(system.file("extdata/EmptyProject",package="tidyproject"),"."),proj_name,recursive=TRUE,overwrite = FALSE)
     ## if the file is there don't overwrite.
     if(file.exists(file.path(proj_name,".Rprofile")))
       message(".Rprofile already present, creating Rprofile.R instead") else {
@@ -157,18 +157,18 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
       stop(e)
     })
   }
-  message(paste("TidyProject directory ready:",proj_name))
+  message(paste("tidyproject directory ready:",proj_name))
   message("----------------------------------------------------")
   message("")
   message("INSTRUCTIONS:")
   message(paste("1. Open Rstudio project to start working: ",proj_name))
   if(project_library){
-    message(paste("2. (optional) Install TidyProject package in project library"))
+    message(paste("2. (optional) Install tidyproject package in project library"))
   }
 }
 
 #' create local bare repository
-#' @param proj_name character vector indicating path to TidyProject
+#' @param proj_name character vector indicating path to tidyproject
 #' @export
 make_local_bare <- function(proj_name=getwd()){
   currentwd <- getwd() ; on.exit(setwd(currentwd))
@@ -201,7 +201,7 @@ new_script <- function(name,overwrite=FALSE,open_file=TRUE){ ## create black scr
          paste0("## ","Keywords: "),
          "","########################################",
          "## load packages and source functions here","",
-         paste0("library(TidyProject)"),
+         paste0("library(tidyproject)"),
          "","########################################",
          "## main script here","")
   writeLines(s,to_path)
