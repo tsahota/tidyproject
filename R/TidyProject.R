@@ -312,7 +312,7 @@ copy_file <- function(from,dest_dir,overwrite=FALSE,alt_paths){
   ## dest_dir is the location direcdest_dirry
   if(!file.info(dest_dir)$isdir) stop("dest_dir needs to be a destination directory")
   if(missing(from)) stop("need \"from\" argument")
-  dest_dir_path <- normalizePath(dest_dir)
+  dest_dir_path <- normalizePath(dest_dir,winslash = "/")
 
   use_code_library <- missing(alt_paths)
 
@@ -354,7 +354,7 @@ ls_scripts <- function(folder=".",extn="r|R",recursive=TRUE){
     file_match <- paste0("\\.(",extn,")$")
     output <- dir(folder,recursive=recursive,full.names = TRUE,pattern=file_match)
   }
-  return(normalizePath(output))
+  return(normalizePath(output,winslash = "/"))
 }
 
 #' List information about scripts
@@ -392,12 +392,12 @@ info_scripts <- function(files,fields=c("Description"),
     res <- do.call(rbind,res)
   } else res <- data.frame(row.names = seq_along(files))
 
-  d <- cbind(data.frame(FULL=normalizePath(files),
-                        FOLDER=normalizePath(dirname(files)),
+  d <- cbind(data.frame(FULL=normalizePath(files,winslash = "/"),
+                        FOLDER=normalizePath(dirname(files),winslash = "/"),
                         NAME=basename(files),stringsAsFactors = FALSE),res)
 
   if(!is.null(base_dirs)){
-    base_dirs <- normalizePath(base_dirs)
+    base_dirs <- normalizePath(base_dirs,winslash = "/")
 
     all_matches <- unlist(lapply(base_dirs,function(base_dir){
       grep(paste0("^",base_dir),d$FULL)
@@ -491,7 +491,7 @@ code_library <- function(extn=NULL,fields = "Description",viewer=TRUE,silent=FAL
   if(return_info){
     if(silent) return_ob <- invisible(info) else return_ob <- info
   } else {
-    return_ob <- normalizePath(files)
+    return_ob <- normalizePath(files,winslash = "/")
   }
   if(viewer==FALSE) return(info)
   if(viewer==TRUE) return(invisible(files))
@@ -543,10 +543,10 @@ preview <- function(name) {  ## preview files in code_library
 #' }
 locate_file <- function(x,search_path=c("."),recursive=FALSE){
   ## internal function: locate_file from an ordered vector of directories
-  if(is.null(x)) if(file.exists(x)) return(normalizePath(x))
+  if(is.null(x)) if(file.exists(x)) return(normalizePath(x,winslash = "/"))
   all_files <- unlist(lapply(search_path,function(dir){
     x <- list.files(path=dir,all.files = TRUE,full.names = TRUE,recursive = recursive)
-    if(length(x)>0) return(normalizePath(x)) else return(character())
+    if(length(x)>0) return(normalizePath(x,winslash = "/")) else return(character())
   }))
   all_files[grepl(paste0(x,"$"),all_files)]
 }
@@ -667,7 +667,7 @@ check_session <- function(proj_name=getwd(),silent=FALSE,check_rstudio=TRUE){
   if(check_rstudio & exists(".rs.getProjectDirectory")){
     drstudio.exists <- FALSE
     drstudio <- do_test("rstudio working dir = current working dir"={
-      res <- normalizePath(get(".rs.getProjectDirectory")()) == normalizePath(".")
+      res <- normalizePath(get(".rs.getProjectDirectory")(),winslash = "/") == normalizePath(".",winslash = "/")
       if(res) return(TRUE) else return(paste0(FALSE,": switch to main dir"))
     },silent = silent)
     if(!drstudio$result[drstudio$test=="rstudio working dir = current working dir"])
@@ -690,7 +690,7 @@ check_session <- function(proj_name=getwd(),silent=FALSE,check_rstudio=TRUE){
                },
                "Project library setup"={
                  if(file.exists(file.path(proj_name,"ProjectLibrary"))){
-                   res <- normalizePath(file.path(proj_name,"ProjectLibrary")) == normalizePath(.libPaths()[1])
+                   res <- normalizePath(file.path(proj_name,"ProjectLibrary"),winslash = "/") == normalizePath(.libPaths()[1],winslash = "/")
                    return(res)
                  } else return(paste0(FALSE,": no project library"))
                },
@@ -728,10 +728,10 @@ do_test <- function(...,silent=FALSE){
 }
 
 scripts_dir <- function(proj_name=getwd()){
-  normalizePath(file.path(proj_name,getOption("scripts.dir")),mustWork = FALSE)
+  normalizePath(file.path(proj_name,getOption("scripts.dir")),winslash = "/",mustWork = FALSE)
 }
 
 models_dir <- function(proj_name=getwd()){
-  normalizePath(file.path(proj_name,getOption("models.dir")),mustWork = FALSE)
+  normalizePath(file.path(proj_name,getOption("models.dir")),winslash = "/",mustWork = FALSE)
 }
 
