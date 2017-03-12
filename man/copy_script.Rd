@@ -16,7 +16,7 @@ copy_script(from, to, dependencies = TRUE, stamp_copy = TRUE,
 
 \item{stamp_copy}{logical. Create a commented timestamp at beginning of file}
 
-\item{overwrite}{logical. Overwrite "to" file if exists?}
+\item{overwrite}{logical. Overwrite 'to' file if exists?}
 
 \item{comment_char}{character. Comment character}
 

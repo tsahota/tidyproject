@@ -24,9 +24,9 @@ facilitate reproducibility and reuse of code
 
 \section{Options}{
 
-\code{scripts.dir} = names of the "scripts" directory in the project
+\code{scripts.dir} = names of the 'scripts' directory in the project
 
-\code{models.dir} = names of the "models" directory in the project
+\code{models.dir} = names of the 'models' directory in the project
 
 \code{git.exists} = \code{TRUE} if git is installed (only works on unix currently)
 
@@ -37,14 +37,14 @@ To modify these values permanently set options() in ~/.Rprofile or R_HOME/etc/Rp
 }
 \examples{
 \dontrun{
-make_project("~/AZDXXXX/PKAE1")         ## creates new_project
+make_project('~/AZDXXXX/PKAE1')         ## creates new_project
 code_library()                          ## display summary of code_library
-preview("template1.R")                  ## preview file in code_library
-copy_script("template1.R")              ## copy_script from code_library to project
+preview('template1.R')                  ## preview file in code_library
+copy_script('template1.R')              ## copy_script from code_library to project
 
-new_script("test.R")                    ## Creates empty test.R
-copy_script("output.data.R")            ## copies from code_library
-copy_script("../pathto/script.R")       ## copies from other location
+new_script('test.R')                    ## Creates empty test.R
+copy_script('output.data.R')            ## copies from code_library
+copy_script('../pathto/script.R')       ## copies from other location
 }
 }
 

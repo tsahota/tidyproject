@@ -11,7 +11,7 @@ copy_file(from, dest_dir, overwrite = FALSE, alt_paths)
 
 \item{dest_dir}{character. file name file to create}
 
-\item{overwrite}{logical. Overwrite "to" file if exists?}
+\item{overwrite}{logical. Overwrite 'to' file if exists?}
 
 \item{alt_paths}{character vector. paths to other candidate files to search}
 }

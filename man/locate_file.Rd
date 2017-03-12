@@ -21,7 +21,7 @@ Finds first file in search_path that exists
 }
 \examples{
 \dontrun{
-locate_file("script.R",c(".","Scripts")) ## looks in current working directory, then Scripts folder
+locate_file('script.R',c('.','Scripts')) ## looks in current working directory, then Scripts folder
 }
 }
 

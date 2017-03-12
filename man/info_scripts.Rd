@@ -25,9 +25,9 @@ List information about scripts
 }
 \examples{
 \dontrun{
-ls_scripts("~/AZD6094/PK_liver4/") \%>\%
-  info_scripts("Description") \%>\%
-  filter(grepl("mod",DESCRIPTION))
+ls_scripts('~/AZD6094/PK_liver4/') \%>\%
+  info_scripts('Description') \%>\%
+  filter(grepl('mod',DESCRIPTION))
 }
 }
 

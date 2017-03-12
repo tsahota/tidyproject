@@ -1,3 +1,3 @@
-.onLoad <- function(libname, pkgname){
-  set_project_opts()
+.onLoad <- function(libname, pkgname) {
+    set_project_opts()
 }
