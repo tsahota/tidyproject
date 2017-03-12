@@ -670,7 +670,7 @@ check_session <- function(proj_name=getwd(),silent=FALSE,check_rstudio=TRUE){
       res <- normalizePath(get(".rs.getProjectDirectory")()) == normalizePath(".")
       if(res) return(TRUE) else return(paste0(FALSE,": switch to main dir"))
     },silent = silent)
-    if(drstudio$result[drstudio$test=="rstudio working dir = current working dir"])
+    if(!drstudio$result[drstudio$test=="rstudio working dir = current working dir"])
       stop("FAILED: working directory should be current working directory. setwd() is discouraged")
   }
 
