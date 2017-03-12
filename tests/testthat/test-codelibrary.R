@@ -62,6 +62,10 @@ test_that("Code library",{
 
   file_contents <- readLines(file.path(getOption("scripts.dir"),"test2.R"))
   expect_true(length(file_contents)>2)
+  
+  unlink(file.path(getOption("scripts.dir"),"test2.R"))
+  copy_file("test2.R",getOption("scripts.dir"))
+  expect_true(file.exists(file.path(getOption("scripts.dir"),"test2.R")))
 
   info <- info_scripts(code_library(viewer=FALSE,silent=TRUE),viewer = FALSE)
   expect_true("data.frame" %in% class(info))
