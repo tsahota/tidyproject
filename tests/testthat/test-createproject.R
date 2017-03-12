@@ -13,19 +13,19 @@ cleanup <- function(proj_name){
 test_that("Project is created",{
 
   currentwd <- getwd()
-  print("dir_before_clean=")
-  print(dir())
-  print(paste0("proj_name=",proj_name))
+  #print("dir_before_clean=")
+  #print(dir())
+  #print(paste0("proj_name=",proj_name))
   cleanup(proj_name)
-  print("dir_after_clean=")
-  print(dir())
+  #print("dir_after_clean=")
+  #print(dir())
   on.exit({
     setwd(currentwd)
     cleanup(proj_name)
   })
 
-  print("dir_before_test=")
-  print(dir())
+  #print("dir_before_test=")
+  #print(dir())
   expect_false(file.exists(proj_name))
 
   make_project(proj_name,project_library = FALSE)
