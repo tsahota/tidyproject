@@ -102,6 +102,10 @@ make_local_bare <- function(proj_name=getwd()){
   bare_proj_name_full <- paste0(proj_name_full,".git")
   git2r::clone(proj_name_full,bare_proj_name_full,bare = TRUE)
   setwd("../")
-  unlink(proj_name,recursive = TRUE)
+  print("in make_local_bare")
+  print(dir())
+  res <- unlink(proj_name_full,recursive = TRUE)
+  print(paste("res=",res))
+  print(dir())
   git2r::clone(bare_proj_name_full,proj_name_full)
 }

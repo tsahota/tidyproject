@@ -97,7 +97,7 @@ test_that(".Rprofile works",{
 
   source(".Rprofile")
 
-  expect_true(normalizePath("ProjectLibrary") %in% .libPaths())
+  expect_true(normalizePath("ProjectLibrary",winslash = "/") %in% .libPaths())
 
 })
 
