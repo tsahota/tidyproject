@@ -48,19 +48,20 @@ new_script("scriptname.R")
 ```
 This will pre-fill some comments and store the script in your "Scripts" subdirectory.
 
-Take an snapshot of your R environment:
-
-```R
-Renvironment_info()
-```
-
-This will search your scripts in your "Scripts" directory for package dependencies and output version and environment information into Renvironment_info.txt of the main directory.
-
 Check your TidyProject is set up correctly by typing the following:
 
 ```R
 check_session()
 ```
+
+It complains about Renvironment_info() not being present. Take an snapshot of your R environment:
+
+```R
+Renvironment_info()
+```
+
+This will search your scripts in your "Scripts" directory for package dependencies and output version and environment information into Renvironment_info.txt of the main directory.  If you run `check_session()` again it should pass now.
+
 
 ### Add a code library
 
