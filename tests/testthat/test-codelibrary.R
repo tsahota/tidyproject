@@ -3,9 +3,9 @@ context("Code Library")
 proj_name <- "test_tidyproject"
 
 cleanup <- function(proj_name){
-  if(file.exists(proj_name)) unlink(proj_name,recursive = TRUE)
+  if(file.exists(proj_name)) unlink(proj_name,recursive = TRUE,force = TRUE)
   base_proj_name <- paste0(proj_name,".git")
-  if(file.exists(base_proj_name)) unlink(base_proj_name,recursive = TRUE)
+  if(file.exists(base_proj_name)) unlink(base_proj_name,recursive = TRUE,force = TRUE)
 }
 
 test_that("Code library",{
@@ -63,7 +63,7 @@ test_that("Code library",{
   file_contents <- readLines(file.path(getOption("scripts.dir"),"test2.R"))
   expect_true(length(file_contents)>2)
   
-  unlink(file.path(getOption("scripts.dir"),"test2.R"))
+  unlink(file.path(getOption("scripts.dir"),"test2.R"),force = TRUE)
   copy_file("test2.R",getOption("scripts.dir"))
   expect_true(file.exists(file.path(getOption("scripts.dir"),"test2.R")))
 

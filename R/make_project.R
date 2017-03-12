@@ -16,13 +16,13 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
       file.copy(file.path(system.file("extdata/EmptyProject",package="tidyproject"),"."),proj_name,recursive=TRUE)
       result <- file.rename(file.path(proj_name,"Rprofile.R"),file.path(proj_name,".Rprofile"))
       if(!result) stop("something wrong with .Rprofile creation") else
-        unlink(file.path(proj_name,"Rprofile.R"))
+        unlink(file.path(proj_name,"Rprofile.R"), force = TRUE)
       if(!TRUE %in% file.info(proj_name)$isdir) stop(paste(proj_name,"not created"))
-      if(!project_library) unlink(file.path(proj_name,"ProjectLibrary"),recursive = TRUE)
+      if(!project_library) unlink(file.path(proj_name,"ProjectLibrary"),recursive = TRUE, force = TRUE)
     },
     error=function(e){
       message("Aborting. Reversing changes...")
-      unlink(proj_name,recursive = TRUE)
+      unlink(proj_name,recursive = TRUE, force = TRUE)
       stop(e)
     })
   } else {
@@ -42,14 +42,14 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
       message(".Rprofile already present, creating Rprofile.R instead") else {
         result <- file.rename(file.path(proj_name,"Rprofile.R"),file.path(proj_name,".Rprofile"))
         if(!result) stop("something wrong with .Rprofile creation") else
-          unlink(file.path(proj_name,"Rprofile.R"))
+          unlink(file.path(proj_name,"Rprofile.R"), force = TRUE)
       }
     if(!project_library) {
       contents <- dir(file.path(proj_name,"ProjectLibrary"),include.dirs = TRUE,all.files = TRUE)
       contents <- contents[!contents %in% c(".","..")]
       contents <- contents[!grepl("Readme\\.txt$",contents)]
       if(length(contents)>0) stop("ProjectLibrary not empty. Will not delete. Rerun with project_library=TRUE")
-      unlink(file.path(proj_name,"ProjectLibrary"),recursive = TRUE)
+      unlink(file.path(proj_name,"ProjectLibrary"),recursive = TRUE, force = TRUE)
     }
   }
   if(getOption("git.exists")){
@@ -73,8 +73,8 @@ make_project <- function(proj_name,project_library=TRUE){ ## must be full path.
       setwd(currentwd)
       if(new_proj){
         message("Aborting. Reversing changes...")
-        unlink(proj_name,recursive = TRUE)
-        unlink(bare_proj_name,recursive = TRUE)
+        unlink(proj_name,recursive = TRUE, force = TRUE)
+        unlink(bare_proj_name,recursive = TRUE, force = TRUE)
       }
       stop(e)
     })
@@ -102,10 +102,6 @@ make_local_bare <- function(proj_name=getwd()){
   bare_proj_name_full <- paste0(proj_name_full,".git")
   git2r::clone(proj_name_full,bare_proj_name_full,bare = TRUE)
   setwd("../")
-  print("in make_local_bare")
-  print(dir())
-  res <- unlink(proj_name_full,recursive = TRUE)
-  print(paste("res=",res))
-  print(dir())
+  res <- unlink(proj_name_full,recursive = TRUE, force = TRUE)
   git2r::clone(bare_proj_name_full,proj_name_full)
 }
