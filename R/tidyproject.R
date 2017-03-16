@@ -127,7 +127,7 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
         if (!drstudio$result[drstudio$test == "rstudio working dir = current working dir"]) 
             stop("FAILED: working directory should be current working directory. setwd() is discouraged")
     }
-    
+
     d <- do_test(`directory is a tidyproject` = is_tidyproject(proj_name), `contains Renvironment_info` = file.exists(file.path(proj_name, 
         "Renvironment_info.txt")), `up to date Renvironment_info` = {
         script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
@@ -158,13 +158,9 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
 
 do_test <- function(..., silent = FALSE) {
     x <- match.call(expand.dots = FALSE)$...
-    
-    eval_x <- logical(length = length(x))
-    for (i in seq_along(x)) {
-        eval_x[i] <- eval(parse(text = deparse(x[[i]])), envir = parent.frame())
-    }
-    names(eval_x) <- names(x)
-    
+    par_env <- parent.frame()
+    eval_x <- unlist(lapply(x, function(i) eval(i,par_env)))
+
     ## check outputs
     lengths <- sapply(eval_x, length)
     if (any(lengths != 1)) 
