@@ -30,8 +30,8 @@ recursive_lib_find <- function(x){
     if(is.name(x[[1]])){
       if(identical(x[[1]],quote(library)) ||
          identical(x[[1]],quote(require)) ||
-         identical(x[[1]],quote(loadNamespace())) ||
-         identical(x[[1]],quote(requireNamespace())) ||
+         identical(x[[1]],quote(loadNamespace)) ||
+         identical(x[[1]],quote(requireNamespace)) ||
          identical(x[[1]],as.name("::")) ||
          identical(x[[1]],as.name(":::")))
         lhs <- as.character(x[[2]])
