@@ -68,13 +68,17 @@ models_dir <- function(proj_name = getwd()) {
 }
 
 is_tidyproject <- function(directory = getwd()) {
-    file.exists(scripts_dir(directory)) & file.exists(models_dir(directory))
+  if(exists(".rs.getProjectDirectory")) in_right_dir <- get(".rs.getProjectDirectory") == getwd() else
+    in_right_dir <- TRUE
+  file.exists(scripts_dir(directory)) & file.exists(models_dir(directory)) & in_right_dir
 }
 
 check_if_tidyproject <- function(directory = getwd()) {
-    if (!is_tidyproject(directory)) 
-        stop("directory not a tidyproject")
-    return(TRUE)
+  if(exists(".rs.getProjectDirectory")) if(get(".rs.getProjectDirectory") != getwd())
+    stop("Rstudio project != current working directory")
+  if (!is_tidyproject(directory))
+    stop("directory not a tidyproject")
+  return(TRUE)
 }
 
 #' Setup files
