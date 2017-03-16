@@ -26,6 +26,15 @@ test_that("Project has basic functionality", {
     new_script("test.R", open_file = FALSE)
     expect_true(file.exists(file.path(getOption("scripts.dir"), "test.R")))
     
+    res <- recursive_lib_find(quote({
+      library(libname1)
+      library(libname2);require(libname3)
+      notalibname
+      notalibname+2
+      libname4::fname + libname5::fname + libname6:::fname
+    }))
+    expect_true(identical(res,paste0("libname",1:length(res))))
+    
     Renvironment_info()
     res <- check_session(check_rstudio = FALSE)
     expect_true(is.data.frame(res))

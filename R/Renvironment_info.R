@@ -11,35 +11,9 @@ Renvironment_info <- function() {
     
     text <- lapply(scripts, readLines)
     text <- unlist(text)
+    text <- parse(text = text)
     
-    lib_statements1 <- text[grep("\\blibrary\\([^)]+\\)", text)]
-    lib_statements1 <- gsub(".*(library\\([^)]+\\)).*", "\\1", lib_statements1)
-    ## remove reasons why lib_statements1 may be different (e.g. spaces)
-    lib_statements1 <- gsub("\\s", "", lib_statements1)
-    lib_statements1 <- gsub("\\\\", "", lib_statements1)  ## no statement should have \\
-    lib_statements1 <- unique(lib_statements1)
-    
-    lib_statements2 <- text[grep("\\brequire\\([^)]+\\)", text)]
-    lib_statements2 <- gsub(".*(require\\([^)]+\\)).*", "\\1", lib_statements2)
-    ## remove reasons why lib_statements2 may be different (e.g. spaces)
-    lib_statements2 <- gsub("\\s", "", lib_statements2)
-    lib_statements2 <- gsub("\\\\", "", lib_statements2)  ## no statement should have \\
-    lib_statements2 <- unique(lib_statements2)
-    
-    lib_statements3 <- text[grep("\\w+\\s*::", text)]
-    lib_statements3 <- unlist(strsplit(lib_statements3, "[^a-zA-Z:]", perl = TRUE))
-    lib_statements3 <- lib_statements3[grepl("^.*\\w+::\\w+.*$", lib_statements3)]
-    lib_statements3 <- gsub("^.*\\b(\\w+)\\s*::.*$", "\\1", lib_statements3)
-    lib_statements3 <- gsub("\\s", "", lib_statements3)
-    lib_statements3 <- unique(lib_statements3)
-    if (length(lib_statements3) > 0) 
-        lib_statements3 <- paste0("library(", lib_statements3, ")")
-    
-    lib_statements <- c(lib_statements1, lib_statements2, lib_statements3)
-    
-    lib_statements
-    pkgs <- gsub("library\\((.*)\\)", "\\1", lib_statements)
-    pkgs <- gsub("require\\((.*)\\)", "\\1", pkgs)
+    pkgs <- unique(unlist(lapply(text,recursive_lib_find)))
     
     txt <- c(paste0("Created at ", Sys.time(), " by ", Sys.info()["user"], "\n"))
     txt <- c(txt, utils::capture.output(utils::sessionInfo(package = pkgs)))
@@ -48,10 +22,26 @@ Renvironment_info <- function() {
     
 }
 
-# Renvironment_info <- function(){ #if(!requireNamespace('packrat', quietly = TRUE))
-# stop('function requires packrat to be installed') dependent_packages <-
-# dirDependencies('.') sessionInfo(package = dependent_packages) txt <-
-# c(paste0('Created at ',Sys.time(),' by ',Sys.info()['user'],'\n')) txt <-
-# c(txt,capture.output(sessionInfo())) writeLines(txt, 'Renvironment_info.txt')
-# message(paste0('Environment info produced: Renvironment_info.txt')) }
+recursive_lib_find <- function(x){
+  if(is.name(x) || is.atomic(x)) {
+    character()
+  } else if(is.call(x)){
+    lhs <- character()
+    if(is.name(x[[1]])){
+      if(identical(x[[1]],quote(library)) ||
+         identical(x[[1]],quote(require)) ||
+         identical(x[[1]],quote(loadNamespace())) ||
+         identical(x[[1]],quote(requireNamespace())) ||
+         identical(x[[1]],as.name("::")) ||
+         identical(x[[1]],as.name(":::")))
+        lhs <- as.character(x[[2]])
+    }
+    unique(c(lhs,unlist(lapply(x,recursive_lib_find))))
+  } else if(is.pairlist(x)){
+    unique(unlist(lapply(x,recursive_lib_find)))
+  } else {
+    stop("Don't know how to handle type ", typeof(x), 
+         call. = FALSE)
+  }
+}
 
