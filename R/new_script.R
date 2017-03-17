@@ -36,12 +36,11 @@ dependency_tree <- function(from, already_got = NULL) {
     if (!file.exists(from)) 
         stop("can't find \"from\" file")
     suppressWarnings(s0 <- readLines(from))
-    depends.on <- s0[grepl("^[#; ]*Depends on: (.*)$", s0)]
-    depends.on <- gsub("^[#; ]*Depends on: (.*)$", "\\1", depends.on)
+    s0 <- parse(text=s0)
+    calling_env <- environment()
+    depends.on <- unique(unlist(lapply(s0,depends_find)))
     if (length(depends.on) == 0) 
         return()
-    depends.on <- strsplit(depends.on, ",")[[1]]
-    depends.on <- gsub("^\\s(.*)$", "\\1", depends.on)
     if (!identical(depends.on, basename(depends.on))) 
         stop("Can't read dependencies as full paths")
     if (length(intersect(depends.on, c(basename(from), already_got))) > 0) 
@@ -51,6 +50,24 @@ dependency_tree <- function(from, already_got = NULL) {
         i), depends.on))), depends.on)
     names(depends.on) <- NULL
     depends.on
+}
+
+depends_find <- function(x){
+  if(is.name(x) || is.atomic(x)) {
+    character()
+  } else if(is.call(x)){
+    lhs <- character()
+    if(is.name(x[[1]])){
+      if(identical(x[[1]],quote(source)))
+        lhs <- basename(as.character(x[[2]]))
+    }
+    unique(c(lhs,unlist(lapply(x,recursive_lib_find))))
+  } else if(is.pairlist(x)){
+    unique(unlist(lapply(x,recursive_lib_find)))
+  } else {
+    stop("Don't know how to handle type ", typeof(x), 
+         call. = FALSE)
+  }
 }
 
 #' Copy script to project directory

@@ -11,7 +11,7 @@ cleanup <- function(proj_name) {
 }
 
 test_that("Project has basic functionality", {
-    
+
     currentwd <- getwd()
     make_project(proj_name)
     on.exit({

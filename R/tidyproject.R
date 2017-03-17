@@ -68,14 +68,20 @@ models_dir <- function(proj_name = getwd()) {
 }
 
 is_tidyproject <- function(directory = getwd()) {
-  if(exists(".rs.getProjectDirectory")) in_right_dir <- get(".rs.getProjectDirectory") == getwd() else
-    in_right_dir <- TRUE
-  file.exists(scripts_dir(directory)) & file.exists(models_dir(directory)) & in_right_dir
+  # if(exists(".rs.getProjectDirectory")){
+  #   in_right_dir <- normalizePath(get(".rs.getProjectDirectory")(),winslash = "/") == 
+  #     normalizePath(getwd(),winslash = "/")
+  # } else
+  #   in_right_dir <- TRUE
+  file.exists(scripts_dir(directory)) & file.exists(models_dir(directory)) 
 }
 
 check_if_tidyproject <- function(directory = getwd()) {
-  if(exists(".rs.getProjectDirectory")) if(get(".rs.getProjectDirectory") != getwd())
-    stop("Rstudio project != current working directory")
+  # if(exists(".rs.getProjectDirectory")){
+  #   in_right_dir <- normalizePath(get(".rs.getProjectDirectory")(),winslash = "/") == 
+  #     normalizePath(getwd(),winslash = "/")
+  #   if(!in_right_dir) stop("Rstudio project != current working directory")
+  # }
   if (!is_tidyproject(directory))
     stop("directory not a tidyproject")
   return(TRUE)
