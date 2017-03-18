@@ -39,7 +39,7 @@ test_that("Code library", {
     write(c("## Description: abc"), file = file.path("code_lib_test", 
         "test2.R"))
     
-    write(c("## Description: def", "source(\"test2.R\")"), file = file.path("code_lib_test", 
+    write(c("## Description: def"), file = file.path("code_lib_test", 
         "test3.R"))
     
     write(c("## Description: hij", "source(\"test2.R\")","source(\"test3.R\")"), file = file.path("code_lib_test", 
@@ -53,15 +53,12 @@ test_that("Code library", {
     clib <- code_library(viewer = FALSE, silent = TRUE)
     expect_true("character" %in% class(clib))
     
-    clib <- code_library(viewer = FALSE, fields = "Depends on", silent = TRUE)
-    expect_true("character" %in% class(clib))
-    
     clib <- code_library(viewer = FALSE, silent = TRUE, return_info = TRUE)
     expect_true("data.frame" %in% class(clib))
     
-    copy_script("test2.R")
+    copy_script("test4.R")
     expect_true(file.exists(file.path(getOption("scripts.dir"), "test2.R")))
-    
+     
     file_contents <- readLines(file.path(getOption("scripts.dir"), "test2.R"))
     expect_true(length(file_contents) > 2)
     
