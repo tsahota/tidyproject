@@ -59,10 +59,18 @@ set_project_opts <- function() {
         options(user.email = "user@example.org")
 }
 
+#' Shortcut to Scripts directory
+#' 
+#' @param proj_name character. Working directory (default = getwd())
+#' @export
 scripts_dir <- function(proj_name = getwd()) {
     normalizePath(file.path(proj_name, getOption("scripts.dir")), winslash = "/", mustWork = FALSE)
 }
 
+#' Shortcut to Models directory
+#' 
+#' @param proj_name character. Working directory (default = getwd())
+#' @export
 models_dir <- function(proj_name = getwd()) {
     normalizePath(file.path(proj_name, getOption("models.dir")), winslash = "/", mustWork = FALSE)
 }
@@ -76,6 +84,10 @@ is_tidyproject <- function(directory = getwd()) {
   file.exists(scripts_dir(directory)) & file.exists(models_dir(directory)) 
 }
 
+#' Check if directory is a tidyproject
+#' 
+#' @param directory character. working directory (default = current working directory)
+#' @export
 check_if_tidyproject <- function(directory = getwd()) {
   # if(exists(".rs.getProjectDirectory")){
   #   in_right_dir <- normalizePath(get(".rs.getProjectDirectory")(),winslash = "/") == 
@@ -85,6 +97,15 @@ check_if_tidyproject <- function(directory = getwd()) {
   if (!is_tidyproject(directory))
     stop("directory not a tidyproject")
   return(TRUE)
+}
+
+#' Reset working directory to rstudio working directory
+#' 
+#' @export
+resetwd <- function(){
+  if(exists(".rs.getProjectDirectory")){
+    setwd(get(".rs.getProjectDirectory")())
+  } else stop("not in rstudio")
 }
 
 #' Setup files
@@ -124,38 +145,42 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
     drstudio.exists <- FALSE
     if (check_rstudio & exists(".rs.getProjectDirectory")) {
         drstudio.exists <- FALSE
-        drstudio <- do_test(`rstudio working dir = current working dir` = {
-            res <- normalizePath(get(".rs.getProjectDirectory")(), winslash = "/") == 
-                normalizePath(".", winslash = "/")
-            if (res) 
-                return(TRUE) else return(paste0(FALSE, ": switch to main dir"))
+        drstudio <- do_test(`rstudio working dir = current working dir` =
+        {
+          res <- normalizePath(get(".rs.getProjectDirectory")(), winslash = "/") == 
+            normalizePath(".", winslash = "/")
+          if (res) 
+            return(TRUE) else return(paste0(FALSE, ": switch to main dir"))
         }, silent = silent)
         if (!drstudio$result[drstudio$test == "rstudio working dir = current working dir"]) 
-            stop("FAILED: working directory should be current working directory. setwd() is discouraged")
+          stop("FAILED: working directory should be current working directory. setwd() is discouraged")
     }
-
-    d <- do_test(`directory is a tidyproject` = is_tidyproject(proj_name), `contains Renvironment_info` = file.exists(file.path(proj_name, 
-        "Renvironment_info.txt")), `up to date Renvironment_info` = {
-        script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
-        if (length(script_times) == 0) 
-            return("No scripts")
-        if (!file.exists(file.path(proj_name, "Renvironment_info.txt"))) 
-            return("no Renvironment_info.txt")
-        envir_time <- file.info(file.path(proj_name, "Renvironment_info.txt"))$mtime
-        time_diff <- difftime(envir_time, max(script_times))
-        result <- time_diff >= 0
-        if (result) 
-            return(TRUE)
-        paste0(result, ": ", signif(time_diff, 2), " ", attr(time_diff, "units"))
-    }, `Project library setup` = {
-        if (file.exists(file.path(proj_name, "ProjectLibrary"))) {
-            res <- normalizePath(file.path(proj_name, "ProjectLibrary"), winslash = "/") == 
-                normalizePath(.libPaths()[1], winslash = "/")
-            return(res)
-        } else return(paste0(FALSE, ": no project library"))
-    }, silent = silent)
+    
+    d <- do_test(`directory is a tidyproject`=
+                   is_tidyproject(proj_name),
+                 `contains Renvironment_info` =
+                   file.exists(file.path(proj_name, "Renvironment_info.txt")),
+                 `up to date Renvironment_info` = {
+                   script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
+                   if (length(script_times) == 0) 
+                     return("No scripts")
+                   if (!file.exists(file.path(proj_name, "Renvironment_info.txt"))) 
+                     return("no Renvironment_info.txt")
+                   envir_time <- file.info(file.path(proj_name, "Renvironment_info.txt"))$mtime
+                   time_diff <- difftime(envir_time, max(script_times))
+                   result <- time_diff >= 0
+                   if (result) 
+                     return(TRUE)
+                   paste0(result, ": ", signif(time_diff, 2), " ", attr(time_diff, "units"))
+                 }, `Project library setup` = {
+                   if (file.exists(file.path(proj_name, "ProjectLibrary"))) {
+                     res <- normalizePath(file.path(proj_name, "ProjectLibrary"), winslash = "/") == 
+                       normalizePath(.libPaths()[1], winslash = "/")
+                     return(res)
+                   } else return(paste0(FALSE, ": no project library"))
+                 }, silent = silent)
     if (drstudio.exists) 
-        d <- rbind(drstudio, d)
+      d <- rbind(drstudio, d)
     invisible(d)
 }
 
@@ -163,24 +188,24 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
 # tools::file_ext(script_name)=='R' browser() }
 
 do_test <- function(..., silent = FALSE) {
-    x <- match.call(expand.dots = FALSE)$...
-    par_env <- parent.frame()
-    eval_x <- unlist(lapply(x, function(i) eval(i,par_env)))
-
-    ## check outputs
-    lengths <- sapply(eval_x, length)
-    if (any(lengths != 1)) 
-        stop(paste("Following tests not return single value:\n", paste(names(eval_x)[lengths != 
-            1], sep = "\n")))
-    
-    if (!silent) 
-        for (test_name in names(eval_x)) {
-            message(substr(paste(test_name, paste(rep(".", 600), collapse = "")), 1, 
-                50), appendLF = FALSE)
-            message(eval_x[[test_name]])
-        }
-    
-    d <- data.frame(test = names(eval_x), result = unlist(eval_x))
+  x <- match.call(expand.dots = FALSE)$...
+  par_env <- parent.frame()
+  eval_x <- unlist(lapply(x, function(i) eval(i,par_env)))
+  
+  ## check outputs
+  lengths <- sapply(eval_x, length)
+  if (any(lengths != 1)) 
+    stop(paste("Following tests not return single value:\n", paste(names(eval_x)[lengths != 
+                                                                                   1], sep = "\n")))
+  
+  if (!silent) 
+    for (test_name in names(eval_x)) {
+      message(substr(paste(test_name, paste(rep(".", 600), collapse = "")), 1, 
+                     50), appendLF = FALSE)
+      message(eval_x[[test_name]])
+    }
+  
+  d <- data.frame(test = names(eval_x), result = unlist(eval_x))
     row.names(d) <- NULL
     invisible(d)
 }

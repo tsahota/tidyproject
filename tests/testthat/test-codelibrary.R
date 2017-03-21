@@ -36,17 +36,19 @@ test_that("Code library", {
     expect_true(code_library_path() == "code_lib_test")
     expect_true(normalizePath("code_lib_test") %in% normalizePath(getOption("code_library_path")))
     
-    write(c("## Description: abc"), file = file.path("code_lib_test", 
-        "test2.R"))
+    write(c("## Description: abc"),
+          file = file.path("code_lib_test","test2.R"))
     
-    write(c("## Description: def"), file = file.path("code_lib_test", 
-        "test3.R"))
+    write(c("## Description: def"),
+          file = file.path("code_lib_test","test3.R"))
     
-    write(c("## Description: hij", "source(\"test2.R\")","source(\"test3.R\")"), file = file.path("code_lib_test", 
-        "test4.R"))
+    write(c("## Description: hij",
+            "source(\"test2.R\")",
+            "source(\"test3.R\")"),
+          file = file.path("code_lib_test","test4.R"))
     
-    write(c("## Description: klm"), file = file.path("code_lib_test", 
-        "test5.R"))
+    write(c("## Description: klm"),
+          file = file.path("code_lib_test","test5.R"))
     
     expect_true(file.exists(file.path("code_lib_test", "test2.R")))
     
