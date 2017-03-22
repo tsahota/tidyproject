@@ -61,9 +61,9 @@ depends_find <- function(x){
       if(identical(x[[1]],quote(source)))
         lhs <- basename(as.character(x[[2]]))
     }
-    unique(c(lhs,unlist(lapply(x,recursive_lib_find))))
+    unique(c(lhs,unlist(lapply(x,depends_find))))
   } else if(is.pairlist(x)){
-    unique(unlist(lapply(x,recursive_lib_find)))
+    unique(unlist(lapply(x,depends_find)))
   } else {
     stop("Don't know how to handle type ", typeof(x), 
          call. = FALSE)
