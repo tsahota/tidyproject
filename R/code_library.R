@@ -1,5 +1,3 @@
-
-
 #' List scripts
 #'
 #' @param folder string describing folder to search recursively in

@@ -145,7 +145,7 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
     drstudio.exists <- FALSE
     if (check_rstudio & exists(".rs.getProjectDirectory")) {
         drstudio.exists <- FALSE
-        drstudio <- do_test(`rstudio working dir = current working dir` =
+        drstudio <- do_test("rstudio working dir = current working dir" =
         {
           res <- normalizePath(get(".rs.getProjectDirectory")(), winslash = "/") == 
             normalizePath(".", winslash = "/")
@@ -156,11 +156,11 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
           stop("FAILED: working directory should be current working directory. setwd() is discouraged")
     }
     
-    d <- do_test(`directory is a tidyproject`=
+    d <- do_test("directory is a tidyproject"=
                    is_tidyproject(proj_name),
-                 `contains Renvironment_info` =
+                 "contains Renvironment_info" =
                    file.exists(file.path(proj_name, "Renvironment_info.txt")),
-                 `up to date Renvironment_info` = {
+                 "up to date Renvironment_info" = {
                    script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
                    if (length(script_times) == 0) 
                      return("No scripts")
@@ -172,7 +172,7 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
                    if (result) 
                      return(TRUE)
                    paste0(result, ": ", signif(time_diff, 2), " ", attr(time_diff, "units"))
-                 }, `Project library setup` = {
+                 }, "Project library setup" = {
                    if (file.exists(file.path(proj_name, "ProjectLibrary"))) {
                      res <- normalizePath(file.path(proj_name, "ProjectLibrary"), winslash = "/") == 
                        normalizePath(.libPaths()[1], winslash = "/")
@@ -184,9 +184,6 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
     invisible(d)
 }
 
-# rate_my_script <- function(script_name,silent=FALSE){
-# tools::file_ext(script_name)=='R' browser() }
-
 do_test <- function(..., silent = FALSE) {
   x <- match.call(expand.dots = FALSE)$...
   par_env <- parent.frame()
@@ -195,13 +192,13 @@ do_test <- function(..., silent = FALSE) {
   ## check outputs
   lengths <- sapply(eval_x, length)
   if (any(lengths != 1)) 
-    stop(paste("Following tests not return single value:\n", paste(names(eval_x)[lengths != 
-                                                                                   1], sep = "\n")))
+    stop("Following tests not return single value:\n",
+         paste(names(eval_x)[lengths != 1]))
   
   if (!silent) 
     for (test_name in names(eval_x)) {
-      message(substr(paste(test_name, paste(rep(".", 600), collapse = "")), 1, 
-                     50), appendLF = FALSE)
+      message(substr(paste(test_name, paste(rep(".", 600), collapse = "")),
+                     1, 50),appendLF = FALSE)
       message(eval_x[[test_name]])
     }
   
