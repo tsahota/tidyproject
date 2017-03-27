@@ -102,13 +102,17 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
 #'
 #' @param files vector string of file names/paths
 #' @param text string (can be regex) to search for
+#' @param search_title logical (default=TRUE). should matching occur in title
+#' @param search_contents logical (default=TRUE). should matching occur in file contents
 #' @export
 
-search_raw <- function(files, text) {
+search_raw <- function(files, text, search_title=TRUE, search_contents=TRUE) {
   res <- unlist(sapply(files, function(file.name) {
-    suppressWarnings(s <- readLines(file.name))
-    s <- grep(text, s)
-    s <- c(s,grep(text, file.name))
+    if(search_contents){
+      suppressWarnings(s <- readLines(file.name))
+      s <- grep(text, s)
+    } else s <- c()
+    if(search_title) s <- c(s,grep(text, file.name))
     if (suppressWarnings(length(s) == 0)) 
       return(NULL) else return(file.name)
   }))
