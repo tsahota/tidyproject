@@ -72,6 +72,8 @@ If you have a directory of scripts somewhere (scripts can be in subdirectories) 
 options(code_library_path="path/to/code/repository")
 ```
 
+TIP: Add this to your user `~/.Rprofile` to avoid doing this every R session (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
+
 View code library with:
 
 ```R
@@ -89,6 +91,9 @@ copy code into your project "Scripts" directory with:
 ```R
 copy_script("nameofscript.R")
 ```
-Attach multiple code libraries with `options(code_library_path=c("path/to/code/repo1","path/to/code/repo2")")`.
 
-To avoid having to do this each R session, add your `options` command to your user `~/.Rprofile` (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
+copy other files into other subdirectories with:
+
+```R
+copy_file("stantemplate.stan","Models")
+```
