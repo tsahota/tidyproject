@@ -120,19 +120,19 @@ ls_scripts("./Scripts") %>% search_raw("text_to_match")
 To find all scripts in the **Code Library** that contain the text `text_to_match`:
 
 ```R
-code_library(viewer=FALSE) %>% search_raw("text_to_match")
+ls_code_library %>% search_raw("text_to_match")
 ```
 
 To find all scripts in Code Library that match the keyword `keyword_to_match`:
 
 ```R
-code_library(viewer=FALSE) %>% search_keyword("keyword_to_match")
+ls_code_library %>% search_keyword("keyword_to_match")
 ```
 
 Chain multiple commands for more targetted searching:
 
 ```R
-code_library(viewer=FALSE) %>%
+ls_code_library %>%
   search_keyword("keyword_to_match") %>%
   search_raw("text_to_match")
 ```
