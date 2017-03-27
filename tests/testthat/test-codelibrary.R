@@ -39,7 +39,8 @@ test_that("Code library", {
     write(c("## Description: abc"),
           file = file.path("code_lib_test","test2.R"))
     
-    write(c("## Description: def"),
+    write(c("## Description: def",
+            "## Keywords: kword1, kword2"),
           file = file.path("code_lib_test","test3.R"))
     
     write(c("## Description: hij",
@@ -71,12 +72,22 @@ test_that("Code library", {
     info <- info_scripts(code_library(viewer = FALSE, silent = TRUE), viewer = FALSE)
     expect_true("data.frame" %in% class(info))
     
-    matched.file <- search_scripts(code_library(viewer = FALSE, silent = TRUE), "hi")
+    matched.file <- search_raw(code_library(viewer = FALSE, silent = TRUE), "hi")
     expect_true(normalizePath(matched.file) == normalizePath(file.path("code_lib_test", 
         "test4.R")))
     
-    matched.file <- search_scripts(code_library(viewer = FALSE, silent = TRUE), "nomatch")
+    matched.file <- search_raw(code_library(viewer = FALSE, silent = TRUE), "nomatch")
     expect_true(length(matched.file) == 0)
+
+    ## should match file name too    
+    matched.file <- search_raw(code_library(viewer = FALSE, silent = TRUE), "test4")
+    expect_true(length(matched.file) == 1)
+    
+    matched.file <- search_raw(code_library(viewer = FALSE, silent = TRUE), "test2")
+    expect_true(length(matched.file) == 2)
+    
+    matched.file <- search_keyword(code_library(viewer = FALSE, silent = TRUE), "kword1")
+    expect_true(length(matched.file) == 1)
     
     preview("test4.R")
     

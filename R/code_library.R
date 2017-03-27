@@ -44,8 +44,9 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
             suppressWarnings({
                 s <- readLines(file.name, n = 30)
                 field.vals <- as.data.frame(lapply(fields, function(field) {
-                  field <- gsub(paste0("^.*", field, ": (.*)$"), "\\1", s[grepl(paste0("^.*", 
-                    field, ": "), s, ignore.case = TRUE)], ignore.case = TRUE)
+                  field <- gsub(paste0("^.*", field, ": (.*)$"), "\\1",
+                                s[grepl(paste0("^.*", field, ": "), s,ignore.case = TRUE)],
+                                ignore.case = TRUE)
                   field <- field[!field %in% ""]
                   if (length(field) == 0) 
                     return(as.character(NA))
@@ -97,20 +98,52 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
     invisible(d)
 }
 
-#' Search for string in files
+#' Search for files matching raw text search
 #'
 #' @param files vector string of file names/paths
 #' @param text string (can be regex) to search for
 #' @export
 
-search_scripts <- function(files, text) {
-    res <- unlist(sapply(files, function(file.name) {
-        suppressWarnings(s <- readLines(file.name))
-        if (suppressWarnings(length(grep(text, s)) == 0)) 
-            return(NULL) else return(file.name)
-    }))
-    names(res) <- NULL
-    res
+search_raw <- function(files, text) {
+  res <- unlist(sapply(files, function(file.name) {
+    suppressWarnings(s <- readLines(file.name))
+    s <- grep(text, s)
+    s <- c(s,grep(text, file.name))
+    if (suppressWarnings(length(s) == 0)) 
+      return(NULL) else return(file.name)
+  }))
+  names(res) <- NULL
+  res
+}
+
+
+#' Search for files matching field values
+#'
+#' @param files vector string of file names/paths
+#' @param field character. field name (can be regex) to search for
+#' @param text string (can be regex) to search for
+#' @export
+
+search_field <- function(files, field, text) {
+  res <- unlist(sapply(files, function(file.name) {
+    suppressWarnings(s <- readLines(file.name,n = 10))
+    s <- s[grep(paste0("^.*",field,"s*:\\s*.*(",text,").*$"), s, ignore.case = TRUE)]
+    if(length(s)==0) return(NULL)
+    if(length(s)>1) stop("multiple fields detected")
+    return(file.name)
+  }))
+  names(res) <- NULL
+  res
+}
+
+#' Search for files matching key words
+#'
+#' @param files vector string of file names/paths
+#' @param text string (can be regex) to search for
+#' @export
+
+search_keyword <- function(files, text) {
+  search_field(files, "key\\s*word", text)
 }
 
 #' List files in code library
@@ -142,7 +175,7 @@ code_library <- function(extn = NULL, fields = "Description", viewer = TRUE, sil
             
             message(" 2. Attach for this user by putting command in ~/.Rprofile:")
         }
-        return(data.frame())
+        return(invisible(data.frame()))
     }
     
     files <- ls_code_library()
@@ -182,22 +215,23 @@ code_library <- function(extn = NULL, fields = "Description", viewer = TRUE, sil
 #' @param name character indicating script in code_library to preview
 #' @export
 preview <- function(name) {
-    ## preview files in code_library
-    if (is_full_path(name)) {
-        if (!file.exists(name)) 
-            stop("file not found")
-        file.show(name)
-        return()
-    }
-    d <- code_library(extn = ".*", viewer = FALSE, silent = TRUE, return_info = TRUE, 
-        fields = c())
-    if (!name %in% d$NAME) 
-        stop("file not found in code_library")
-    if (length(which(d$NAME %in% name)) > 1) 
-        stop("Matched more than one file with that name.\n Try preview() again with full path")
-    pos <- match(name, d$NAME)
-    path <- file.path(d$FOLDER[pos], d$NAME[pos])
-    file.show(path)
+  ## preview files in code_library
+  if(length(name)>1) stop("can only preview one file at a time")
+  if (is_full_path(name)) {
+    if (!file.exists(name)) 
+      stop("file not found")
+    file.show(name)
+    return()
+  }
+  d <- code_library(extn = ".*", viewer = FALSE, silent = TRUE, return_info = TRUE, 
+                    fields = c())
+  if (!name %in% d$NAME) 
+    stop("file not found in code_library")
+  if (length(which(d$NAME %in% name)) > 1) 
+    stop("Matched more than one file with that name.\n Try preview() again with full path")
+  pos <- match(name, d$NAME)
+  path <- file.path(d$FOLDER[pos], d$NAME[pos])
+  file.show(path)
 }
 
 #' Display code library search path
