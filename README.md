@@ -41,13 +41,14 @@ devtools::install_github("tsahota/tidyproject")
 
 This package is now in your "ProjectLibrary" subdirectory. Loading packages from this tidyproject (e.g. with `library`), will cause packages in this specific project library load. If you want to switch projects, use Rstudio's "open project".  Using setwd() is strongly discouraged.
 
-### Make a script
 Create a new script:
 
 ```R
 new_script("scriptname.R")
 ```
-This will pre-fill some comments and store the script in your "Scripts" subdirectory.
+This will pre-fill some comment fields and store the script in your "Scripts" subdirectory.
+
+### Monitor your compliance
 
 Check your tidyproject is set up correctly by typing the following:
 
@@ -72,7 +73,9 @@ If you have a directory of scripts somewhere (scripts can be in subdirectories) 
 options(code_library_path="path/to/code/repository")
 ```
 
-TIP: Add this to your user `~/.Rprofile` to avoid doing this every R session (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
+**Tip**: Add this to your user `~/.Rprofile` to avoid doing this every R session (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
+
+### Use code library
 
 View code library with:
 
@@ -97,3 +100,40 @@ copy other files into other subdirectories with:
 ```R
 copy_file("stantemplate.stan","Models")
 ```
+
+### Search for code
+
+Searching is most easily accomplished with `magrittr`'s `%>%` symbol (`library(magrittr)`)
+
+E.g. to list all R scripts in `./Scripts` a directory:
+
+```R
+ls_scripts("./Scripts")
+```
+
+To find all scripts in `./Scripts` that contain the text `text_to_match`:
+
+```R
+ls_scripts("./Scripts") %>% search_raw("text_to_match")
+```
+
+To find all scripts in the **Code Library** that contain the text `text_to_match`:
+
+```R
+ls_code_library %>% search_raw("text_to_match")
+```
+
+To find all scripts in Code Library that match the keyword `keyword_to_match`:
+
+```R
+ls_code_library %>% search_keyword("keyword_to_match")
+```
+
+Chain multiple commands for more targetted searching:
+
+```R
+ls_code_library %>%
+  search_keyword("keyword_to_match") %>%
+  search_raw("text_to_match")
+```
+
