@@ -44,8 +44,8 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
             suppressWarnings({
                 s <- readLines(file.name, n = 30)
                 field.vals <- as.data.frame(lapply(fields, function(field) {
-                  field <- gsub(paste0("^.*", field, ": (.*)$"), "\\1",
-                                s[grepl(paste0("^.*", field, ": "), s,ignore.case = TRUE)],
+                  field <- gsub(paste0("^.*",field,"s*:\\s*(.*)$"), "\\1",
+                                s[grepl(paste0("^.*", field, "s*:\\s*"), s,ignore.case = TRUE)],
                                 ignore.case = TRUE)
                   field <- field[!field %in% ""]
                   if (length(field) == 0) 
@@ -140,6 +140,8 @@ search_field <- function(files, field, text) {
   res
 }
 
+
+
 #' Search for files matching key words
 #'
 #' @param files vector string of file names/paths
@@ -200,7 +202,7 @@ code_library <- function(extn = NULL, fields = "Description", viewer = TRUE, sil
         stop(e)
     })
     if (!silent) 
-        message("\nNOTE: Do not source scripts from the code library,\n copy them to your project with copy_script")
+        message("\nNOTE: Do not source scripts from the code library,\n copy them to your project with copy_script() or copy_file()")
     if (return_info) {
         if (silent) 
             return_ob <- invisible(info) else return_ob <- info
