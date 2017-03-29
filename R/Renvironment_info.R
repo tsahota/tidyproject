@@ -20,6 +20,7 @@ Renvironment_info <- function() {
       txt <- c(txt, utils::capture.output(utils::sessionInfo()))
 
     writeLines(txt, "Renvironment_info.txt")
+    tidyproject::setup_file("Renvironment_info.txt")
     message(paste0("Environment info produced: Renvironment_info.txt"))
     
 }
