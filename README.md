@@ -73,7 +73,9 @@ If you have a directory of scripts somewhere (scripts can be in subdirectories) 
 options(code_library_path="path/to/code/repository")
 ```
 
-**Tip**: Add this to your user `~/.Rprofile` to avoid doing this every R session (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
+**Tip 1**: Add this to your user `~/.Rprofile` to avoid doing this every R session (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
+
+**Tip 2**: Add multiple directories to the `code_library_path` by specifying a vector of directory paths.
 
 ### Use code library
 
@@ -103,15 +105,13 @@ copy_file("stantemplate.stan","Models")
 
 ### Search for code
 
-Searching is most easily accomplished with `magrittr`'s `%>%` symbol (`library(magrittr)`)
-
-E.g. to list all R scripts in `./Scripts` a directory:
+To list all R scripts in `./Scripts` a directory:
 
 ```R
 ls_scripts("./Scripts")
 ```
 
-To find all scripts in `./Scripts` that contain the text `text_to_match`:
+More refined searching is most easily accomplished with `magrittr`'s `%>%` symbol (`library(magrittr)`), e.g. to find all scripts in `./Scripts` that contain the text `text_to_match`:
 
 ```R
 ls_scripts("./Scripts") %>% search_raw("text_to_match")
@@ -120,19 +120,19 @@ ls_scripts("./Scripts") %>% search_raw("text_to_match")
 To find all scripts in the **Code Library** that contain the text `text_to_match`:
 
 ```R
-ls_code_library %>% search_raw("text_to_match")
+ls_code_library() %>% search_raw("text_to_match")
 ```
 
 To find all scripts in Code Library that match the keyword `keyword_to_match`:
 
 ```R
-ls_code_library %>% search_keyword("keyword_to_match")
+ls_code_library() %>% search_keyword("keyword_to_match")
 ```
 
 Chain multiple commands for more targetted searching:
 
 ```R
-ls_code_library %>%
+ls_code_library() %>%
   search_keyword("keyword_to_match") %>%
   search_raw("text_to_match")
 ```
