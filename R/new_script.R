@@ -12,7 +12,7 @@ new_script <- function(name, overwrite = FALSE, open_file = TRUE) {
     if (file.exists(to_path) & !overwrite) 
         stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
     s <- c(paste0("## ", "Author: ", Sys.info()["user"]), paste0("## ", "First created: ", 
-        Sys.Date()), paste0("## ", "Description: "), paste0("## ", "Depends on: "), paste0("## ", 
+        Sys.Date()), paste0("## ", "Description: "), paste0("## ", 
         "Keywords: "), "", "########################################", "## load packages and source functions here", 
         "", paste0("library(tidyproject)"), "", "########################################", 
         "## main script here", "")
