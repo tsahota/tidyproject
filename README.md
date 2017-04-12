@@ -29,6 +29,7 @@ devtools::install_github("tsahota/tidyproject")
 Make a tidyproject with
 
 ```R
+library(tidyproject)
 make_project("path/to/directory")
 ```
 Open the newly created Rstudio project with File -> Open Project. **Warning: do not use setwd() to open tidyprojects.**
@@ -37,6 +38,7 @@ You should see a new directory structure.  Opening the Rstudio project reconfigu
 
 ```R
 devtools::install_github("tsahota/tidyproject")
+library(tidyproject)
 ```
 
 This package is now in your "ProjectLibrary" subdirectory. Loading packages from this tidyproject (e.g. with `library`), will cause packages in this specific project library load. If you want to switch projects, use Rstudio's "open project".  Using setwd() is strongly discouraged.
