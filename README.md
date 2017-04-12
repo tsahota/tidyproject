@@ -75,7 +75,7 @@ If you have a directory of scripts somewhere (scripts can be in subdirectories) 
 options(code_library_path="path/to/code/repository")
 ```
 
-**Tip 1**: Add this to your user `~/.Rprofile` to avoid doing this every R session (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
+**Tip 1**: Add this to your user `~/.Rprofile` (create it if it doesn't exist) to avoid doing this every R session (or `R_HOME/etc/Rprofile.site` if you want this to apply for all users).
 
 **Tip 2**: Add multiple directories to the `code_library_path` by specifying a vector of directory paths.
 
