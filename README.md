@@ -21,6 +21,7 @@
 ```R
 install.packages("devtools")
 devtools::install_github("tsahota/tidyproject")
+library(tidyproject)
 ```
 
 ## Quick Tutorial
@@ -29,7 +30,6 @@ devtools::install_github("tsahota/tidyproject")
 Make a tidyproject with
 
 ```R
-library(tidyproject)
 make_project("path/to/directory")
 ```
 Open the newly created Rstudio project with File -> Open Project. **Warning: do not use setwd() to open tidyprojects.**
