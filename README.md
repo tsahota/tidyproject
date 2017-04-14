@@ -58,13 +58,13 @@ Check your tidyproject is set up correctly by typing the following:
 check_session()
 ```
 
-It complains about Renvironment_info() not being present. Take an snapshot of your R environment:
+It complains about Renvironment_info.txt not being present. Take an snapshot of your R environment:
 
 ```R
 Renvironment_info()
 ```
 
-This will search your scripts in your "Scripts" directory for package dependencies and output version and environment information into Renvironment_info.txt of the main directory.  If you run `check_session()` again it should pass now.
+This will search your scripts in your "Scripts" directory for package dependencies and output version and environment information into Renvironment_info.txt of the main directory.  If you run `check_session()` again it should pass now.  If tidyproject ever gives you errors, `check_session()` is a good first port of call.
 
 
 ### Add a code library
@@ -93,13 +93,13 @@ Preview code with:
 preview("nameofscript.R")
 ```
 
-copy code into your project "Scripts" directory with:
+copy code into your project "Scripts" subdirectory with:
 
 ```R
 copy_script("nameofscript.R")
 ```
 
-copy other files into other subdirectories with:
+copy other types of files into other subdirectories (e.g. "Models") with:
 
 ```R
 copy_file("stantemplate.stan","Models")
@@ -107,13 +107,13 @@ copy_file("stantemplate.stan","Models")
 
 ### Search for code
 
-To list all R scripts in `./Scripts` a directory:
+To list all R scripts in the `./Scripts` subdirectory:
 
 ```R
 ls_scripts("./Scripts")
 ```
 
-More refined searching is most easily accomplished with `magrittr`'s `%>%` symbol (`library(magrittr)`), e.g. to find all scripts in `./Scripts` that contain the text `text_to_match`:
+More refined searching is most easily accomplished with `magrittr`'s `%>%` symbol `library(magrittr)`, e.g. to find all scripts in `./Scripts` that contain the text `text_to_match`:
 
 ```R
 ls_scripts("./Scripts") %>% search_raw("text_to_match")
