@@ -72,6 +72,9 @@ test_that("Code library", {
     info <- info_scripts(code_library(viewer = FALSE, silent = TRUE), viewer = FALSE)
     expect_true("data.frame" %in% class(info))
     
+    copy_script("Scripts/test2.R","test5.R")
+    expect_true(file.exists(file.path(getOption("scripts.dir"), "test5.R")))
+    
     matched.file <- search_raw(code_library(viewer = FALSE, silent = TRUE), "hi")
     expect_true(normalizePath(matched.file) == normalizePath(file.path("code_lib_test", 
         "test4.R")))

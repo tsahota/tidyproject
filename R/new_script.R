@@ -198,7 +198,7 @@ copy_file <- function(from, dest_dir, overwrite = FALSE, alt_paths) {
 #' }
 locate_file <- function(x, search_path = c("."), recursive = FALSE) {
     ## internal function: locate_file from an ordered vector of directories
-    if (is.null(x)) 
+    if (!is.null(x)) 
         if (file.exists(x)) 
             return(normalizePath(x, winslash = "/"))
     all_files <- unlist(lapply(search_path, function(dir) {
