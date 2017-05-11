@@ -6,6 +6,5 @@ if (file.exists("ProjectLibrary")) {
   message("Project Library configured")
   if (file.exists(file.path("ProjectLibrary", "tidyproject"))) {
     library("tidyproject")
-    message("tidyproject loaded")
   }
 }

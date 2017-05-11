@@ -142,48 +142,84 @@ is_full_path <- function(x) grepl("^(~|/|\\\\|([a-zA-Z]:))", x, perl = TRUE)
 #' @export
 
 check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = TRUE) {
+  drstudio.exists <- FALSE
+  if (check_rstudio & exists(".rs.getProjectDirectory")) {
     drstudio.exists <- FALSE
-    if (check_rstudio & exists(".rs.getProjectDirectory")) {
-        drstudio.exists <- FALSE
-        drstudio <- do_test("rstudio working dir = current working dir" =
-        {
-          res <- normalizePath(get(".rs.getProjectDirectory")(), winslash = "/") == 
-            normalizePath(".", winslash = "/")
-          if (res) 
-            return(TRUE) else return(paste0(FALSE, ": switch to main dir"))
-        }, silent = silent)
-        if (!drstudio$result[drstudio$test == "rstudio working dir = current working dir"]) 
-          stop("FAILED: working directory should be current working directory. setwd() is discouraged")
-    }
-    
-    d <- do_test("directory is a tidyproject"=
-                   is_tidyproject(proj_name),
-                 "contains Renvironment_info" =
-                   file.exists(file.path(proj_name, "Renvironment_info.txt")),
-                 "up to date Renvironment_info" = {
-                   script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
-                   if (length(script_times) == 0) 
-                     return("No scripts")
-                   if (!file.exists(file.path(proj_name, "Renvironment_info.txt"))) 
-                     return("no Renvironment_info.txt")
-                   envir_time <- file.info(file.path(proj_name, "Renvironment_info.txt"))$mtime
-                   time_diff <- difftime(envir_time, max(script_times))
-                   result <- time_diff >= 0
-                   if (result) 
-                     return(TRUE)
-                   paste0(result, ": ", signif(time_diff, 2), " ", attr(time_diff, "units"))
-                 }, "Project library setup" = {
-                   if (file.exists(file.path(proj_name, "ProjectLibrary"))) {
-                     res <- normalizePath(file.path(proj_name, "ProjectLibrary"), winslash = "/") == 
-                       normalizePath(.libPaths()[1], winslash = "/")
-                     return(res)
-                   } else return(paste0(FALSE, ": no project library"))
-                 }, silent = silent)
-    if (drstudio.exists) 
-      d <- rbind(drstudio, d)
-    invisible(d)
+    drstudio <- do_test("rstudio working dir = current working dir" =
+    {
+      res <- normalizePath(get(".rs.getProjectDirectory")(), winslash = "/") == 
+        normalizePath(".", winslash = "/")
+      if (res) 
+        return(TRUE) else return(paste0(FALSE, ": switch to main dir"))
+    }, silent = silent)
+    if (!drstudio$result[drstudio$test == "rstudio working dir = current working dir"]) 
+      stop("FAILED: working directory should be current working directory. setwd() is discouraged")
+  }
+  
+  d <- do_test("directory is a tidyproject"=
+                 is_tidyproject(proj_name),
+               "contains Renvironment_info" =
+                 file.exists(file.path(proj_name, "Renvironment_info.txt")),
+               "up to date Renvironment_info" = {
+                 script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
+                 if (length(script_times) == 0) 
+                   return("No scripts")
+                 if (!file.exists(file.path(proj_name, "Renvironment_info.txt"))) 
+                   return("no Renvironment_info.txt")
+                 envir_time <- file.info(file.path(proj_name, "Renvironment_info.txt"))$mtime
+                 time_diff <- difftime(envir_time, max(script_times))
+                 result <- time_diff >= 0
+                 if (result) 
+                   return(TRUE)
+                 paste0(result, ": ", signif(time_diff, 2), " ", attr(time_diff, "units"))
+               }, "Project library setup" = {
+                 if (file.exists(file.path(proj_name, "ProjectLibrary"))) {
+                   res <- normalizePath(file.path(proj_name, "ProjectLibrary"), winslash = "/") == 
+                     normalizePath(.libPaths()[1], winslash = "/")
+                   return(res)
+                 } else return(paste0(FALSE, ": no project library"))
+               }, "Description fields present" = {
+                 field_val_test("Description")
+               }, "Author fields present" = {
+                 field_val_test("Author")
+               },
+               silent = silent)
+  if (drstudio.exists) 
+    d <- rbind(drstudio, d)
+  invisible(d)
 }
 
+field_val_test <- function(field_name){
+  dir0 <- dir(getOption("scripts.dir"),full.names = TRUE)
+  dir0 <- dir0[tools::file_ext(dir0) %in% "R"]
+  field_vals <- lapply(dir0,get_script_field,field_name = field_name)
+  names(field_vals) <- basename(dir0)
+  field_vals <- unlist(field_vals)
+  empty_field_vals <- names(field_vals[field_vals%in%""])
+  if(length(empty_field_vals)>0)
+    return(paste("FALSE:",paste(empty_field_vals,collapse=","))) else
+      return(TRUE)
+}
+
+#' Get field from a code file
+#' 
+#' @param file_name character. path to file
+#' @param field_name character. name of field to find.
+#' @export
+get_script_field <- function(file_name,field_name){
+  script <- readLines(file_name,n = 10)
+  field <- gsub(paste0("^.*",field_name,"s*:\\s*(.*)$"), "\\1",
+                script[grepl(paste0("^.*", field_name, "s*:\\s*"), script,ignore.case = TRUE)],
+                ignore.case = TRUE)
+  if(length(field)==0) field <- ""
+  field
+}
+
+#' Testing interfact
+#' 
+#' @param ... named expression to evaluate
+#' @param silent logical. Default = FALSE. Should messages be printed.
+#' @export
 do_test <- function(..., silent = FALSE) {
   x <- match.call(expand.dots = FALSE)$...
   par_env <- parent.frame()
@@ -203,7 +239,7 @@ do_test <- function(..., silent = FALSE) {
     }
   
   d <- data.frame(test = names(eval_x), result = unlist(eval_x))
-    row.names(d) <- NULL
-    invisible(d)
+  row.names(d) <- NULL
+  invisible(d)
 }
 
