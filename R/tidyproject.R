@@ -189,9 +189,11 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
   invisible(d)
 }
 
-field_val_test <- function(field_name){
-  dir0 <- dir(getOption("scripts.dir"),full.names = TRUE)
-  dir0 <- dir0[tools::file_ext(dir0) %in% "R"]
+field_val_test <- function(field_name,
+                           directory=getOption("scripts.dir"),
+                           extension="R"){
+  dir0 <- dir(directory,full.names = TRUE)
+  dir0 <- dir0[tools::file_ext(dir0) %in% extension]
   field_vals <- lapply(dir0,get_script_field,field_name = field_name)
   names(field_vals) <- basename(dir0)
   field_vals <- unlist(field_vals)
@@ -205,9 +207,10 @@ field_val_test <- function(field_name){
 #' 
 #' @param file_name character. path to file
 #' @param field_name character. name of field to find.
+#' @param n numeric. number of lines of each file to search
 #' @export
-get_script_field <- function(file_name,field_name){
-  script <- readLines(file_name,n = 10)
+get_script_field <- function(file_name,field_name,n = 10){
+  script <- readLines(file_name,n = n)
   field <- gsub(paste0("^.*",field_name,"s*:\\s*(.*)$"), "\\1",
                 script[grepl(paste0("^.*", field_name, "s*:\\s*"), script,ignore.case = TRUE)],
                 ignore.case = TRUE)

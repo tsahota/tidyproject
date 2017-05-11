@@ -4,12 +4,14 @@
 \alias{get_script_field}
 \title{Get field from a code file}
 \usage{
-get_script_field(file_name, field_name)
+get_script_field(file_name, field_name, n = 10)
 }
 \arguments{
 \item{file_name}{character. path to file}
 
 \item{field_name}{character. name of field to find.}
+
+\item{n}{numeric. number of lines of each file to search}
 }
 \description{
 Get field from a code file
