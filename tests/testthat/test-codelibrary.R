@@ -97,6 +97,12 @@ test_that("Code library", {
     replace_code_library(NULL)
     expect_true(is.null(getOption("code_library_path")))
     
+    get_github_code_library("testCodeLibrary",
+                            giturl="https://github.com/tsahota/PMXcodelibrary",
+                            config_file="test_config.R")
+    
+    expect_true(length(readLines("test_config.R"))>0)
+    
     
 })
 

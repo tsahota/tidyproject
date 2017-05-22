@@ -281,3 +281,37 @@ short_path <- function(x) {
     })
     unlist(short_paths)
 }
+
+#' Download code repositor from github
+#'
+#' @param local_path character. Path to install repository
+#' @param giturl character. URL to github repository
+#' @param config_file character. Name of config file (e.g. "~/.Rprofile")
+#' @export
+get_github_code_library <- function(local_path,giturl,
+                                    config_file){
+  
+  if(missing(config_file)) stop("config_file required. Use either::\n",
+                                " ~/.Rprofile (for user installation)\n ",R.home(),"/etc/Rprofile.site (for all users - administrator access required)")
+  local_path <- normalizePath(local_path,mustWork = FALSE)
+  
+  tryCatch({
+    git2r::clone(url = giturl,local_path = local_path)
+    if(file.exists(config_file))
+      config_contents <- readLines(config_file) else {
+        config_contents <- ""}
+
+    if(any(grepl(local_path,config_contents))){
+      warning("local_path detected in config file.\n",
+              "Ensure the following in your config_file:\n",
+              " options(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n")
+    } else
+      cat("options(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n",
+          file = config_file, append = TRUE , sep = "")
+  }, error = function(e){
+    message("removing ",local_path)
+    unlink(local_path, recursive = TRUE, force = TRUE)
+    stop(e)
+  })
+}
+
