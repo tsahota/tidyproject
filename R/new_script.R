@@ -157,7 +157,7 @@ copy_file <- function(from, dest, overwrite = FALSE, alt_paths, version_control=
     ## dest is the location direcdestry
     if (missing(from)) 
         stop("need \"from\" argument")
-    dest_path <- normalizePath(dest, winslash = "/")
+    dest_path <- normalizePath(dest, winslash = "/", mustWork = FALSE)
     
     use_code_library <- missing(alt_paths)
     
