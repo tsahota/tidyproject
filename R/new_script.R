@@ -147,18 +147,17 @@ copy_script <- function(from, to, dependencies = TRUE, stamp_copy = TRUE, overwr
 #' No modification of that file will take place
 #'
 #' @param from character. file name or path of file to copy
-#' @param dest_dir character. file name file to create
+#' @param dest character. file name file to create
 #' @param overwrite logical. Overwrite 'to' file if exists?
 #' @param alt_paths character vector. paths to other candidate files to search
+#' @param version_control logical. Should file be added to version control (default = FALSE)
 #' @export
 
-copy_file <- function(from, dest_dir, overwrite = FALSE, alt_paths) {
-    ## dest_dir is the location direcdest_dirry
-    if (!file.info(dest_dir)$isdir) 
-        stop("dest_dir needs to be a destination directory")
+copy_file <- function(from, dest, overwrite = FALSE, alt_paths, version_control=FALSE) {
+    ## dest is the location direcdestry
     if (missing(from)) 
         stop("need \"from\" argument")
-    dest_dir_path <- normalizePath(dest_dir, winslash = "/")
+    dest_path <- normalizePath(dest, winslash = "/")
     
     use_code_library <- missing(alt_paths)
     
@@ -178,8 +177,8 @@ copy_file <- function(from, dest_dir, overwrite = FALSE, alt_paths) {
         if (length(from_path) > 1 & !use_code_library) 
             stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
     }
-    
-    file.copy(from_path, dest_dir_path, overwrite = overwrite)
+    file.copy(from_path, dest_path, overwrite = overwrite)
+    setup_file(dest_path,version_control=version_control)
 }
 
 

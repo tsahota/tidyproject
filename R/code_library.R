@@ -291,6 +291,10 @@ short_path <- function(x) {
 get_github_code_library <- function(local_path,giturl,
                                     config_file){
   
+  if(!requireNamespace("git2r", quietly = TRUE))
+    stop("git2r needed for this function to work. Please install it.",
+         call. = FALSE)
+  
   if(missing(config_file)) stop("config_file required. Use either::\n",
                                 " ~/.Rprofile (for user installation)\n ",R.home(),"/etc/Rprofile.site (for all users - administrator access required)")
   local_path <- normalizePath(local_path,mustWork = FALSE)

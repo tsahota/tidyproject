@@ -4,16 +4,18 @@
 \alias{copy_file}
 \title{Copy file to project directory}
 \usage{
-copy_file(from, dest_dir, overwrite = FALSE, alt_paths)
+copy_file(from, dest, overwrite = FALSE, alt_paths, version_control = FALSE)
 }
 \arguments{
 \item{from}{character. file name or path of file to copy}
 
-\item{dest_dir}{character. file name file to create}
+\item{dest}{character. file name file to create}
 
 \item{overwrite}{logical. Overwrite 'to' file if exists?}
 
 \item{alt_paths}{character vector. paths to other candidate files to search}
+
+\item{version_control}{logical. Should file be added to version control (default = FALSE)}
 }
 \description{
 Will copy any file from an external location (e.g. code library) into project

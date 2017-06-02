@@ -109,14 +109,16 @@ resetwd <- function(){
 }
 
 #' Setup files
-#' @param file.name character indicating name of file to set up
+#' @param file.name character. Indicating name of file to set up
+#' @param version_control logical. Should file be added to version control
 #' @export
-setup_file <- function(file.name) {
+setup_file <- function(file.name,version_control=getOption("git.exists")) {
     check_if_tidyproject()
     Sys.chmod(file.name, mode = "744")  ## 744= read-write-executable for user, read only for others
-    if (getOption("git.exists")) {
+    if (version_control) {
         git2r::add(git2r::repository("."), file.name)
         message(paste(file.name, "added to git"))
+        Sys.sleep(0.1)
     } else message(paste(file.name, "created"))
 }
 
