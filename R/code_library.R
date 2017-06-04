@@ -318,5 +318,6 @@ get_github_code_library <- function(local_path,giturl,
     unlink(local_path, recursive = TRUE, force = TRUE)
     stop(e)
   })
+  options(code_library_path=c(getOption("code_library_path"),local_path))
 }
 
