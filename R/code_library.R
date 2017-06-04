@@ -59,8 +59,9 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
         res <- do.call(rbind, res)
     } else res <- data.frame(row.names = seq_along(files))
     
-    d <- cbind(data.frame(FULL = normalizePath(files, winslash = "/"), FOLDER = normalizePath(dirname(files), 
-        winslash = "/"), NAME = basename(files), stringsAsFactors = FALSE), res)
+    d <- cbind(data.frame(FULL = normalizePath(files, winslash = "/"),
+                          FOLDER = normalizePath(dirname(files), winslash = "/"),
+                          NAME = basename(files), stringsAsFactors = FALSE), res)
     
     if (!is.null(base_dirs)) {
         base_dirs <- normalizePath(base_dirs, winslash = "/")
@@ -297,7 +298,7 @@ get_github_code_library <- function(local_path,giturl,
   
   if(missing(config_file)) stop("config_file required. Use either::\n",
                                 " ~/.Rprofile (for user installation)\n ",R.home(),"/etc/Rprofile.site (for all users - administrator access required)")
-  local_path <- normalizePath(local_path,mustWork = FALSE)
+  local_path <- normalizePath(local_path, winslash = "/", mustWork = FALSE)
   
   tryCatch({
     git2r::clone(url = giturl,local_path = local_path)
