@@ -95,7 +95,7 @@ check_if_tidyproject <- function(directory = getwd()) {
   #   if(!in_right_dir) stop("Rstudio project != current working directory")
   # }
   if (!is_tidyproject(directory))
-    stop("directory not a tidyproject")
+    stop("working directory not a tidyproject base directory")
   return(TRUE)
 }
 
