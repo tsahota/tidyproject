@@ -3,10 +3,11 @@
 #' Creates directory structure.  User install tidyproject again in
 #'
 #' @param proj_name character string of full path to new_project
-#' @param project_library TRUE (default) or FALSE indicating whether or not to create a project library
+#' @param remove_user_lib logical (default=FALSE) if TRUE will attempt to remove 
+#'   user R package library from .libPaths()
 #'
 #' @export
-make_project <- function(proj_name, project_library = TRUE) {
+make_project <- function(proj_name, remove_user_lib = FALSE) {
     ## must be full path.  User function: create new_project
     new_proj <- !file.exists(proj_name)
     if (new_proj) {
@@ -15,14 +16,25 @@ make_project <- function(proj_name, project_library = TRUE) {
             dir.create(proj_name)
             file.copy(file.path(system.file("extdata/EmptyProject", package = "tidyproject"), 
                 "."), proj_name, recursive = TRUE)
-            result <- file.rename(file.path(proj_name, "Rprofile.R"), file.path(proj_name, 
-                ".Rprofile"))
-            if (!result) 
-                stop("something wrong with .Rprofile creation") else unlink(file.path(proj_name, "Rprofile.R"), force = TRUE)
+            if(!file.exists(file.path(proj_name, "Rprofile.R"))){
+              result <- file.rename(file.path(proj_name, "Rprofile.R"), file.path(proj_name, 
+                                                                                  ".Rprofile"))
+            } else {
+              existing_lines <- readLines(file.path(proj_name, ".Rprofile.R"))
+              if(any(grepl("### Begin tidyproject config",existing_lines)))
+                stop("Existing ProjectLibrary setup lines found in ",
+                     file.path(proj_name, ".Rprofile.R"),call. = FALSE)
+              new_lines <- readLines(file.path(proj_name, "Rprofile.R"))
+              cat(paste0("\n",new_lines),file = file.path(proj_name, ".Rprofile.R"),
+                  append = TRUE)
+            }
+            config_lines <- readLines(file.path(proj_name, ".Rprofile.R"))
+            config_lines <- gsub("^(remove_user_lib <- )\\S*$",
+                                 paste0("\\1",remove_user_lib),
+                                 config_lines)
+            write(config_lines,file=file.path(proj_name, ".Rprofile.R"))
             if (!TRUE %in% file.info(proj_name)$isdir) 
                 stop(paste(proj_name, "not created"))
-            if (!project_library) 
-                unlink(file.path(proj_name, "ProjectLibrary"), recursive = TRUE, force = TRUE)
         }, error = function(e) {
             message("Aborting. Reversing changes...")
             unlink(proj_name, recursive = TRUE, force = TRUE)
@@ -49,15 +61,6 @@ make_project <- function(proj_name, project_library = TRUE) {
                 ".Rprofile"))
             if (!result) 
                 stop("something wrong with .Rprofile creation") else unlink(file.path(proj_name, "Rprofile.R"), force = TRUE)
-        }
-        if (!project_library) {
-            contents <- dir(file.path(proj_name, "ProjectLibrary"), include.dirs = TRUE, 
-                all.files = TRUE)
-            contents <- contents[!contents %in% c(".", "..")]
-            contents <- contents[!grepl("Readme\\.txt$", contents)]
-            if (length(contents) > 0) 
-                stop("ProjectLibrary not empty. Will not delete. Rerun with project_library=TRUE")
-            unlink(file.path(proj_name, "ProjectLibrary"), recursive = TRUE, force = TRUE)
         }
     }
     if (getOption("git.exists")) {
@@ -93,9 +96,8 @@ make_project <- function(proj_name, project_library = TRUE) {
     message("")
     message("INSTRUCTIONS:")
     message(paste("1. Open Rstudio project to start working: ", proj_name))
-    if (project_library) {
-        message(paste("2. (optional) Install tidyproject package in project library"))
-    }
+    message(paste("2. (optional) Install tidyproject package in project library"))
+
 }
 
 #' create local bare repository

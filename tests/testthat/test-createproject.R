@@ -26,11 +26,13 @@ test_that("Project is created", {
     # print('dir_before_test=') print(dir())
     expect_false(file.exists(proj_name))
     
-    make_project(proj_name, project_library = FALSE)
+    make_project(proj_name, remove_user_lib = TRUE)
     
     expect_true(is_tidyproject(proj_name))
     expect_true(file.exists(proj_name))
-    expect_false(file.exists(file.path(proj_name, "ProjectLibrary")))
+    
+    config_lines <- readLines(file.path(proj_name, ".Rprofile.R"))
+    expect_true(any(grepl("remove_user_lib <- TRUE",config_lines)))
     
     cleanup(proj_name)
     make_project(proj_name)
