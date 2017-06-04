@@ -77,7 +77,7 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
             match_base <- grepl(paste0("^", base_dir), d$FULL)
             
             d$FOLDER[match_base] <- gsub(paste0("^(", base_dir, ").*$"), "\\1", d$FULL[match_base])
-            d$NAME[match_base] <- gsub(paste0("^", base_dir, .Platform$file.sep, "(.*)$"), 
+            d$NAME[match_base] <- gsub(paste0("^", base_dir, .Platform$file.sep, "*(.*)$"), 
                 "\\1", d$FULL[match_base])
         }
     }
