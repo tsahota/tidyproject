@@ -1,3 +1,27 @@
+copy_empty_project <- function(proj_name,remove_user_lib){
+  .Rprofile_name <- normalizePath(file.path(proj_name, ".Rprofile"),winslash = "/",mustWork = FALSE)
+  Rprofile.R_name <- normalizePath(file.path(proj_name, "Rprofile.R"),winslash = "/",mustWork = FALSE)
+  file.copy(file.path(system.file("extdata/EmptyProject", package = "tidyproject"), 
+                      "."), proj_name, recursive = TRUE, overwrite = FALSE)
+  if(!file.exists(.Rprofile_name)){
+    result <- file.rename(Rprofile.R_name,.Rprofile_name)
+    if(!result) stop("unable to create project config file")
+  } else {
+    existing_lines <- readLines(.Rprofile_name)
+    if(any(grepl("ProjectLibrary",existing_lines)))
+      stop("Existing ProjectLibrary setup lines found in ",
+           .Rprofile_name,"\n Remove and then try again",call. = FALSE)
+    new_lines <- readLines(Rprofile.R_name)
+    cat(paste0("\n",new_lines),file = .Rprofile_name,append = TRUE)
+  }
+  config_lines <- readLines(.Rprofile_name)
+  config_lines <- gsub("^(\\.remove_user_lib <- )\\S*$",
+                       paste0("\\1",remove_user_lib),
+                       config_lines)
+  write(config_lines,file=.Rprofile_name)
+}
+
+
 #' Create new_project
 #'
 #' Creates directory structure.  User install tidyproject again in
@@ -14,25 +38,7 @@ make_project <- function(proj_name, remove_user_lib = FALSE) {
         tryCatch({
             message("Directory doesn't exist. Creating...")
             dir.create(proj_name)
-            file.copy(file.path(system.file("extdata/EmptyProject", package = "tidyproject"), 
-                "."), proj_name, recursive = TRUE)
-            if(!file.exists(file.path(proj_name, "Rprofile.R"))){
-              result <- file.rename(file.path(proj_name, "Rprofile.R"), file.path(proj_name, 
-                                                                                  ".Rprofile"))
-            } else {
-              existing_lines <- readLines(file.path(proj_name, ".Rprofile.R"))
-              if(any(grepl("### Begin tidyproject config",existing_lines)))
-                stop("Existing ProjectLibrary setup lines found in ",
-                     file.path(proj_name, ".Rprofile.R"),call. = FALSE)
-              new_lines <- readLines(file.path(proj_name, "Rprofile.R"))
-              cat(paste0("\n",new_lines),file = file.path(proj_name, ".Rprofile.R"),
-                  append = TRUE)
-            }
-            config_lines <- readLines(file.path(proj_name, ".Rprofile.R"))
-            config_lines <- gsub("^(remove_user_lib <- )\\S*$",
-                                 paste0("\\1",remove_user_lib),
-                                 config_lines)
-            write(config_lines,file=file.path(proj_name, ".Rprofile.R"))
+            copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib)
             if (!TRUE %in% file.info(proj_name)$isdir) 
                 stop(paste(proj_name, "not created"))
         }, error = function(e) {
@@ -51,17 +57,7 @@ make_project <- function(proj_name, remove_user_lib = FALSE) {
         message("\n---Merge conflict on files/folders (will not replace)---:\n")
         message(paste(merge_conf, collapse = "\n"))
         message("")
-        
-        file.copy(file.path(system.file("extdata/EmptyProject", package = "tidyproject"), 
-            "."), proj_name, recursive = TRUE, overwrite = FALSE)
-        ## if the file is there don't overwrite.
-        if (file.exists(file.path(proj_name, ".Rprofile"))) 
-            message(".Rprofile already present, creating Rprofile.R instead") else {
-            result <- file.rename(file.path(proj_name, "Rprofile.R"), file.path(proj_name, 
-                ".Rprofile"))
-            if (!result) 
-                stop("something wrong with .Rprofile creation") else unlink(file.path(proj_name, "Rprofile.R"), force = TRUE)
-        }
+        copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib)
     }
     if (getOption("git.exists")) {
         currentwd <- getwd()

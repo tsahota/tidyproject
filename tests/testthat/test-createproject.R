@@ -13,26 +13,23 @@ cleanup <- function(proj_name) {
 }
 
 test_that("Project is created", {
-    
+
     currentwd <- getwd()
-    # print('dir_before_clean=') print(dir()) print(paste0('proj_name=',proj_name))
     cleanup(proj_name)
-    # print('dir_after_clean=') print(dir())
     on.exit({
         setwd(currentwd)
         cleanup(proj_name)
     })
     
-    # print('dir_before_test=') print(dir())
-    expect_false(file.exists(proj_name))
+    #expect_false(file.exists(proj_name))
     
     make_project(proj_name, remove_user_lib = TRUE)
     
     expect_true(is_tidyproject(proj_name))
     expect_true(file.exists(proj_name))
     
-    config_lines <- readLines(file.path(proj_name, ".Rprofile.R"))
-    expect_true(any(grepl("remove_user_lib <- TRUE",config_lines)))
+    config_lines <- readLines(file.path(proj_name, ".Rprofile"))
+    expect_true(any(grepl(".remove_user_lib <- TRUE",config_lines)))
     
     cleanup(proj_name)
     make_project(proj_name)
@@ -41,12 +38,9 @@ test_that("Project is created", {
     expect_true(is_tidyproject(proj_name))
     expect_true(file.exists(file.path(proj_name, "ProjectLibrary")))
     
+    unlink(file.path(proj_name,".Rprofile"))
     make_project(proj_name)  ## merges directories
-    expect_true(file.exists(file.path(proj_name, "Rprofile.R")))
-    
-    make_project(proj_name, project_library = FALSE)
-    expect_false(file.exists(file.path(proj_name, "ProjectLibrary")))
-    
+
 })
 
 test_that("make bare repository", {
