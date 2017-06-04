@@ -4,14 +4,14 @@
 \alias{make_project}
 \title{Create new_project}
 \usage{
-make_project(proj_name, project_library = TRUE)
+make_project(proj_name, remove_user_lib = FALSE)
 }
 \arguments{
 \item{proj_name}{character string of full path to new_project}
 
-\item{project_library}{TRUE (default) or FALSE indicating whether or not to create a project library}
+\item{remove_user_lib}{logical (default=FALSE) if TRUE will attempt to remove 
+user R package library from .libPaths()}
 }
 \description{
 Creates directory structure.  User install tidyproject again in
 }
-

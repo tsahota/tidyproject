@@ -9,4 +9,3 @@ set_project_opts()
 \description{
 Set project options
 }
-

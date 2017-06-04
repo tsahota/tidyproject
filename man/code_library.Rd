@@ -21,4 +21,3 @@ code_library(extn = NULL, fields = "Description", viewer = TRUE,
 \description{
 Show Code Library
 }
-

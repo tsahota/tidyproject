@@ -16,4 +16,3 @@ search_field(files, field, text)
 \description{
 Search for files matching field values
 }
-

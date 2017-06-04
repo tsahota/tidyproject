@@ -12,4 +12,3 @@ models_dir(proj_name = getwd())
 \description{
 Shortcut to Models directory
 }
-

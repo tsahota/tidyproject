@@ -21,4 +21,3 @@ is_full_path('file.text.ext')
 is_full_path('/path/to/file.text.ext')
 }
 }
-

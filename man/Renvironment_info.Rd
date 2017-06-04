@@ -9,4 +9,3 @@ Renvironment_info()
 \description{
 Create a record of the R version and package versions used in a particular NMproject
 }
-

@@ -12,4 +12,3 @@ scripts_dir(proj_name = getwd())
 \description{
 Shortcut to Scripts directory
 }
-

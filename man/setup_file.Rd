@@ -14,4 +14,3 @@ setup_file(file.name, version_control = getOption("git.exists"))
 \description{
 Setup files
 }
-

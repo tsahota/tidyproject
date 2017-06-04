@@ -16,4 +16,3 @@ get_script_field(file_name, field_name, n = 10)
 \description{
 Get field from a code file
 }
-

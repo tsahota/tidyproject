@@ -18,4 +18,3 @@ search_raw(files, text, search_title = TRUE, search_contents = TRUE)
 \description{
 Search for files matching raw text search
 }
-

@@ -16,4 +16,3 @@ get_github_code_library(local_path, giturl, config_file)
 \description{
 Download code repositor from github
 }
-

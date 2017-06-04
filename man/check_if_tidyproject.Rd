@@ -12,4 +12,3 @@ check_if_tidyproject(directory = getwd())
 \description{
 Check if directory is a tidyproject
 }
-

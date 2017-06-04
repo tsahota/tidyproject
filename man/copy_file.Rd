@@ -21,4 +21,3 @@ copy_file(from, dest, overwrite = FALSE, alt_paths, version_control = FALSE)
 Will copy any file from an external location (e.g. code library) into project
 No modification of that file will take place
 }
-

@@ -9,7 +9,7 @@ Description: Create and manage standardised analysis directories with
   private package libraries and links to external code repositories.
 License: GPL-3 | file LICENSE
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Suggests:
     devtools,
     covr,

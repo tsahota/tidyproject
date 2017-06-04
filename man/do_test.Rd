@@ -14,4 +14,3 @@ do_test(..., silent = FALSE)
 \description{
 Testing interfact
 }
-

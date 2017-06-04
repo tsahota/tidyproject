@@ -35,6 +35,7 @@ facilitate reproducibility and reuse of code
 To modify these options use the options() interface.
 To modify these values permanently set options() in ~/.Rprofile or R_HOME/etc/Rprofile.site
 }
+
 \examples{
 \dontrun{
 make_project('~/AZDXXXX/PKAE1')         ## creates new_project
@@ -47,4 +48,3 @@ copy_script('output.data.R')            ## copies from code_library
 copy_script('../pathto/script.R')       ## copies from other location
 }
 }
-

@@ -14,4 +14,3 @@ search_keyword(files, text)
 \description{
 Search for files matching key words
 }
-

@@ -12,4 +12,3 @@ make_local_bare(proj_name = getwd())
 \description{
 create local bare repository
 }
-

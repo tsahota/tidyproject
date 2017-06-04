@@ -28,4 +28,3 @@ copy_script(from, to, dependencies = TRUE, stamp_copy = TRUE,
 Will search code library and copy script and dependencies into scripts directory.
 Script will also be stamped with source location, time and user information
 }
-

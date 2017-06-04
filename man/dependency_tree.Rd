@@ -16,4 +16,3 @@ Used by copy_script. Creates an an ordered vector of script dependencies.}
 \description{
 Create a recursive dependency_tree of file names
 }
-

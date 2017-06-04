@@ -12,4 +12,3 @@ short_path(x)
 \description{
 shorten path name
 }
-

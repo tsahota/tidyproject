@@ -12,4 +12,3 @@ attach_code_library(path)
 \description{
 Attaches a path(s) to to the code library search path
 }
-

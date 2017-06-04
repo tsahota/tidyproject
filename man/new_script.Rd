@@ -16,4 +16,3 @@ new_script(name, overwrite = FALSE, open_file = TRUE)
 \description{
 Create new R script
 }
-
