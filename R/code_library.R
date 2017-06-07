@@ -311,7 +311,7 @@ get_github_code_library <- function(local_path,giturl,
               "Ensure the following in your config_file:\n",
               " options(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n")
     } else
-      cat("options(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n",
+      cat("\n\noptions(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n",
           file = config_file, append = TRUE , sep = "")
   }, error = function(e){
     message("removing ",local_path)
