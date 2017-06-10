@@ -6,7 +6,7 @@ Authors@R: person("Tarj", "Sahota", email =
     "tarjinder.sahota@astrazeneca.com", role = c("aut", "cre"))
 Maintainer: Tarj Sahota <tarjinder.sahota@astrazeneca.com>
 Description: Create and manage standardised analysis directories with
-  private package libraries and links to external code repositories.
+    private package libraries and links to external code repositories.
 License: GPL-3 | file LICENSE
 LazyData: TRUE
 RoxygenNote: 6.0.1

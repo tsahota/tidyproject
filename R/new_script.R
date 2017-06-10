@@ -2,8 +2,9 @@
 #' @param name character indicating name of script to create
 #' @param overwrite logical. Whether to overwrite existing file (default = FALSE)
 #' @param open_file logical. Whether function should open script (default = TRUE)
+#' @param libs character. What libraries to add.
 #' @export
-new_script <- function(name, overwrite = FALSE, open_file = TRUE) {
+new_script <- function(name, overwrite = FALSE, open_file = TRUE, libs=c("tidyproject")) {
     ## create black script with comment fields. Add new_script to git
     check_if_tidyproject()
     if (name != basename(name)) 
@@ -14,7 +15,7 @@ new_script <- function(name, overwrite = FALSE, open_file = TRUE) {
     s <- c(paste0("## ", "Author: ", Sys.info()["user"]), paste0("## ", "First created: ", 
         Sys.Date()), paste0("## ", "Description: "), paste0("## ", 
         "Keywords: "), "", "########################################", "## load packages and source functions here", 
-        "", paste0("library(tidyproject)"), "", "########################################", 
+        "", paste0("library(",libs,")"), "", "########################################", 
         "## main script here", "")
     writeLines(s, to_path)
     setup_file(to_path)

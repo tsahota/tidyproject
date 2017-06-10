@@ -4,7 +4,8 @@
 \alias{new_script}
 \title{Create new R script}
 \usage{
-new_script(name, overwrite = FALSE, open_file = TRUE)
+new_script(name, overwrite = FALSE, open_file = TRUE,
+  libs = c("tidyproject"))
 }
 \arguments{
 \item{name}{character indicating name of script to create}
@@ -12,6 +13,8 @@ new_script(name, overwrite = FALSE, open_file = TRUE)
 \item{overwrite}{logical. Whether to overwrite existing file (default = FALSE)}
 
 \item{open_file}{logical. Whether function should open script (default = TRUE)}
+
+\item{libs}{character. What libraries to add.}
 }
 \description{
 Create new R script
