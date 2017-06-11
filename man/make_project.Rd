@@ -4,13 +4,15 @@
 \alias{make_project}
 \title{Create new_project}
 \usage{
-make_project(proj_name, remove_user_lib = FALSE)
+make_project(proj_name, remove_user_lib = FALSE, overwrite_rprofile = FALSE)
 }
 \arguments{
 \item{proj_name}{character string of full path to new_project}
 
 \item{remove_user_lib}{logical (default=FALSE) if TRUE will attempt to remove 
 user R package library from .libPaths()}
+
+\item{overwrite_rprofile}{logical. should project .Rprofile be overwritten (default=FALSE)}
 }
 \description{
 Creates directory structure.  User install tidyproject again in

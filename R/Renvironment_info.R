@@ -10,6 +10,10 @@ Renvironment_info <- function() {
     scripts <- ls_scripts(scripts_dir())
     
     text <- lapply(scripts, readLines)
+    if(length(text)==0) {
+      message("No package dependencies right now")
+      return(invisible())
+    }
     text <- unlist(text)
     text <- parse(text = text)
 

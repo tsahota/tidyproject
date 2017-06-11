@@ -75,28 +75,20 @@ models_dir <- function(proj_name = getwd()) {
     normalizePath(file.path(proj_name, getOption("models.dir")), winslash = "/", mustWork = FALSE)
 }
 
-is_tidyproject <- function(directory = getwd()) {
-  # if(exists(".rs.getProjectDirectory")){
-  #   in_right_dir <- normalizePath(get(".rs.getProjectDirectory")(),winslash = "/") == 
-  #     normalizePath(getwd(),winslash = "/")
-  # } else
-  #   in_right_dir <- TRUE
-  file.exists(scripts_dir(directory)) & file.exists(models_dir(directory)) 
-}
-
 #' Check if directory is a tidyproject
 #' 
 #' @param directory character. working directory (default = current working directory)
+#' @param return_logical logical. If true will return FALSE instead of error
 #' @export
-check_if_tidyproject <- function(directory = getwd()) {
-  # if(exists(".rs.getProjectDirectory")){
-  #   in_right_dir <- normalizePath(get(".rs.getProjectDirectory")(),winslash = "/") == 
-  #     normalizePath(getwd(),winslash = "/")
-  #   if(!in_right_dir) stop("Rstudio project != current working directory")
-  # }
-  if (!is_tidyproject(directory))
+check_if_tidyproject <- function(directory = getwd(),return_logical=FALSE) {
+  test <- is_tidyproject(directory)
+  if (!test & !return_logical) {
     stop("working directory not a tidyproject base directory")
-  return(TRUE)
+  } else return(test)
+}
+
+is_tidyproject <- function(directory = getwd()) {
+  file.exists(scripts_dir(directory)) & file.exists(models_dir(directory)) 
 }
 
 #' Reset working directory to rstudio working directory
@@ -248,3 +240,19 @@ do_test <- function(..., silent = FALSE) {
   invisible(d)
 }
 
+#' Wait for statement to be true
+#'
+#' @param x expression to evaluate
+#' @param timeout numeric. Maximum time (seconds) to wait
+#' @param interval numeric. Number of seconds (default=1s) to wait till rechecking
+#' @export
+wait_for <- function(x,timeout=NULL,interval=1){
+  x <- substitute(x)
+  start.time <- Sys.time()
+  diff.time <- 0
+  while (!eval(x,envir = parent.frame())){
+    diff.time <- difftime(Sys.time(),start.time,units="secs")
+    if(!is.null(timeout))if(diff.time > timeout) stop(paste("timed out waiting for\n",x,sep=""))
+    Sys.sleep(1)
+  }
+}

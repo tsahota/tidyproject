@@ -1,4 +1,4 @@
-copy_empty_project <- function(proj_name,remove_user_lib){
+copy_empty_project <- function(proj_name,remove_user_lib,overwrite_rprofile=FALSE){
   .Rprofile_name <- normalizePath(file.path(proj_name, ".Rprofile"),winslash = "/",mustWork = FALSE)
   Rprofile.R_name <- normalizePath(file.path(proj_name, "Rprofile.R"),winslash = "/",mustWork = FALSE)
   file.copy(file.path(system.file("extdata/EmptyProject", package = "tidyproject"), 
@@ -8,9 +8,16 @@ copy_empty_project <- function(proj_name,remove_user_lib){
     if(!result) stop("unable to create project config file")
   } else {
     existing_lines <- readLines(.Rprofile_name)
-    if(any(grepl("ProjectLibrary",existing_lines)))
-      stop("Existing ProjectLibrary setup lines found in ",
-           .Rprofile_name,"\n Remove and then try again",call. = FALSE)
+    if(any(grepl("ProjectLibrary",existing_lines))){
+      if(!overwrite_rprofile){
+        stop("Existing ProjectLibrary setup lines found in ",
+             .Rprofile_name,
+             "\n  Remove and then try again ",
+             "\n  Or run again with overwrite_rprofile=TRUE", call. = FALSE)
+      } else {
+        unlink(.Rprofile_name,force = TRUE)
+      }
+    }
     new_lines <- readLines(Rprofile.R_name)
     cat(paste0("\n",new_lines),file = .Rprofile_name,append = TRUE)
   }
@@ -29,16 +36,19 @@ copy_empty_project <- function(proj_name,remove_user_lib){
 #' @param proj_name character string of full path to new_project
 #' @param remove_user_lib logical (default=FALSE) if TRUE will attempt to remove 
 #'   user R package library from .libPaths()
+#' @param overwrite_rprofile logical. should project .Rprofile be overwritten (default=FALSE)
 #'
 #' @export
-make_project <- function(proj_name, remove_user_lib = FALSE) {
+make_project <- function(proj_name, remove_user_lib = FALSE,
+                         overwrite_rprofile = FALSE) {
     ## must be full path.  User function: create new_project
     new_proj <- !file.exists(proj_name)
     if (new_proj) {
         tryCatch({
             message("Directory doesn't exist. Creating...")
             dir.create(proj_name)
-            copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib)
+            copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib,
+                               overwrite_rprofile = overwrite_rprofile)
             if (!TRUE %in% file.info(proj_name)$isdir) 
                 stop(paste(proj_name, "not created"))
         }, error = function(e) {

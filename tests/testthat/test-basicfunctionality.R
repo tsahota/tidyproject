@@ -19,6 +19,8 @@ test_that("Project has basic functionality", {
         cleanup(proj_name)
     })
     
+    wait_for(TRUE)
+    
     setwd(proj_name)
     
     expect_true(file.exists("ProjectLibrary"))

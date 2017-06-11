@@ -4,10 +4,12 @@
 \alias{check_if_tidyproject}
 \title{Check if directory is a tidyproject}
 \usage{
-check_if_tidyproject(directory = getwd())
+check_if_tidyproject(directory = getwd(), return_logical = FALSE)
 }
 \arguments{
 \item{directory}{character. working directory (default = current working directory)}
+
+\item{return_logical}{logical. If true will return FALSE instead of error}
 }
 \description{
 Check if directory is a tidyproject
