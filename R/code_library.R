@@ -1,3 +1,7 @@
+#' @importFrom magrittr %>%
+#' @export
+magrittr::'%>%'
+
 #' List scripts
 #'
 #' @param folder string describing folder to search recursively in

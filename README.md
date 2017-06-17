@@ -113,7 +113,7 @@ To list all R scripts in the `./Scripts` subdirectory:
 ls_scripts("./Scripts")
 ```
 
-More refined searching is most easily accomplished with `magrittr`'s `%>%` symbol `library(magrittr)`, e.g. to find all scripts in `./Scripts` that contain the text `text_to_match`:
+More refined searching is most easily accomplished with the pipe symbol, `%>%`, e.g. to find all scripts in `./Scripts` that contain the text `text_to_match`:
 
 ```R
 ls_scripts("./Scripts") %>% search_raw("text_to_match")
