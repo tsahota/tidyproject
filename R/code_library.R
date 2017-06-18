@@ -325,3 +325,14 @@ get_github_code_library <- function(local_path,giturl,
   options(code_library_path=c(getOption("code_library_path"),local_path))
 }
 
+#' pull repository
+#'
+#' @param local_path character. Path to repository
+#' @export
+pull_repo <- function(local_path){
+  repo <- git2r::init(local_path)
+  if(length(git2r::remotes(repo)==0))
+    stop("No remotes for git repository found. Something wrong. Set up manually")
+  git2r::config(repo,user.name = Sys.info()["user"])
+  git2r::pull(repo)
+}
