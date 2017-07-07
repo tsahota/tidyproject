@@ -303,6 +303,7 @@ get_github_code_library <- function(local_path,giturl,
   if(missing(config_file)) stop("config_file required. Use either::\n",
                                 " ~/.Rprofile (for user installation)\n ",R.home(),"/etc/Rprofile.site (for all users - administrator access required)")
   local_path <- normalizePath(local_path, winslash = "/", mustWork = FALSE)
+  local_path_exists <- file.exists(local_path)
   
   tryCatch({
     git2r::clone(url = giturl,local_path = local_path)
@@ -318,8 +319,10 @@ get_github_code_library <- function(local_path,giturl,
       cat("\n\noptions(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n",
           file = config_file, append = TRUE , sep = "")
   }, error = function(e){
-    message("removing ",local_path)
-    unlink(local_path, recursive = TRUE, force = TRUE)
+    if(!local_path_exists){
+      message("removing ",local_path)
+      unlink(local_path, recursive = TRUE, force = TRUE)
+    }
     stop(e)
   })
   options(code_library_path=c(getOption("code_library_path"),local_path))
