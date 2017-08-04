@@ -5,7 +5,7 @@ Version: 0.3.1
 Authors@R: person("Tarj", "Sahota", email =
     "tarjinder.sahota@astrazeneca.com", role = c("aut", "cre"))
 Maintainer: Tarj Sahota <tarjinder.sahota@astrazeneca.com>
-Description: Create and manage standardised analysis directories with
+Description: Create and manage standardised data analysis directories with
     private package libraries and links to external code repositories.
 License: GPL-3 | file LICENSE
 LazyData: TRUE
