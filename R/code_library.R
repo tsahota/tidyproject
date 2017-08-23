@@ -86,15 +86,15 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
         res)
     
     if (shorten_paths) {
-        ds <- cbind(data.frame(FOLDER = short_path(d$FOLDER), NAME = d$NAME, stringsAsFactors = FALSE), 
+        dshort <- cbind(data.frame(FOLDER = short_path(d$FOLDER), NAME = d$NAME, stringsAsFactors = FALSE), 
             res)
     } else {
-        ds <- d
+      dshort <- d
     }
     
     if (!silent) {
         if (viewer) 
-            get("View")(ds, "available files")  # else print(ds)
+            get("View")(dshort, "available files")
     }
     invisible(d)
 }
@@ -309,15 +309,15 @@ get_github_code_library <- function(local_path,giturl,
     if(any(grepl(local_path,config_contents))){
       warning("local_path detected in config file.\n",
               "Ensure the following in your config_file:\n",
-              " options(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n")
+              " options(code_library_path=unique(c(getOption(\"code_library_path\"),\"",local_path,"\")))\n")
     } else
-      cat("\n\noptions(code_library_path=c(getOption(\"code_library_path\"),\"",local_path,"\"))\n",
+      cat("\n\noptions(code_library_path=unique(c(getOption(\"code_library_path\"),\"",local_path,"\")))\n",
           file = config_file, append = TRUE , sep = "")
   }, error = function(e){
     message("removing ",local_path)
     unlink(local_path, recursive = TRUE, force = TRUE)
     stop(e)
   })
-  options(code_library_path=c(getOption("code_library_path"),local_path))
+  options(code_library_path=unique(c(getOption("code_library_path"),local_path)))
 }
 
