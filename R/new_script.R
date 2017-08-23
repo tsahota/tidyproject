@@ -179,7 +179,7 @@ copy_file <- function(from, dest, overwrite = FALSE, alt_paths, version_control=
             stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
     }
     file.copy(from_path, dest_path, overwrite = overwrite)
-    setup_file(dest_path,version_control=version_control)
+    setup_file(file.path(dest_path,basename(from_path)),version_control=version_control)
 }
 
 

@@ -1,3 +1,7 @@
+#' @importFrom magrittr %>%
+#' @export
+magrittr::'%>%'
+
 #' List scripts
 #'
 #' @param folder string describing folder to search recursively in
@@ -299,6 +303,7 @@ get_github_code_library <- function(local_path,giturl,
   if(missing(config_file)) stop("config_file required. Use either::\n",
                                 " ~/.Rprofile (for user installation)\n ",R.home(),"/etc/Rprofile.site (for all users - administrator access required)")
   local_path <- normalizePath(local_path, winslash = "/", mustWork = FALSE)
+  local_path_exists <- file.exists(local_path)
   
   tryCatch({
     git2r::clone(url = giturl,local_path = local_path)
@@ -314,10 +319,23 @@ get_github_code_library <- function(local_path,giturl,
       cat("\n\noptions(code_library_path=unique(c(getOption(\"code_library_path\"),\"",local_path,"\")))\n",
           file = config_file, append = TRUE , sep = "")
   }, error = function(e){
-    message("removing ",local_path)
-    unlink(local_path, recursive = TRUE, force = TRUE)
+    if(!local_path_exists){
+      message("removing ",local_path)
+      unlink(local_path, recursive = TRUE, force = TRUE)
+    }
     stop(e)
   })
   options(code_library_path=unique(c(getOption("code_library_path"),local_path)))
 }
 
+#' pull repository
+#'
+#' @param local_path character. Path to repository
+#' @export
+pull_repo <- function(local_path){
+  repo <- git2r::init(local_path)
+  if(length(git2r::remotes(repo))==0)
+    stop("No remotes for git repository found. Something wrong. Set up manually")
+  git2r::config(repo,user.name = Sys.info()["user"],user.email = getOption("user.email"))
+  git2r::pull(repo)
+}
