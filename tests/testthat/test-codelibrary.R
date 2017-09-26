@@ -101,6 +101,8 @@ test_that("Code library", {
                             giturl="https://github.com/tsahota/PMXcodelibrary",
                             config_file="test_config.R")
     
+    pull_repo("testCodeLibrary")
+    
     expect_true(length(readLines("test_config.R"))>0)
     
     

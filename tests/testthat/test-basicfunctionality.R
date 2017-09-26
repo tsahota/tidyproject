@@ -40,17 +40,20 @@ test_that("Project has basic functionality", {
     Renvironment_info()
     res <- check_session(check_rstudio = FALSE)
     expect_true(is.data.frame(res))
-    
+
+    if(!exists(".rs.getProjectDirectory")) expect_error(resetwd(),"not.*rstudio")
+    if(exists(".rs.getProjectDirectory")) expect_error(resetwd(),NA)
 })
 
 test_that("R session stamp", {
-    
+
     currentwd <- getwd()
-    make_project(proj_name)
     on.exit({
-        setwd(currentwd)
-        cleanup(proj_name)
+      setwd(currentwd)
+      cleanup(proj_name)
     })
+    
+    make_project(proj_name)
     
     setwd(proj_name)
     

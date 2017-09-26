@@ -256,3 +256,10 @@ wait_for <- function(x,timeout=NULL,interval=1){
     Sys.sleep(1)
   }
 }
+
+#' Render rmarkdown for tidyproject
+#' @param ... what 
+render <- function(...){
+  if(!requireNamespace("rmarkdown")) stop("requires rmarkdown - please install")
+  rmarkdown::render(...)
+}
