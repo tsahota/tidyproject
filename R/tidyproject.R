@@ -235,7 +235,9 @@ do_test <- function(..., silent = FALSE) {
       message(eval_x[[test_name]])
     }
   
-  d <- data.frame(test = names(eval_x), result = unlist(eval_x))
+  d <- data.frame(test = names(eval_x),
+                  result_char = as.character(unlist(eval_x)),
+                  result_logical=as.logical(unlist(eval_x)))
   row.names(d) <- NULL
   invisible(d)
 }
@@ -255,11 +257,4 @@ wait_for <- function(x,timeout=NULL,interval=1){
     if(!is.null(timeout))if(diff.time > timeout) stop(paste("timed out waiting for\n",x,sep=""))
     Sys.sleep(1)
   }
-}
-
-#' Render rmarkdown for tidyproject
-#' @param ... what 
-render <- function(...){
-  if(!requireNamespace("rmarkdown")) stop("requires rmarkdown - please install")
-  rmarkdown::render(...)
 }
