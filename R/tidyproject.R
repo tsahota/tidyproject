@@ -216,8 +216,9 @@ get_script_field <- function(file_name,field_name,n = 10){
 #' 
 #' @param ... named expression to evaluate
 #' @param silent logical. Default = FALSE. Should messages be printed.
+#' @param append data.frame. Default = empty. Existing set of results to append to
 #' @export
-do_test <- function(..., silent = FALSE) {
+do_test <- function(..., silent = FALSE,append=data.frame()) {
   x <- match.call(expand.dots = FALSE)$...
   par_env <- parent.frame()
   eval_x <- unlist(lapply(x, function(i) eval(i,par_env)))
@@ -237,8 +238,10 @@ do_test <- function(..., silent = FALSE) {
   
   d <- data.frame(test = names(eval_x),
                   result_char = as.character(unlist(eval_x)),
-                  result_logical=as.logical(unlist(eval_x)))
+                  result_logical=as.logical(unlist(eval_x)),
+                  stringsAsFactors = FALSE)
   row.names(d) <- NULL
+  d <- rbind(append,d)
   invisible(d)
 }
 

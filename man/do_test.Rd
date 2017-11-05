@@ -4,12 +4,14 @@
 \alias{do_test}
 \title{Testing interfact}
 \usage{
-do_test(..., silent = FALSE)
+do_test(..., silent = FALSE, append = data.frame())
 }
 \arguments{
 \item{...}{named expression to evaluate}
 
 \item{silent}{logical. Default = FALSE. Should messages be printed.}
+
+\item{append}{data.frame. Default = empty. Existing set of results to append to}
 }
 \description{
 Testing interfact
