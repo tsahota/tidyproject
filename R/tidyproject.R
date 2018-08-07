@@ -101,18 +101,50 @@ resetwd <- function(){
 }
 
 #' Setup files
-#' @param file.name character. Indicating name of file to set up
+#' 
+#' This function should not be used directly. Only exported for use by dependent packages
+#' 
+#' @param file_name character. Indicating name of file to set up
 #' @param version_control logical. Should file be added to version control
 #' @export
-setup_file <- function(file.name,version_control=getOption("git.exists")) {
+setup_file <- function(file_name,version_control=getOption("git.exists")) {
     check_if_tidyproject()
-    Sys.chmod(file.name, mode = "744")  ## 744= read-write-executable for user, read only for others
+    Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
     if (version_control) {
-        git2r::add(git2r::repository("."), file.name)
-        message(paste(file.name, "added to git"))
-        Sys.sleep(0.1)
-    } else message(paste(file.name, "created"))
+      #browser()
+      #if(packageVersion("git2r") < "0.23.0"){
+        #git2r::add(git2r::repository("."), file_name)
+        #message(paste(file_name, "added to git"))
+      #} else {
+        commit_file(file_name)
+      #}
+      Sys.sleep(0.1)
+    } else message(paste(file_name, "created"))
 }
+
+
+#' commit individual file(s)
+#' 
+#' Has side effect that staged changed will be updated to working tree
+#'
+#' @param commit_file character vector. File(s) to be committed
+#' @export
+#' @examples 
+#' \dontrun{
+#' commit_file("Scripts/script1.R")
+#' }
+commit_file <- function(file_name){
+  repo <- git2r::repository(".")
+  
+  staged_files <- git2r::status(repo)
+  staged_files <- unlist(staged_files$staged)
+  
+  if(length(staged_files) > 0) git2r::reset(repo, path = staged_files)
+  git2r::add(repo,path = file_name)
+  git2r::commit(repo,message = paste("snapshot:", paste(file_name, collapse = ",")))
+  git2r::add(repo, path = staged_files)
+}
+
 
 #' Test if full path
 #'
@@ -261,3 +293,4 @@ wait_for <- function(x,timeout=NULL,interval=1){
     Sys.sleep(1)
   }
 }
+

@@ -4,13 +4,13 @@
 \alias{setup_file}
 \title{Setup files}
 \usage{
-setup_file(file.name, version_control = getOption("git.exists"))
+setup_file(file_name, version_control = getOption("git.exists"))
 }
 \arguments{
-\item{file.name}{character. Indicating name of file to set up}
+\item{file_name}{character. Indicating name of file to set up}
 
 \item{version_control}{logical. Should file be added to version control}
 }
 \description{
-Setup files
+This function should not be used directly. Only exported for use by dependent packages
 }
