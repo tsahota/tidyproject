@@ -7,7 +7,7 @@
 commit_file(file_name)
 }
 \arguments{
-\item{commit_file}{character vector. File(s) to be committed}
+\item{file_name}{character vector. File(s) to be committed}
 }
 \description{
 Has side effect that staged changed will be updated to working tree

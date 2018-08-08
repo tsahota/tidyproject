@@ -112,12 +112,9 @@ setup_file <- function(file_name,version_control=getOption("git.exists")) {
     Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
     if (version_control) {
       #browser()
-      #if(packageVersion("git2r") < "0.23.0"){
         #git2r::add(git2r::repository("."), file_name)
         #message(paste(file_name, "added to git"))
-      #} else {
         commit_file(file_name)
-      #}
       Sys.sleep(0.1)
     } else message(paste(file_name, "created"))
 }
@@ -127,7 +124,7 @@ setup_file <- function(file_name,version_control=getOption("git.exists")) {
 #' 
 #' Has side effect that staged changed will be updated to working tree
 #'
-#' @param commit_file character vector. File(s) to be committed
+#' @param file_name character vector. File(s) to be committed
 #' @export
 #' @examples 
 #' \dontrun{
@@ -136,13 +133,23 @@ setup_file <- function(file_name,version_control=getOption("git.exists")) {
 commit_file <- function(file_name){
   repo <- git2r::repository(".")
   
-  staged_files <- git2r::status(repo)
-  staged_files <- unlist(staged_files$staged)
+  old_staged_files <- git2r::status(repo)
+  old_staged_files <- unlist(old_staged_files$staged)
   
-  if(length(staged_files) > 0) git2r::reset(repo, path = staged_files)
+  if(length(old_staged_files) > 0) {
+    on.exit(git2r::add(repo, path = old_staged_files))
+    git2r::reset(repo, path = old_staged_files)
+  }
+  
   git2r::add(repo,path = file_name)
+  new_staged_files <- git2r::status(repo)
+  new_staged_files <- unlist(new_staged_files$staged)
+  if(length(new_staged_files) == 0){
+    message("git2r failed to add files to git repository. Do it manually instead")
+    return()
+  }
   git2r::commit(repo,message = paste("snapshot:", paste(file_name, collapse = ",")))
-  git2r::add(repo, path = staged_files)
+  
 }
 
 
@@ -294,3 +301,6 @@ wait_for <- function(x,timeout=NULL,interval=1){
   }
 }
 
+#' Logical flag for detecting if R session is on rstudio not
+#' @export
+is_rstudio <- Sys.getenv("RSTUDIO") == "1"

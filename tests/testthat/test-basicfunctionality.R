@@ -24,7 +24,6 @@ test_that("Project has basic functionality", {
     setwd(proj_name)
     
     expect_true(file.exists("ProjectLibrary"))
-    # browser()
     new_script("test.R", open_file = FALSE)
     expect_true(file.exists(file.path(getOption("scripts.dir"), "test.R")))
     
@@ -35,7 +34,7 @@ test_that("Project has basic functionality", {
       notalibname+2
       libname4::fname + libname5::fname + libname6:::fname
     }))
-    expect_true(identical(res,paste0("libname",1:length(res))))
+    expect_true(identical(res,paste0("libname",1:6)))
     
     Renvironment_info()
     res <- check_session(check_rstudio = FALSE)
