@@ -45,18 +45,23 @@ NULL
 
 #' Set project options
 set_project_opts <- function() {
-    ## Internal function: will set all global variables put as much AZ specific code in
-    ## here.
-    if (is.null(getOption("scripts.dir"))) 
-        options(scripts.dir = "Scripts")
-    if (is.null(getOption("models.dir"))) 
-        options(models.dir = "Models")
-    if (is.null(getOption("git.exists"))) 
-        options(git.exists = requireNamespace("git2r", quietly = TRUE))
-    if (is.null(getOption("git.ignore.files"))) 
-        options(git.ignore.files = c(""))
-    if (getOption("git.exists") & is.null(getOption("user.email"))) 
-        options(user.email = "user@example.org")
+  ## Internal function: will set all global variables put as much AZ specific code in
+  ## here.
+  if (is.null(getOption("scripts.dir"))) 
+    options(scripts.dir = "Scripts")
+  if (is.null(getOption("models.dir"))) 
+    options(models.dir = "Models")
+  if (is.null(getOption("git.exists"))) 
+    options(git.exists = requireNamespace("git2r", quietly = TRUE))
+  if(is.null(getOption("system_cmd"))) options(system_cmd=function(cmd,...) {
+    if(.Platform$OS.type == "windows") shell(cmd,...) else system(cmd,...)
+  })
+  if (is.null(getOption("git.command.line.available"))) 
+    options(git.command.line.available = FALSE)
+  if (is.null(getOption("git.ignore.files"))) 
+    options(git.ignore.files = c(""))
+  if (getOption("git.exists") & is.null(getOption("user.email"))) 
+    options(user.email = "user@example.org")
 }
 
 #' Shortcut to Scripts directory
@@ -64,7 +69,7 @@ set_project_opts <- function() {
 #' @param proj_name character. Working directory (default = getwd())
 #' @export
 scripts_dir <- function(proj_name = getwd()) {
-    normalizePath(file.path(proj_name, getOption("scripts.dir")), winslash = "/", mustWork = FALSE)
+  normalizePath(file.path(proj_name, getOption("scripts.dir")), winslash = "/", mustWork = FALSE)
 }
 
 #' Shortcut to Models directory
@@ -72,7 +77,7 @@ scripts_dir <- function(proj_name = getwd()) {
 #' @param proj_name character. Working directory (default = getwd())
 #' @export
 models_dir <- function(proj_name = getwd()) {
-    normalizePath(file.path(proj_name, getOption("models.dir")), winslash = "/", mustWork = FALSE)
+  normalizePath(file.path(proj_name, getOption("models.dir")), winslash = "/", mustWork = FALSE)
 }
 
 #' Check if directory is a tidyproject
@@ -108,17 +113,16 @@ resetwd <- function(){
 #' @param version_control logical. Should file be added to version control
 #' @export
 setup_file <- function(file_name,version_control=getOption("git.exists")) {
-    check_if_tidyproject()
-    Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
-    if (version_control) {
-      #browser()
-        #git2r::add(git2r::repository("."), file_name)
-        #message(paste(file_name, "added to git"))
-        commit_file(file_name)
-      Sys.sleep(0.1)
-    } else message(paste(file_name, "created"))
+  check_if_tidyproject()
+  Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
+  if (version_control) {
+    #browser()
+    #git2r::add(git2r::repository("."), file_name)
+    #message(paste(file_name, "added to git"))
+    commit_file(file_name)
+    Sys.sleep(0.1)
+  } else message(paste(file_name, "created"))
 }
-
 
 #' commit individual file(s)
 #' 
@@ -145,13 +149,27 @@ commit_file <- function(file_name){
   new_staged_files <- git2r::status(repo)
   new_staged_files <- unlist(new_staged_files$staged)
   if(length(new_staged_files) == 0){
-    message("git2r failed to add files to git repository. Do it manually instead")
-    return()
+    if(getOption("git.command.line.available")){
+      for(f in file_name) system_cmd(paste("git add",f))
+    } else {
+      message("git2r failed to add files to git repository. Do it manually instead")
+      return()
+    }
   }
   git2r::commit(repo,message = paste("snapshot:", paste(file_name, collapse = ",")))
-  
 }
 
+#' system/shell command wrapper
+#'
+#' @param cmd character. command to send to shell
+#' @param dir character. directory to run command in
+#' @param ... other arguments passed to system command
+#' @export
+system_cmd <- function(cmd,dir=".",...){
+  if(!dir %in% ".") if(file.exists(dir)) {currentwd <- getwd(); setwd(dir) ; on.exit(setwd(currentwd))} else
+    stop(paste0("Directory \"",dir,"\" doesn't exist."))
+  getOption("system_cmd")(cmd,...)
+}
 
 #' Test if full path
 #'
