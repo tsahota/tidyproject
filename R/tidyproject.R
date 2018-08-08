@@ -116,9 +116,6 @@ setup_file <- function(file_name,version_control=getOption("git.exists")) {
   check_if_tidyproject()
   Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
   if (version_control) {
-    #browser()
-    #git2r::add(git2r::repository("."), file_name)
-    #message(paste(file_name, "added to git"))
     commit_file(file_name)
     Sys.sleep(0.1)
   } else message(paste(file_name, "created"))
@@ -152,7 +149,7 @@ commit_file <- function(file_name){
     if(getOption("git.command.line.available")){
       for(f in file_name) system_cmd(paste("git add",f))
     } else {
-      message("git2r failed to add files to git repository. Do it manually instead")
+      message("Skipping adding files to repo: git2r failed. Do it manually if needed.")
       return()
     }
   }
@@ -322,3 +319,45 @@ wait_for <- function(x,timeout=NULL,interval=1){
 #' Logical flag for detecting if R session is on rstudio not
 #' @export
 is_rstudio <- Sys.getenv("RSTUDIO") == "1"
+
+#' Git commit of ctl files, SourceData and Scripts
+#'
+#' @param message character. Description to be added to commit
+#' @param session logical. Should sessionInfo be included in commit message
+#' @param ... additional arguments for git2r::commit
+#' @export
+
+code_snapshot <- function(message = "created automatic snapshot", session = TRUE, ...){
+  
+  files_to_stage <- c(file.path(getOption("scripts.dir"),"*"),
+                       file.path("SourceData","*"))
+  
+  code_snapshot_files(message = message, session = session, files_to_stage = files_to_stage, ...)
+  
+}
+
+#' Git commit of ctl files, SourceData and Scripts
+#'
+#' This function should not be used directly.
+#' 
+#' @param message character. Description to be added to commit
+#' @param session logical. Should sessionInfo be included in commit message
+#' @param files_to_stage character vector. file paths to add to commit
+#' @param ... additional arguments for git2r::commit
+#' @export
+
+code_snapshot_files <- function(message = "created automatic snapshot", session = TRUE, files_to_stage, ...){
+  
+  ## 'all' doesn't seem to work in git2r::commit, so add the 
+  repo <- git2r::repository(".")
+  git2r::add(repo, files_to_stage)
+  
+  new_staged_files <- git2r::status(repo)
+  new_staged_files <- unlist(new_staged_files$staged)
+  if(length(new_staged_files) == 0){
+    message("nothing to commit")
+    return(invisible())
+  }
+  git2r::commit(repo, message = message, all = TRUE, session = session, ...)
+  message("Committed ctl files, scripts, and source data")
+}
