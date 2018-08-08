@@ -148,8 +148,14 @@ commit_file <- function(file_name){
   if(length(new_staged_files) == 0){
     if(getOption("git.command.line.available")){
       for(f in file_name) system_cmd(paste("git add",f))
+      new_staged_files <- git2r::status(repo)
+      new_staged_files <- unlist(new_staged_files$staged)
+      if(length(new_staged_files) == 0){
+        #nothing to commit. file already commited
+        return()
+      }
     } else {
-      message("Skipping adding files to repo: git2r failed. Do it manually if needed.")
+      #Skipping adding files to repo: git2r failed. Do it manually if needed
       return()
     }
   }
@@ -327,7 +333,7 @@ is_rstudio <- Sys.getenv("RSTUDIO") == "1"
 #' @param ... additional arguments for git2r::commit
 #' @export
 
-code_snapshot <- function(message = "created automatic snapshot", session = TRUE, ...){
+snapshot <- function(message = "created automatic snapshot", session = TRUE, ...){
   
   files_to_stage <- c(file.path(getOption("scripts.dir"),"*"),
                        file.path("SourceData","*"))
@@ -352,12 +358,14 @@ code_snapshot_files <- function(message = "created automatic snapshot", session 
   repo <- git2r::repository(".")
   git2r::add(repo, files_to_stage)
   
-  new_staged_files <- git2r::status(repo)
-  new_staged_files <- unlist(new_staged_files$staged)
-  if(length(new_staged_files) == 0){
+  files <- git2r::status(repo)
+  new_unstaged_files <- unlist(files$unstaged)
+  new_staged_files <- unlist(files$staged)
+  
+  if(length(c(new_staged_files,new_unstaged_files)) == 0){
     message("nothing to commit")
     return(invisible())
   }
   git2r::commit(repo, message = message, all = TRUE, session = session, ...)
-  message("Committed ctl files, scripts, and source data")
+  message("Committed changes to: ctl files, scripts, and source data")
 }
