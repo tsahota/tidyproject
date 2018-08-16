@@ -1,8 +1,9 @@
 copy_empty_project <- function(proj_name,remove_user_lib,overwrite_rprofile=FALSE){
   .Rprofile_name <- normalizePath(file.path(proj_name, ".Rprofile"),winslash = "/",mustWork = FALSE)
   Rprofile.R_name <- normalizePath(file.path(proj_name, "Rprofile.R"),winslash = "/",mustWork = FALSE)
-  file.copy(file.path(system.file("extdata/EmptyProject", package = "tidyproject"), 
-                      "."), proj_name, recursive = TRUE, overwrite = FALSE)
+  
+  file.copy2(file.path(system.file("extdata/EmptyProject", package = "tidyproject"), 
+                       "."), proj_name, recursive = TRUE, overwrite = FALSE)
   if(!file.exists(.Rprofile_name)){
     result <- file.rename(Rprofile.R_name,.Rprofile_name)
     if(!result) stop("unable to create project config file")
@@ -26,6 +27,24 @@ copy_empty_project <- function(proj_name,remove_user_lib,overwrite_rprofile=FALS
                        paste0("\\1",remove_user_lib),
                        config_lines)
   write(config_lines,file=.Rprofile_name)
+}
+
+## like file.copy, but only for non binaries 
+file.copy2 <- function(from, to, overwrite = FALSE, recursive = FALSE){
+  dest <- file.path(to, basename(from))
+  for(i in seq_along(from)){
+    if(file.info(from[i])$isdir){
+      if(overwrite | !file.exists(dest[i])) dir.create(dest[i], showWarnings = FALSE)
+      next_list_files <- list.files(from[i], full.names = TRUE)
+      if(length(next_list_files) > 0 & recursive)
+        file.copy2(from = next_list_files, to = dest[i], recursive = TRUE)
+    } else {
+      if(overwrite | !file.exists(dest[i])) {
+        file.create(dest[i])
+        write(readLines(from[i]), file = dest[i])
+      }
+    }
+  }
 }
 
 
