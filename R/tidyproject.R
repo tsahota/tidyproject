@@ -152,11 +152,11 @@ commit_file <- function(file_name){
       new_staged_files <- unlist(new_staged_files$staged)
       if(length(new_staged_files) == 0){
         #nothing to commit. file already commited
-        return()
+        return(invisible())
       }
     } else {
       #Skipping adding files to repo: git2r failed. Do it manually if needed
-      return()
+      return(invisible())
     }
   }
   git2r::commit(repo,message = paste("snapshot:", paste(file_name, collapse = ",")))
