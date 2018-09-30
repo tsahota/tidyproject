@@ -8,9 +8,6 @@ if (file.exists("ProjectLibrary")) {
     .libPaths(c("ProjectLibrary", .libPaths()))
   } else .libPaths("ProjectLibrary")
   message("Project Library configured")
-  if (file.exists(file.path("ProjectLibrary", "tidyproject"))) {
-    library("tidyproject")
-  }
 }
 
 ### End tidyproject config
