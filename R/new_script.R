@@ -179,7 +179,43 @@ copy_file <- function(from, dest, overwrite = FALSE, alt_paths, version_control=
             stop("Matched more than one file with that name in alt_paths.\n Try specifying full path")
     }
     file.copy(from_path, dest_path, overwrite = overwrite)
-    setup_file(file.path(dest_path,basename(from_path)),version_control=version_control)
+    setup_file(dest_path,version_control=version_control)
+}
+
+copy_directory <- function(){
+  
+}
+
+
+detect_type <- function(x){
+  
+  ## detect type of x
+  ##   if x = directory do copy_directory
+  ##   if x = Rscript
+  ##   if x = NM control file
+  
+}
+
+copy_code <- function(x){
+  
+  type <- detect_type(x)
+   
+  ## Apply copy_x to it:
+  ##  read in required contents of x
+  ##  transform if necessary
+  ##  return (list of) file contents with paths
+  
+  if(type %in% "Rscript"){
+    #res <- get_contents_Rscript(x)
+  }
+  if(type %in% "unknown"){
+    #res <- get_contents_ascii(x)
+  }
+  
+  ## write and setup
+
+  #setup_file(file.path(dest_path,basename(from_path)),version_control=version_control)
+  
 }
 
 
