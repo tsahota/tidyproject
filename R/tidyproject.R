@@ -324,7 +324,7 @@ wait_for <- function(x,timeout=NULL,interval=1){
 
 #' Logical flag for detecting if R session is on rstudio not
 #' @export
-is_rstudio <- Sys.getenv("RSTUDIO") == "1"
+is_rstudio <- function() Sys.getenv("RSTUDIO") == "1"
 
 #' Git commit of ctl files, SourceData and Scripts
 #'
