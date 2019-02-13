@@ -271,6 +271,17 @@ replace_code_library <- function(path) {
     options(code_library_path = unique(path))
 }
 
+#' Import a project into current project
+#'
+#' If file isn't found will look in code_library
+#'
+#' @param path character vector with paths to attach to
+#' @export
+
+import_project <- function(proj_name){
+  
+}
+
 
 
 #' shorten path name
