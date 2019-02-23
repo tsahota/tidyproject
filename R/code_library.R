@@ -2,6 +2,10 @@
 #' @export
 magrittr::'%>%'
 
+#' @importFrom rlang .data
+#' @export
+rlang::.data
+
 #' List scripts
 #'
 #' @param folder string describing folder to search recursively in
@@ -275,11 +279,11 @@ replace_code_library <- function(path) {
 #'
 #' If file isn't found will look in code_library
 #'
-#' @param path character vector with paths to attach to
+#' @param proj_name character vector with paths to attach to
 #' @export
 
 import_project <- function(proj_name){
-  
+  message("under construction")
 }
 
 

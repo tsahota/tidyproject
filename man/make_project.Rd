@@ -4,13 +4,13 @@
 \alias{make_project}
 \title{Create new_project}
 \usage{
-make_project(proj_name, remove_user_lib = FALSE, overwrite_rprofile = FALSE)
+make_project(proj_name, lib_strategy = c("project-user", "project", "user",
+  "global"), overwrite_rprofile = FALSE)
 }
 \arguments{
 \item{proj_name}{character string of full path to new_project}
 
-\item{remove_user_lib}{logical (default=FALSE) if TRUE will attempt to remove 
-user R package library from .libPaths()}
+\item{lib_strategy}{character either missing, "project","project-user","user",or "global"}
 
 \item{overwrite_rprofile}{logical. should project .Rprofile be overwritten (default=FALSE)}
 }

@@ -7,7 +7,7 @@
 import_project(proj_name)
 }
 \arguments{
-\item{path}{character vector with paths to attach to}
+\item{proj_name}{character vector with paths to attach to}
 }
 \description{
 If file isn't found will look in code_library

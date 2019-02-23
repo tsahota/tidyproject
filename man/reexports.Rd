@@ -4,6 +4,8 @@
 \name{reexports}
 \alias{reexports}
 \alias{\%>\%}
+\alias{reexports}
+\alias{.data}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -12,5 +14,7 @@ below to see their documentation.
 
 \describe{
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
+
+  \item{rlang}{\code{\link[rlang]{.data}}}
 }}
 

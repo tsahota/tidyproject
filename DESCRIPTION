@@ -17,4 +17,5 @@ Suggests:
     git2r,
     rmarkdown
 Imports:
-    magrittr
+    magrittr,
+    rlang

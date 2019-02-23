@@ -1,4 +1,7 @@
-copy_empty_project <- function(proj_name,remove_user_lib,overwrite_rprofile=FALSE){
+copy_empty_project <- function(proj_name,
+                               lib_strategy = c("project-user","project","user","global"),
+                               overwrite_rprofile=FALSE){
+  lib_strategy <- match.arg(lib_strategy)
   .Rprofile_name <- normalizePath(file.path(proj_name, ".Rprofile"),winslash = "/",mustWork = FALSE)
   Rprofile.R_name <- normalizePath(file.path(proj_name, "Rprofile.R"),winslash = "/",mustWork = FALSE)
   
@@ -23,9 +26,13 @@ copy_empty_project <- function(proj_name,remove_user_lib,overwrite_rprofile=FALS
     cat(paste0("\n",new_lines),file = .Rprofile_name,append = TRUE)
   }
   config_lines <- readLines(.Rprofile_name)
-  config_lines <- gsub("^(\\.remove_user_lib <- )\\S*(.*)$",
-                       paste0("\\1",remove_user_lib,"\\2"),
-                       config_lines)
+  
+  config_lines <- gsub("project-user", lib_strategy, config_lines)
+  
+  #config_lines <- gsub("^(\\.remove_user_lib <- )\\S*(.*)$",
+  #                     paste0("\\1",remove_user_lib,"\\2"),
+  #                     config_lines)
+  
   write(config_lines,file=.Rprofile_name)
 }
 
@@ -53,12 +60,11 @@ file.copy2 <- function(from, to, overwrite = FALSE, recursive = FALSE){
 #' Creates directory structure.  User install tidyproject again in
 #'
 #' @param proj_name character string of full path to new_project
-#' @param remove_user_lib logical (default=FALSE) if TRUE will attempt to remove 
-#'   user R package library from .libPaths()
+#' @param lib_strategy character either missing, "project","project-user","user",or "global"
 #' @param overwrite_rprofile logical. should project .Rprofile be overwritten (default=FALSE)
 #'
 #' @export
-make_project <- function(proj_name, remove_user_lib = FALSE,
+make_project <- function(proj_name, lib_strategy = c("project-user","project","user","global"),
                          overwrite_rprofile = FALSE) {
     ## must be full path.  User function: create new_project
     new_proj <- !file.exists(proj_name)
@@ -66,7 +72,8 @@ make_project <- function(proj_name, remove_user_lib = FALSE,
         tryCatch({
             message("Directory doesn't exist. Creating...")
             dir.create(proj_name)
-            copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib,
+            copy_empty_project(proj_name = proj_name,
+                               lib_strategy = lib_strategy,
                                overwrite_rprofile = overwrite_rprofile)
             if (!TRUE %in% file.info(proj_name)$isdir) 
                 stop(paste(proj_name, "not created"))
@@ -86,7 +93,7 @@ make_project <- function(proj_name, remove_user_lib = FALSE,
         message("\n---Merge conflict on files/folders (will not replace)---:\n")
         message(paste(merge_conf, collapse = "\n"))
         message("")
-        copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib)
+        copy_empty_project(proj_name=proj_name,lib_strategy = lib_strategy)
     }
     if (getOption("git.exists")) {
         currentwd <- getwd()
@@ -149,7 +156,7 @@ make_local_bare <- function(proj_name = getwd()) {
 #' @param lib character either missing, "project","project-user","user",or "global"
 #' @export
 
-toggle_lib_loc <- function(lib = c("project","project-user","user","global")){
+toggle_libs <- function(lib = c("project","project-user","user","global")){
   current_lib_paths <- normalizePath(.libPaths())
   new_lib_paths <- current_lib_paths
   
@@ -275,6 +282,8 @@ toggle_lib_loc <- function(lib = c("project","project-user","user","global")){
   }
 
   .libPaths(new_lib_paths)
-  toggle_lib_loc()
+  toggle_libs()
   
 }
+
+
