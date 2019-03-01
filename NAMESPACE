@@ -3,6 +3,7 @@
 export("%>%")
 export(.data)
 export(Renvironment_info)
+export(Renvironment_info0)
 export(check_if_tidyproject)
 export(check_session)
 export(code_library)

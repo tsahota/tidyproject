@@ -1,3 +1,40 @@
+#' Internal function to make  R session record
+#'
+#' Internal function. Use Renvironment_info instead
+#'
+#' @export
+
+Renvironment_info0 <- function() {
+  check_if_tidyproject()
+  scripts <- ls_scripts(scripts_dir())
+  
+  text <- lapply(scripts, readLines)
+  if(length(text)==0) {
+    message("No package dependencies right now")
+    return(invisible())
+  }
+  text <- unlist(text)
+  text <- parse(text = text)
+  
+  pkgs <- unique(unlist(lapply(text,recursive_lib_find)))
+  
+  txt <- c(paste0("Created at ", Sys.time(), " by ", Sys.info()["user"], "\n"))
+  if(length(pkgs)>0) {
+    installed_packages <- row.names(utils::installed.packages())
+    non_installed_pkgs <- pkgs[!pkgs %in% installed_packages]
+    if(length(non_installed_pkgs) != 0) {
+      warning("following packages are used but not installed:\n ",
+              paste(non_installed_pkgs, collapse = ","), call. = FALSE)
+      pkgs <- pkgs[pkgs %in% installed_packages]
+    }
+    txt <- c(txt, utils::capture.output(utils::sessionInfo(package = pkgs))) 
+  } else {
+    txt <- c(txt, utils::capture.output(utils::sessionInfo()))
+  }
+  txt
+  
+}
+
 #' Make R session record
 #'
 #' Create a record of the R version and package versions used in a particular NMproject
@@ -6,36 +43,12 @@
 
 
 Renvironment_info <- function() {
-    check_if_tidyproject()
-    scripts <- ls_scripts(scripts_dir())
-    
-    text <- lapply(scripts, readLines)
-    if(length(text)==0) {
-      message("No package dependencies right now")
-      return(invisible())
-    }
-    text <- unlist(text)
-    text <- parse(text = text)
-
-    pkgs <- unique(unlist(lapply(text,recursive_lib_find)))
-
-    txt <- c(paste0("Created at ", Sys.time(), " by ", Sys.info()["user"], "\n"))
-    if(length(pkgs)>0) {
-      installed_packages <- row.names(installed.packages())
-      non_installed_pkgs <- pkgs[!pkgs %in% installed_packages]
-      if(length(non_installed_pkgs) != 0) {
-        warning("following packages are used but not installed:\n ",
-                paste(non_installed_pkgs, collapse = ","), call. = FALSE)
-        pkgs <- pkgs[pkgs %in% installed_packages]
-      }
-      txt <- c(txt, utils::capture.output(utils::sessionInfo(package = pkgs))) 
-    } else {
-      txt <- c(txt, utils::capture.output(utils::sessionInfo()))
-    }
-    writeLines(txt, "Renvironment_info.txt")
-    tidyproject::setup_file("Renvironment_info.txt")
-    message(paste0("Environment info produced: Renvironment_info.txt"))
-    
+  txt <- Renvironment_info0()
+  
+  writeLines(txt, "Renvironment_info.txt")
+  tidyproject::setup_file("Renvironment_info.txt")
+  message(paste0("Environment info produced: Renvironment_info.txt"))
+  
 }
 
 recursive_lib_find <- function(x){
