@@ -13,6 +13,8 @@ ls_script_dirs(path = ".", dir_name = getOption("scripts.dir"), depth,
 \item{dir_name}{character (default = "Scripts"). name of scripts dirs}
 
 \item{depth}{integer. number of levels to search}
+
+\item{maxdepth}{integer. max number of levels to search}
 }
 \description{
 recursively get all script dirs
