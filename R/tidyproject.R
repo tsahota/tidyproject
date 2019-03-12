@@ -79,18 +79,18 @@ scripts_dir <- function(proj_name = getwd()) {
 #' @param depth integer. number of levels to search
 #' @export
 #' 
-list_script_dirs <- function(path = ".", dir_name = getOption("scripts.dir"), 
+ls_script_dirs <- function(path = ".", dir_name = getOption("scripts.dir"), 
                         depth, maxdepth = 10) {
   
   path <- list.dirs(path, full.names = TRUE, recursive = FALSE)
   script_paths <- path[basename(path) %in% dir_name]
   if(maxdepth > 1){
     if(missing(depth)) {
-      if(length(script_paths) == 0) path <- script_dirs(path, dir_name, 
-                                                        maxdepth = maxdepth -1)
+      if(length(script_paths) == 0) path <- ls_script_dirs(path, dir_name, 
+                                                           maxdepth = maxdepth -1)
     } else {
-      if(depth > 1) path <- script_dirs(path, dir_name, 
-                                        depth = depth - 1, maxdepth = maxdepth - 1) 
+      if(depth > 1) path <- ls_script_dirs(path, dir_name, 
+                                           depth = depth - 1, maxdepth = maxdepth - 1) 
     }    
   }
   
