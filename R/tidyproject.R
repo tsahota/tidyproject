@@ -77,10 +77,11 @@ scripts_dir <- function(proj_name = getwd()) {
 #' @param path character. Script dirs are in a subdirectory n levels below
 #' @param dir_name character (default = "Scripts"). name of scripts dirs
 #' @param depth integer. number of levels to search
+#' @param maxdepth integer. max number of levels to search
 #' @export
 #' 
 ls_script_dirs <- function(path = ".", dir_name = getOption("scripts.dir"), 
-                        depth, maxdepth = 10) {
+                           depth, maxdepth = 10) {
   
   path <- list.dirs(path, full.names = TRUE, recursive = FALSE)
   script_paths <- path[basename(path) %in% dir_name]
@@ -94,8 +95,8 @@ ls_script_dirs <- function(path = ".", dir_name = getOption("scripts.dir"),
     }    
   }
   
-  path <- path[grepl("Scripts", path)]
-  normalizePath(path, winslash = "/")
+  script_paths <- path[basename(path) %in% dir_name]
+  normalizePath(script_paths, winslash = "/")
 }
 
 #' Shortcut to Models directory
