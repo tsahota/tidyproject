@@ -239,15 +239,20 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
   
   d <- do_test("directory is a tidyproject"=
                  is_tidyproject(proj_name),
-               "contains Renvironment_info" =
-                 file.exists(file.path(proj_name, "Renvironment_info.txt")),
-               "up to date Renvironment_info" = {
+               "contains environment_info" = {
+                 files <- list.files(proj_name, pattern = "environment_info.*txt")
+                 length(files) > 0
+               },
+               "up to date environment_info" = {
+                 files <- list.files(proj_name, pattern = "environment_info.*txt")
+                 if (length(files) == 0) return("no environment_info")
+                 d <- file.info(files)
+                 d$file_name <- row.names(d)
+                 d <- d[order(d$mtime, decreasing = ), ]
                  script_times <- file.info(ls_scripts(scripts_dir(proj_name)))$mtime
                  if (length(script_times) == 0) 
                    return("No scripts")
-                 if (!file.exists(file.path(proj_name, "Renvironment_info.txt"))) 
-                   return("no Renvironment_info.txt")
-                 envir_time <- file.info(file.path(proj_name, "Renvironment_info.txt"))$mtime
+                 envir_time <- d$mtime[1]
                  time_diff <- difftime(envir_time, max(script_times))
                  result <- time_diff >= 0
                  if (result) 

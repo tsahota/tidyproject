@@ -35,8 +35,8 @@ test_that("Project has basic functionality", {
       libname4::fname + libname5::fname + libname6:::fname
     }))
     expect_true(identical(res,paste0("libname",1:6)))
-    
-    Renvironment_info()
+
+    environment_info()
     res <- check_session(check_rstudio = FALSE)
     expect_true(is.data.frame(res))
 
@@ -59,7 +59,10 @@ test_that("R session stamp", {
     write(c("## Description: abc", "## Depends on: ", "library(tidyproject)", "require(tidyproject)", 
         "tidyproject::make_project"), file = file.path(getOption("scripts.dir"), "test.R"))
     
-    Renvironment_info()
-    expect_true(file.exists("Renvironment_info.txt"))
+    environment_info()
+    
+    files <- list.files(pattern = "environment_info.*txt")
+    
+    expect_true(length(files) > 0)
     
 })
