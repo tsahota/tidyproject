@@ -8,7 +8,7 @@ environment_info0 <- function() {
   check_if_tidyproject()
   scripts <- ls_scripts(scripts_dir())
   
-  text <- lapply(scripts, readLines)
+  text <- suppressWarnings(lapply(scripts, readLines))
   if(length(text)==0) {
     message("No package dependencies right now")
     return(invisible())
@@ -50,7 +50,7 @@ environment_info <- function(){
     uname <- gsub("\\s", "", uname)
     if(nchar(uname) > 0) uname <- paste0("_", uname)
   } else uname <- ""
-
+  
   
   log_file_name <- paste0("environment_info",uname,".txt")
   
