@@ -141,7 +141,11 @@ resetwd <- function(){
 #' @export
 setup_file <- function(file_name,version_control=getOption("git.exists")) {
   check_if_tidyproject()
-  Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
+  #Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
+  
+  if(grepl(file.path(getOption("models.dir"), ".+"),dirname(file_name)))
+    version_control <- FALSE
+  
   if (version_control) {
     commit_file(file_name)
     Sys.sleep(0.1)
