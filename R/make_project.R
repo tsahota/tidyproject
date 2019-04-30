@@ -54,6 +54,15 @@ file.copy2 <- function(from, to, overwrite = FALSE, recursive = FALSE){
   }
 }
 
+#' Load local package
+
+#' @param ... arguments to be passed to devtools::load_all
+#' @export
+
+load_localpackage <- function(...){
+  devtools::load_all("localpackage", ...)
+}
+
 
 #' Create new_project
 #'
