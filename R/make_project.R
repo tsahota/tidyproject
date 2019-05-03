@@ -55,12 +55,30 @@ file.copy2 <- function(from, to, overwrite = FALSE, recursive = FALSE){
 }
 
 #' Load local package
-
+#'
+#' This function loads code stored in localpackage/R and data stored in
+#' localpackage/data.  It is a wrapper around devtools::document() and
+#' devtools::load_all().  See their documentation for more information.
+#'
 #' @param ... arguments to be passed to devtools::load_all
+#' @param fail_silently logical. default FALSE. Should function fail silently
 #' @export
 
-load_localpackage <- function(...){
+load_localpackage <- function(..., fail_silently = FALSE){
+  if(!file.exists("localpackage")) {
+    if(!fail_silently){
+      stop("localpackage does not exist.
+Ensure you are in a tidyproject.
+It's possible you created this project before the localpackages were implemented.
+In this case, run make_project(\".\") to create the localpackage", call. = FALSE)
+    } else return(invisible(FALSE))
+  }
+  if(!requireNamespace("devtools",quietly = TRUE)) stop("devtools package required", call. = FALSE)
+  suppressWarnings(suppressMessages({
+    devtools::document("localpackage")
+  }))
   devtools::load_all("localpackage", ...)
+  return(invisible(TRUE))
 }
 
 

@@ -1,5 +1,5 @@
 Binding: make_project_template
-Title: tidyproject
+Title: New tidyproject
 
 Parameter: lib_strategy
 Widget: SelectInput
@@ -7,3 +7,4 @@ Label: Library strategy
 Fields: project-user, project, user, global
 Default: project-user
 Position: left
+
