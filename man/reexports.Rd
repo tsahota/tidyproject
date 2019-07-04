@@ -5,6 +5,8 @@
 \alias{reexports}
 \alias{\%>\%}
 \alias{reexports}
+\alias{\%T>\%}
+\alias{reexports}
 \alias{.data}
 \title{Objects exported from other packages}
 \keyword{internal}
@@ -13,7 +15,7 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
+  \item{magrittr}{\code{\link[magrittr]{\%>\%}}, \code{\link[magrittr]{\%T>\%}}}
 
   \item{rlang}{\code{\link[rlang]{.data}}}
 }}

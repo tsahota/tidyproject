@@ -2,6 +2,10 @@
 #' @export
 magrittr::'%>%'
 
+#' @importFrom magrittr %>%
+#' @export
+magrittr::'%T>%'
+
 #' @importFrom rlang .data
 #' @export
 rlang::.data

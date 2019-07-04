@@ -2,21 +2,30 @@
 #'
 #' Internal function. Use environment_info instead
 #'
+#' @param scripts_dir character. Which directory to search
 #' @export
 
-environment_info0 <- function() {
-  check_if_tidyproject()
-  scripts <- ls_scripts(scripts_dir())
+environment_info0 <- function(scripts_dir = scripts_dir(getwd())) {
+  check_if_tidyproject(dirname(scripts_dir))
+  scripts <- ls_scripts(scripts_dir)
   
   text <- suppressWarnings(lapply(scripts, readLines))
   if(length(text)==0) {
     message("No package dependencies right now")
     return(invisible())
   }
-  text <- unlist(text)
-  text <- parse(text = text)
+  #text <- unlist(text)
   
-  pkgs <- unique(unlist(lapply(text,recursive_lib_find)))
+  pkgs <- sapply(text, function(text){
+    text <- try(parse(text = text), silent = TRUE)
+    if(inherits(text, "try-error")) return(NA)
+    unique(unlist(lapply(text,recursive_lib_find)))    
+  })
+  #pkgs <- unique(unlist(pkgs))
+  
+  #text <- parse(text = text)
+  
+  #pkgs <- unique(unlist(lapply(text,recursive_lib_find)))
   
   txt <- c(paste0("Created at ", Sys.time(), " by ", Sys.info()["user"], "\n"))
   if(length(pkgs)>0) {
