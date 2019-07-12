@@ -4,7 +4,7 @@
 \alias{environment_info0}
 \title{Internal function to make  R session record}
 \usage{
-environment_info0(scripts_dir = scripts_dir(getwd()))
+environment_info0(scripts_dir)
 }
 \arguments{
 \item{scripts_dir}{character. Which directory to search}

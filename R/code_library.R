@@ -2,7 +2,7 @@
 #' @export
 magrittr::'%>%'
 
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %T>%
 #' @export
 magrittr::'%T>%'
 

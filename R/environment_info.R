@@ -5,7 +5,8 @@
 #' @param scripts_dir character. Which directory to search
 #' @export
 
-environment_info0 <- function(scripts_dir = scripts_dir(getwd())) {
+environment_info0 <- function(scripts_dir) {
+  if(missing(scripts_dir)) scripts_dir <- tidyproject::scripts_dir(getwd())
   check_if_tidyproject(dirname(scripts_dir))
   scripts <- ls_scripts(scripts_dir)
   
