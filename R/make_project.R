@@ -294,7 +294,7 @@ toggle_libs <- function(lib = c("project","project-user","user","global")){
   
   
   if(lib %in% "project-user"){
-    new_lib_paths <- user_front()
+    new_lib_paths <- user_front_if_exists()
     new_lib_paths <- project_front()
   }
   
