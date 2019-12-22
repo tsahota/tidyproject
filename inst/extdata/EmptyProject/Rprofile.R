@@ -3,6 +3,8 @@
 
 if (file.exists(file.path("~", ".Rprofile"))) source(file.path("~", ".Rprofile"))
 
+.libPaths(c(normalizePath("ProjectLibrary"),.libPaths()))
+
 ## set default library config strategy
 suppressMessages({
   tidyproject::toggle_libs("project-user")
