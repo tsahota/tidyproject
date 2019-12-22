@@ -5,22 +5,34 @@
 #' @param libs character. What libraries to add.
 #' @export
 new_script <- function(name, overwrite = FALSE, open_file = TRUE, libs=c("tidyproject")) {
-    ## create black script with comment fields. Add new_script to git
-    check_if_tidyproject()
-    if (name != basename(name)) 
-        stop("name must not be a path")
+  ## create black script with comment fields. Add new_script to git
+  check_if_tidyproject()
+  # if (name != basename(name)) 
+  #   stop("name must not be a path")
+  if (name == basename(name)) {
     to_path <- file.path(scripts_dir(), name)  ## destination path
-    if (file.exists(to_path) & !overwrite) 
-        stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
-    s <- c(paste0("## ", "Author: ", Sys.info()["user"]), paste0("## ", "First created: ", 
-        Sys.Date()), paste0("## ", "Description: "), paste0("## ", 
-        "Keywords: "), "", "########################################", "## load packages and source functions here", 
-        "", paste0("library(",libs,")"), "", "########################################", 
-        "## main script here", "")
-    writeLines(s, to_path)
-    setup_file(to_path)
-    if (open_file) 
-        get("file.edit")(to_path)
+  } else {
+    to_path <- name
+  }
+  if (file.exists(to_path) & !overwrite) 
+    stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
+  s <- c(paste0("## ", "Author: ", Sys.info()["user"]),
+         paste0("## ", "First created: ", Sys.Date()),
+         paste0("## ", "Description: "),
+         paste0("## ", "Keywords: "),
+         "",
+         "########################################",
+         "## load packages and source functions here",
+         "",
+         paste0("library(",libs,")"),
+         "",
+         "########################################",
+         "## main script here", 
+         "")
+  writeLines(s, to_path)
+  setup_file(to_path)
+  if (open_file) 
+    get("file.edit")(to_path)
 }
 
 ## how to have multiple paths on the code_library Can add them in order to the search
@@ -77,7 +89,8 @@ depends_find <- function(x){
 #' Script will also be stamped with source location, time and user information
 #'
 #' @param from character. file name or path of file to copy
-#' @param to character. file name file to create
+#' @param dir character. directory to copy to, default "Scripts"
+#' @param file_path character. file name.  default = same as from
 #' @param dependencies logical. Default = TRUE. will script copy dependencies
 #' @param stamp_copy logical. Create a commented timestamp at beginning of file
 #' @param overwrite logical. Overwrite 'to' file if exists?
@@ -85,19 +98,29 @@ depends_find <- function(x){
 #' @param alt_paths character vector. paths to other candidate files to search
 #' @param proj_path character. Default = current working directory. path to tidyproject
 #' @export
-copy_script <- function(from, to, dependencies = TRUE, stamp_copy = TRUE, overwrite = FALSE, 
-    comment_char = "#", alt_paths, proj_path = ".") {
-    ## User function: copies script from one location (e.g. code_library) to project
-    ## scripts directory
-    check_if_tidyproject(proj_path)
-    if (missing(from)) 
-        stop("need \"from\" argument")
-    onlyfrom <- missing(to)
-    if (missing(to)) 
-        to <- basename(from)
-    if (to != basename(to)) 
-        stop("name must not be a path")
-    to_path <- file.path(scripts_dir(proj_path), to)  ## destination path
+copy_script <- function(from, dir = scripts_dir(proj_path), file_name = basename(from),
+                        dependencies = TRUE, stamp_copy = TRUE, overwrite = FALSE, 
+                        comment_char = "#", alt_paths, proj_path = ".") {
+  ## User function: copies script from one location (e.g. code_library) to project
+  ## scripts directory
+  if (missing(from)) 
+    stop("need \"from\" argument")
+  to <- file_name
+  to_path <- normalizePath(file.path(dir, file_name), mustWork = FALSE)
+  onlyfrom <- missing(dir)
+    # if (missing(to)) {
+    #   to <- basename(from)
+    #   to_path <- file.path(scripts_dir(proj_path), to)  ## destination path
+    # } else {
+    #   to <- normalizePath(to, mustWork = FALSE)
+    #   if(file.info(to)$isdir %in% TRUE){
+    #     to <- basename(from)
+    #     to_path <- file.path(to, basename(from))  ## destination path
+    #   } else {
+    #     to_path <- dirname(to)
+    #   }
+    # }
+
     if (file.exists(to_path) & !overwrite) 
         stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
     
