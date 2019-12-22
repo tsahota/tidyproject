@@ -106,9 +106,14 @@ copy_script <- function(from, file_name = basename(from), dir = scripts_dir(proj
   if (missing(from)) 
     stop("need \"from\" argument")
   to <- file_name
-  if(file_name == basename(file_name))
-    to_path <- normalizePath(file.path(dir, file_name), mustWork = FALSE) else 
-      to_path <- to
+  
+  to_path <- sapply(file_name, function(file_name){
+    if(file_name == basename(file_name))
+      to_path <- normalizePath(file.path(dir, file_name), mustWork = FALSE) else 
+        to_path <- to
+      to_path
+  })
+  
   onlyfrom <- missing(dir)
     # if (missing(to)) {
     #   to <- basename(from)
@@ -165,6 +170,41 @@ copy_script <- function(from, file_name = basename(from), dir = scripts_dir(proj
             Sys.time(), ") by ", Sys.info()["user"]), s0) else s <- s0
     writeLines(s, to_path)
     setup_file(to_path)
+}
+
+#' Copy script to project directory
+#'
+#' Will search code library and copy script and dependencies into scripts directory.
+#' Script will also be stamped with source location, time and user information
+#'
+#' @param from character. file name or path of file to copy
+#' @param to character. file name.  default = same as from
+#' @param stamp_copy logical. Create a commented timestamp at beginning of file
+#' @param overwrite logical. Overwrite 'to' file if exists?
+#' @param comment_char character. Comment character
+#' @export
+copy_script2 <- function(from, to = file.path(getOption("scripts.dir"), basename(from)), 
+                         stamp_copy = TRUE, overwrite = FALSE, comment_char = "#") {
+  ## User function: copies script from one location (e.g. code_library) to project
+  ## scripts directory
+
+  d <- data.frame(from, to, stringsAsFactors = FALSE)
+  
+  to_path <- d$to
+  from_path <- d$from
+  
+  if(!overwrite & any(file.exists(to_path)))
+    stop("File(s) already exist:\n",paste(paste0("  ",to_path),collapse="\n"), "\nRename existing files or use overwrite=TRUE", call. = FALSE)
+
+  for(i in seq_len(nrow(d))){
+    suppressWarnings(s0 <- readLines(from_path[i]))
+    ## modify text at top of 'from_path'
+    if (stamp_copy) 
+      s <- c(paste0(comment_char, comment_char, " Copied from ", from_path[i], "\n##  (", 
+                    Sys.time(), ") by ", Sys.info()["user"]), s0) else s <- s0
+                    writeLines(s, to_path[i])
+                    setup_file(to_path[i]) 
+  }
 }
 
 #' Copy file to project directory
