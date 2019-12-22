@@ -89,8 +89,8 @@ depends_find <- function(x){
 #' Script will also be stamped with source location, time and user information
 #'
 #' @param from character. file name or path of file to copy
+#' @param file_name character. file name.  default = same as from
 #' @param dir character. directory to copy to, default "Scripts"
-#' @param file_path character. file name.  default = same as from
 #' @param dependencies logical. Default = TRUE. will script copy dependencies
 #' @param stamp_copy logical. Create a commented timestamp at beginning of file
 #' @param overwrite logical. Overwrite 'to' file if exists?
@@ -98,7 +98,7 @@ depends_find <- function(x){
 #' @param alt_paths character vector. paths to other candidate files to search
 #' @param proj_path character. Default = current working directory. path to tidyproject
 #' @export
-copy_script <- function(from, dir = scripts_dir(proj_path), file_name = basename(from),
+copy_script <- function(from, file_name = basename(from), dir = scripts_dir(proj_path),
                         dependencies = TRUE, stamp_copy = TRUE, overwrite = FALSE, 
                         comment_char = "#", alt_paths, proj_path = ".") {
   ## User function: copies script from one location (e.g. code_library) to project
@@ -106,7 +106,9 @@ copy_script <- function(from, dir = scripts_dir(proj_path), file_name = basename
   if (missing(from)) 
     stop("need \"from\" argument")
   to <- file_name
-  to_path <- normalizePath(file.path(dir, file_name), mustWork = FALSE)
+  if(file_name == basename(file_name))
+    to_path <- normalizePath(file.path(dir, file_name), mustWork = FALSE) else 
+      to_path <- to
   onlyfrom <- missing(dir)
     # if (missing(to)) {
     #   to <- basename(from)

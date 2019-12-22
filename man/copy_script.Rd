@@ -4,12 +4,14 @@
 \alias{copy_script}
 \title{Copy script to project directory}
 \usage{
-copy_script(from, dir = scripts_dir(proj_path), file_name = basename(from),
+copy_script(from, file_name = basename(from), dir = scripts_dir(proj_path),
   dependencies = TRUE, stamp_copy = TRUE, overwrite = FALSE,
   comment_char = "#", alt_paths, proj_path = ".")
 }
 \arguments{
 \item{from}{character. file name or path of file to copy}
+
+\item{file_name}{character. file name.  default = same as from}
 
 \item{dir}{character. directory to copy to, default "Scripts"}
 
@@ -24,8 +26,6 @@ copy_script(from, dir = scripts_dir(proj_path), file_name = basename(from),
 \item{alt_paths}{character vector. paths to other candidate files to search}
 
 \item{proj_path}{character. Default = current working directory. path to tidyproject}
-
-\item{file_path}{character. file name.  default = same as from}
 }
 \description{
 Will search code library and copy script and dependencies into scripts directory.
