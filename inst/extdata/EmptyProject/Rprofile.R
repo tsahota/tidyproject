@@ -3,7 +3,11 @@
 
 if (file.exists(file.path("~", ".Rprofile"))) source(file.path("~", ".Rprofile"))
 
-.libPaths(c(normalizePath("ProjectLibrary"),.libPaths()))
+R_version <- paste0(R.version$major, ".", tools::file_path_sans_ext(R.version$minor))
+proj_lib <- file.path("ProjectLibrary", R_version)
+dir.create(proj_lib, showWarnings = FALSE, recursive = TRUE)
+.libPaths(c(proj_lib,.libPaths()))
+rm(proj_lib, R_version)
 
 ## set default library config strategy
 suppressMessages({

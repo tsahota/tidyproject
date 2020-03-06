@@ -18,4 +18,5 @@ Suggests:
     rmarkdown
 Imports:
     magrittr,
-    rlang
+    rlang,
+    tibble
