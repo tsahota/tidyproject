@@ -309,3 +309,45 @@ locate_file <- function(x, search_path = c("."), recursive = FALSE) {
     }))
     all_files[grepl(paste0(x, "$"), all_files)]
 }
+
+
+#' Create new R notebook
+#' @param script_name character
+#' @param overwrite logical. Whether to overwrite existing file (default = FALSE)
+#' @param open_file logical. Whether function should open script (default = TRUE)
+#' @param libs character. What libraries to add.
+#' @export
+new_notebook_template <- function(script_name, overwrite = FALSE, open_file = TRUE, libs=c("NMproject")) {
+  ## create black script with comment fields. Add new_script to git
+  check_if_tidyproject()
+  file_name <- paste0(script_name, ".Rmd")
+  if (file_name != basename(file_name))
+    stop("name must not be a path")
+  to_path <- file.path(tidyproject::scripts_dir(), file_name)  ## destination path
+  if (file.exists(to_path) & !overwrite)
+    stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
+  s <- c("---",
+         "title: \"QCP_MODELING disk monitoring\"",
+         "output: html_document",
+         "---",
+         "",
+         "```{r setup, include=F}",
+         "## DO NOT MODIFY THIS BLOCK (unless you know what you're doing)",
+         "library(rprojroot)",
+         "library(knitr)",
+         "opts_chunk$set(echo=F)",
+         "opts_knit$set(root.dir=find_root(has_file('.Rprofile')))",
+         "opts_chunk$set(echo = TRUE)",
+         "```",
+         "",
+         "```{r echo=FALSE,message=FALSE}",
+         "## LOAD PACKAGES HERE",
+         "library(NMprojectAZ)",
+         "devtools::load_all(\"~/NMproject\")",
+         "library(dplyr)",
+         "```")
+  writeLines(s, to_path)
+  setup_file(to_path)
+  if (open_file) 
+    get("file.edit")(to_path)
+}

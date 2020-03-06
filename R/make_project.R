@@ -347,4 +347,115 @@ toggle_libs <- function(lib = c("project","project-user","user","global")){
   
 }
 
+#' stage files in project staging area ready for import
+#' 
+#' @param files character vector. path of files to stage
+#' @param additional_sub_dirs character vector. additional subdirectories 
+#'  not in standard tidyproject structure
+#' @param overwrite logical (default = FALSE).
+#' @param silent logical (default = FALSE)
+#' @export
+stage <- function(files, additional_sub_dirs = c(),
+                  overwrite = FALSE, silent = FALSE){
+  
+  ## send unmodified files into staging area for importation
+  
+  files <- normalizePath(files)
+  
+  ##########################  
+  sub_dirs <- c("SourceData",
+                "DerivedData",
+                "localpackage",
+                "Scripts",
+                "Models",
+                tidyproject::models_dir(),
+                "Results",
+                additional_sub_dirs)
+  
+  sub_dirs <- basename(sub_dirs)
+  
+  sub_dirs <- unique(sub_dirs)
+  
+  key_dirs <- sub_dirs
+  
+  regex_key_dirs <- paste0("\\b", key_dirs, "\\b")
+  
+  files_sep <- strsplit(files, .Platform$file.sep)
+  
+  destination <- sapply(files_sep, function(file_sep){
+    file_sep <- rev(file_sep)
+    matches <- match(key_dirs, file_sep)
+    if(all(is.na(matches))) return(NA_character_)
+    matched_dir <- key_dirs[which.min(matches)]
+    file_sep <- file_sep[seq_len(match(matched_dir, file_sep))]
+    do.call(file.path, as.list(rev(file_sep)))
+  })
+  
+  d <- tibble::tibble(from = files, destination)
+  d$staging <- file.path("staging", d$destination)
+  
+  d <- d[!is.na(d$destination), ]
+  dir_names <- unique(dirname(d$staging))
+  for(dir_name in dir_names) dir.create(dir_name, recursive = TRUE, showWarnings = FALSE)
+  
+  existing_files <- d$staging[file.exists(d$staging)]
+  do_copy <- rep(TRUE, nrow(d))  ## default = copy
+  if(!overwrite & length(existing_files)){
+    #stop("File(s) already exist:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing staged files or use overwrite=TRUE", call. = FALSE)
+    if(!silent) message("File(s) not to be overwritten:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing staged files or use overwrite=TRUE", call. = FALSE)
+    #d <- d[!d$staging %in% existing_files, ]
+    do_copy[file.exists(d$staging)] <- FALSE
+  }
+  
+  file.copy(d$from[do_copy],
+            d$staging[do_copy],
+            overwrite = overwrite)
+  
+  if(!silent) message("File(s) staged in project:\n",paste(paste0(" ",d$staging[do_copy]),collapse="\n"), "\nTo import use import()")
+  
+  invisible(d)
+  
+}
 
+#' Import staged files into project
+#' 
+#' @param copy_table data frame output from stage()
+#' @param overwrite logical (default = FALSE)
+#' @param silent logical (default = FALSE)
+#' @export
+import <- function(copy_table, overwrite = FALSE, silent = FALSE){
+  
+  ## import the files_to_copy
+  
+  ## R scripts in Scripts to be copied with the stamp at the top
+  ## Code in Models/. not to be copied - this will be handled by nm() %>% ctl("staging/...")
+  ## everything else copied as is
+  
+  copy_table <- copy_table[!is.na(copy_table$destination), ]
+  ## skip everything in Models 
+  copy_table <- copy_table[!grepl(paste0("^", getOption("models.dir"), .Platform$file.sep), copy_table$destination), ]
+  
+  copy_table$extn <- tools::file_ext(copy_table$destination)
+  
+  d_R <- copy_table[copy_table$extn %in% c("r", "R"), ]
+  d_other <- copy_table[!copy_table$extn %in% c("r", "R"), ]
+  
+  existing_files <- c(
+    d_R$destination[file.exists(d_R$destination)],
+    d_other$destination[file.exists(d_other$destination)]
+  )
+  if(!overwrite & length(existing_files)){
+    #stop("File(s) already exist:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing staged files or use overwrite=TRUE", call. = FALSE)
+    if(!silent) message("File(s) not to be overwritten:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing project files or use overwrite=TRUE", call. = FALSE)
+    copy_table <- copy_table[!copy_table$destination %in% existing_files, ]
+  }
+  
+  copy_script2(d_R$staging, d_R$destination, overwrite = overwrite)
+  file.copy(d_other$staging, d_other$destination, overwrite = overwrite)  ## use copy_file instead?
+  
+  message("Files imported:\n ",
+          paste(copy_table$destination, collapse = "\n "))
+  
+  invisible()
+  
+}

@@ -353,7 +353,10 @@ wait_for <- function(x,timeout=NULL,interval=1){
   diff.time <- 0
   while (!eval(x,envir = parent.frame())){
     diff.time <- difftime(Sys.time(),start.time,units="secs")
-    if(!is.null(timeout))if(diff.time > timeout) stop(paste("timed out waiting for\n",x,sep=""))
+    if(!is.null(timeout))if(diff.time > timeout) {
+      warning(paste("timed out waiting for\n",x,sep=""))
+      return(invisible())
+    }
     Sys.sleep(1)
   }
 }
