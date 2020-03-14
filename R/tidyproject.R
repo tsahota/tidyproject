@@ -408,3 +408,48 @@ code_snapshot_files <- function(message = "created automatic snapshot", session 
   git2r::commit(repo, message = message, all = TRUE, session = session, ...)
   message("Committed changes to: ctl files, scripts, and source data")
 }
+
+#' List directories
+#' 
+#' Wrapper around list.dirs() but includes maxdepth and pattern arguments
+#'  and removes full.names argument, always return full names.
+#' 
+#' @param path same as list.dirs()
+#' @param full.names same as list.dirs()
+#' @param recursive same as list.dirs()
+#' @param maxdepth integer (default = 1) maximum depth to search
+#' @param pattern character (default = missing) regex pattern match on directory name
+#' 
+#' @export
+list_dirs <- function(path = ".", full.names = TRUE, recursive = FALSE, maxdepth = 1, pattern){
+  
+  dirs <- list()
+  dirs[[1]] <- list.dirs(path, full.names = TRUE, recursive = FALSE)
+  
+  missing_pattern <- missing(pattern)
+  
+  return_ready <- function(dirs){ ## prep for return character vector
+    dirs <- unlist(dirs)
+    if(!missing_pattern) dirs <- dirs[grepl(pattern, basename(dirs))]
+    if(!full.names) dirs <- basename(dirs)
+    dirs
+  }
+  
+  if(maxdepth == 1 | !recursive) return(return_ready(dirs))
+  
+  for(i in 2:maxdepth){
+    current_dirs <- sapply(dirs[[i-1]], function(path){
+      list.dirs(path, full.names = TRUE, recursive = FALSE)
+    })
+    current_dirs <- unlist(current_dirs)
+    names(current_dirs) <- NULL
+    
+    ## breakpoint if no more dirs
+    if(length(current_dirs) == 0) return(return_ready(dirs))
+    
+    dirs[[i]] <- current_dirs
+  }
+  
+  return(return_ready(dirs))
+  
+}
