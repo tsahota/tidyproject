@@ -378,7 +378,7 @@ stage <- function(files, additional_sub_dirs = c(),
   do_copy <- rep(TRUE, nrow(d))  ## default = copy
   if(!overwrite & length(existing_files)){
     #stop("File(s) already exist:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing staged files or use overwrite=TRUE", call. = FALSE)
-    if(!silent) message("File(s) not to be overwritten:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing staged files or use overwrite=TRUE", call. = FALSE)
+    if(!silent) message("File(s) not to be overwritten:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing staged files or use overwrite=TRUE")
     #d <- d[!d$staging %in% existing_files, ]
     do_copy[file.exists(d$staging)] <- FALSE
   }
@@ -420,9 +420,9 @@ import <- function(copy_table, overwrite = FALSE, silent = FALSE){
     d_R$destination[file.exists(d_R$destination)],
     d_other$destination[file.exists(d_other$destination)]
   )
-  if(!overwrite & length(existing_files)){
+  if(!overwrite & length(existing_files) > 0){
     #stop("File(s) already exist:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing staged files or use overwrite=TRUE", call. = FALSE)
-    if(!silent) message("File(s) not to be overwritten:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing project files or use overwrite=TRUE", call. = FALSE)
+    if(!silent) message("File(s) not to be overwritten:\n",paste(paste0(" ",existing_files),collapse="\n"), "\nRename existing project files or use overwrite=TRUE")
     copy_table <- copy_table[!copy_table$destination %in% existing_files, ]
   }
   
