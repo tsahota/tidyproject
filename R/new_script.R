@@ -190,20 +190,23 @@ copy_script2 <- function(from, to = file.path(getOption("scripts.dir"), basename
 
   d <- data.frame(from, to, stringsAsFactors = FALSE)
   
-  to_path <- d$to
-  from_path <- d$from
+  already_exist <- file.exists(d$to)
   
-  if(!overwrite & any(file.exists(to_path)))
-    stop("File(s) already exist:\n",paste(paste0("  ",to_path),collapse="\n"), "\nRename existing files or use overwrite=TRUE", call. = FALSE)
-
+  if(!overwrite & any(already_exist))
+    message("File(s) already exist:\n",
+            paste(paste0("  ",d$to[already_exist]),collapse="\n"),
+            "\nRename existing files or use overwrite=TRUE")
+  
+  d <- d[!already_exist, ]
+  
   for(i in seq_len(nrow(d))){
-    suppressWarnings(s0 <- readLines(from_path[i]))
-    ## modify text at top of 'from_path'
+    suppressWarnings(s0 <- readLines(d$from[i]))
+    ## modify text at top of 'd$from'
     if (stamp_copy) 
-      s <- c(paste0(comment_char, comment_char, " Copied from ", from_path[i], "\n##  (", 
+      s <- c(paste0(comment_char, comment_char, " Copied from ", d$from[i], "\n##  (", 
                     Sys.time(), ") by ", Sys.info()["user"]), s0) else s <- s0
-                    writeLines(s, to_path[i])
-                    setup_file(to_path[i]) 
+                    writeLines(s, d$to[i])
+                    setup_file(d$to[i]) 
   }
 }
 
@@ -320,6 +323,7 @@ locate_file <- function(x, search_path = c("."), recursive = FALSE) {
 new_notebook_template <- function(script_name, overwrite = FALSE, open_file = TRUE, libs=c("NMproject")) {
   ## create black script with comment fields. Add new_script to git
   check_if_tidyproject()
+  script_name <- gsub("\\.Rmd$", "", script_name)
   file_name <- paste0(script_name, ".Rmd")
   if (file_name != basename(file_name))
     stop("name must not be a path")
@@ -327,7 +331,7 @@ new_notebook_template <- function(script_name, overwrite = FALSE, open_file = TR
   if (file.exists(to_path) & !overwrite)
     stop(paste(to_path, "already exists. Rerun with overwrite = TRUE"))
   s <- c("---",
-         "title: \"QCP_MODELING disk monitoring\"",
+         paste0("title: \"", script_name ,"\""),
          "output: html_document",
          "---",
          "",
@@ -343,8 +347,6 @@ new_notebook_template <- function(script_name, overwrite = FALSE, open_file = TR
          "```{r echo=FALSE,message=FALSE}",
          "## LOAD PACKAGES HERE",
          "library(NMprojectAZ)",
-         "devtools::load_all(\"~/NMproject\")",
-         "library(dplyr)",
          "```")
   writeLines(s, to_path)
   setup_file(to_path)
