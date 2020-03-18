@@ -320,7 +320,7 @@ locate_file <- function(x, search_path = c("."), recursive = FALSE) {
 #' @param open_file logical. Whether function should open script (default = TRUE)
 #' @param libs character. What libraries to add.
 #' @export
-new_notebook_template <- function(script_name, overwrite = FALSE, open_file = TRUE, libs=c("NMproject")) {
+new_notebook_template <- function(script_name, overwrite = FALSE, open_file = TRUE, libs=c("tidyproject")) {
   ## create black script with comment fields. Add new_script to git
   check_if_tidyproject()
   script_name <- gsub("\\.Rmd$", "", script_name)
