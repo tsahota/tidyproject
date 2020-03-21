@@ -158,7 +158,7 @@ make_project <- function(proj_name, lib_strategy = c("project-user","project","u
     message(paste("1. Open Rstudio project to start working: ", proj_name))
     message(paste("2. (optional) Install tidyproject package in project library"))
     
-    invisible(proj_name)
+    proj_name
 
 }
 
