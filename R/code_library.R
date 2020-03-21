@@ -23,7 +23,7 @@ rlang::.data
 #' }
 #' @export
 
-ls_scripts <- function(folder = ".", extn = "r|R", recursive = TRUE) {
+ls_scripts <- function(folder = ".", extn = "r|R|Rmd|rmd", recursive = TRUE) {
     if (is.null(extn)) {
         output <- dir(folder, recursive = recursive, full.names = TRUE)
     } else {
