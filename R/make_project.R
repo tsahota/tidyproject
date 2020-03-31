@@ -326,12 +326,14 @@ toggle_libs <- function(lib = c("project","project-user","user","global")){
 #' stage files in project staging area ready for import
 #' 
 #' @param files character vector. path of files to stage
+#' @param destination default empty.  Optional destination directory
+#'  by default will be equivalent location in staging/
 #' @param additional_sub_dirs character vector. additional subdirectories 
 #'  not in standard tidyproject structure
 #' @param overwrite logical (default = FALSE).
 #' @param silent logical (default = FALSE)
 #' @export
-stage <- function(files, additional_sub_dirs = c(),
+stage <- function(files, destination, additional_sub_dirs = c(),
                   overwrite = FALSE, silent = FALSE){
   
   ## send unmodified files into staging area for importation
@@ -358,14 +360,21 @@ stage <- function(files, additional_sub_dirs = c(),
   
   files_sep <- strsplit(files, .Platform$file.sep)
   
-  destination <- sapply(files_sep, function(file_sep){
-    file_sep <- rev(file_sep)
-    matches <- match(key_dirs, file_sep)
-    if(all(is.na(matches))) return(NA_character_)
-    matched_dir <- key_dirs[which.min(matches)]
-    file_sep <- file_sep[seq_len(match(matched_dir, file_sep))]
-    do.call(file.path, as.list(rev(file_sep)))
-  })
+  if(!missing(destination)){
+    if(!grepl("staging", destination))
+      stop("destination should be in staging area", call. = FALSE)
+    destination <- file.path(destination, basename(files))
+    destination <- relative_path(destination, "staging")
+  } else {
+    destination <- sapply(files_sep, function(file_sep){
+      file_sep <- rev(file_sep)
+      matches <- match(key_dirs, file_sep)
+      if(all(is.na(matches))) return(NA_character_)
+      matched_dir <- key_dirs[which.min(matches)]
+      file_sep <- file_sep[seq_len(match(matched_dir, file_sep))]
+      do.call(file.path, as.list(rev(file_sep)))
+    })
+  }
   
   d <- tibble::tibble(from = files, destination)
   d$staging <- file.path("staging", d$destination)
