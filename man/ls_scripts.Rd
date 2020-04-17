@@ -4,7 +4,7 @@
 \alias{ls_scripts}
 \title{List scripts}
 \usage{
-ls_scripts(folder = ".", extn = "r|R", recursive = TRUE)
+ls_scripts(folder = ".", extn = "r|R|Rmd|rmd", recursive = TRUE)
 }
 \arguments{
 \item{folder}{string describing folder to search recursively in}
