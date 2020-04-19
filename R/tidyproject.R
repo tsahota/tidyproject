@@ -1,3 +1,21 @@
+#' @importFrom magrittr %>%
+#' @export
+magrittr::'%>%'
+
+#' @importFrom magrittr %<>%
+#' @export
+magrittr::'%<>%'
+
+#' @importFrom magrittr %T>%
+#' @export
+magrittr::'%T>%'
+
+#' @importFrom rlang .data
+#' @export
+rlang::.data
+
+
+
 #' Project and code management
 #'
 #' tidyproject is designed to manage tidy project directories and
