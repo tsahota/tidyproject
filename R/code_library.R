@@ -1,15 +1,3 @@
-#' @importFrom magrittr %>%
-#' @export
-magrittr::'%>%'
-
-#' @importFrom magrittr %T>%
-#' @export
-magrittr::'%T>%'
-
-#' @importFrom rlang .data
-#' @export
-rlang::.data
-
 #' List scripts
 #'
 #' @param folder string describing folder to search recursively in
