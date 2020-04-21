@@ -4,7 +4,10 @@
 \alias{proj_lib}
 \title{get project library location}
 \usage{
-proj_lib()
+proj_lib(base_dir = ".")
+}
+\arguments{
+\item{base_dir}{optional character path}
 }
 \description{
 get project library location
