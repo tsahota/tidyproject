@@ -229,7 +229,6 @@ toggle_libs <- function(lib = c("project","project-user","user","global")){
   project_libs <- current_lib_paths[match_project_libs]
   project_lib_present <- length(project_libs) > 0
   default_project_lib <- proj_lib() #normalizePath(list.files(pattern = "ProjectLibrary", full.names = TRUE))
-
   default_user_lib <- normalizePath(Sys.getenv("R_LIBS_USER"), mustWork = FALSE)
   match_user_lib <- grepl(default_user_lib, current_lib_paths)
   user_lib_pos <- which(match_user_lib)
