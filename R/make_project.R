@@ -381,6 +381,8 @@ relative_path <- function (path, relative_path){
   do.call(file.path, as.list(relativePieces))
 }
 
+relative_path <- Vectorize(relative_path, USE.NAMES = FALSE)
+
 #' stage files in project staging area ready for import
 #' 
 #' @param files character vector. path of files to stage
