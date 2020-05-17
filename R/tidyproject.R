@@ -10,6 +10,10 @@ magrittr::'%<>%'
 #' @export
 magrittr::'%T>%'
 
+#' @importFrom magrittr %$%
+#' @export
+magrittr::'%$%'
+
 #' @importFrom rlang .data
 #' @export
 rlang::.data
