@@ -31,8 +31,10 @@ copy_empty_project <- function(proj_name,
   #   cat(paste0("\n",new_lines),file = .Rprofile_name,append = TRUE)
   # }
   config_lines <- readLines(.Rprofile_name)
-  
-  config_lines <- gsub('"project-user"', paste0('"',lib_strategy,'"'), config_lines)
+
+  regex_lib_strategy <- '(lib\\s*<-\\s*)"project-user"'  
+  if(length(regex_lib_strategy) != 1) stop("can't set lib strategy - write .Rprofile manually")
+  config_lines <- gsub(regex_lib_strategy, paste0('\\1"',lib_strategy,'"'), config_lines)
   
   #config_lines <- gsub("^(\\.remove_user_lib <- )\\S*(.*)$",
   #                     paste0("\\1",remove_user_lib,"\\2"),
