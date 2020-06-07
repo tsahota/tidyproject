@@ -466,11 +466,15 @@ stage <- function(files, destination, additional_sub_dirs = c(),
 
 #' Import staged files into project
 #' 
-#' @param copy_table data frame output from stage()
+#' @param copy_table data frame or character.
+#'   if data.frame should be output from \code{stage()}
+#'   if character path, result will be \code{stage()}d first 
 #' @param overwrite logical (default = FALSE)
 #' @param silent logical (default = FALSE)
+#' @param skip character (default = "\\.mod$"). pattern to skip
 #' @export
-import <- function(copy_table, overwrite = FALSE, silent = FALSE){
+import <- function(copy_table, overwrite = FALSE, silent = FALSE,
+                   skip = "\\.mod$"){
   
   ## import the files_to_copy
   
@@ -478,9 +482,13 @@ import <- function(copy_table, overwrite = FALSE, silent = FALSE){
   ## Code in Models/. not to be copied - this will be handled by nm() %>% ctl("staging/...")
   ## everything else copied as is
   
+  if(is.character(copy_table)){
+    copy_table <- stage(copy_table, overwrite = overwrite, silent = silent)
+  }
+  
   copy_table <- copy_table[!is.na(copy_table$destination), ]
   ## skip everything in Models 
-  copy_table <- copy_table[!grepl(paste0("^", getOption("models.dir"), .Platform$file.sep), copy_table$destination), ]
+  copy_table <- copy_table[!grepl(skip, copy_table$destination), ]
   
   copy_table$extn <- tools::file_ext(copy_table$destination)
   
