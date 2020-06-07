@@ -4,14 +4,18 @@
 \alias{import}
 \title{Import staged files into project}
 \usage{
-import(copy_table, overwrite = FALSE, silent = FALSE)
+import(copy_table, overwrite = FALSE, silent = FALSE, skip = "\\\\.mod$")
 }
 \arguments{
-\item{copy_table}{data frame output from stage()}
+\item{copy_table}{data frame or character.
+if data.frame should be output from \code{stage()}
+if character path, result will be \code{stage()}d first}
 
 \item{overwrite}{logical (default = FALSE)}
 
 \item{silent}{logical (default = FALSE)}
+
+\item{skip}{character (default = "\\.mod$"). pattern to skip}
 }
 \description{
 Import staged files into project
