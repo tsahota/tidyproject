@@ -506,8 +506,8 @@ import <- function(copy_table, overwrite = FALSE, silent = FALSE,
   }
   
   dirs <- dirname(c(d_R$destination, d_other$destination))
-  if(length(unique(dirs)))
-    dir.create(unique(dirs), recursive = TRUE, showWarnings = FALSE)
+  dirs <- unique(dirs)
+  for(path in dirs) dir.create(path, recursive = TRUE, showWarnings = FALSE)
   
   copy_script2(d_R$staging, d_R$destination, overwrite = overwrite)
   file.copy(d_other$staging, d_other$destination, overwrite = overwrite)  ## use copy_file instead?
