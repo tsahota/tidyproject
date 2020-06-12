@@ -377,10 +377,11 @@ wait_for <- function(x,timeout=NULL,interval=1){
     diff.time <- difftime(Sys.time(),start.time,units="secs")
     if(!is.null(timeout))if(diff.time > timeout) {
       warning(paste("timed out waiting for\n",x,sep=""))
-      return(invisible())
+      return(invisible(FALSE))
     }
     Sys.sleep(1)
   }
+  invisible(TRUE)
 }
 
 #' Logical flag for detecting if R session is on rstudio not
