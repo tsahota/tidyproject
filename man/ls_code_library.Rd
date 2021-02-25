@@ -4,7 +4,10 @@
 \alias{ls_code_library}
 \title{List files in code library}
 \usage{
-ls_code_library()
+ls_code_library(pattern = ".")
+}
+\arguments{
+\item{pattern}{optional character. filter the code library}
 }
 \description{
 List files in code library

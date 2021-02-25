@@ -4,8 +4,13 @@
 \alias{code_library}
 \title{Show Code Library}
 \usage{
-code_library(extn = NULL, fields = "Description", viewer = TRUE,
-  silent = FALSE, return_info = FALSE)
+code_library(
+  extn = NULL,
+  fields = "Description",
+  viewer = TRUE,
+  silent = FALSE,
+  return_info = FALSE
+)
 }
 \arguments{
 \item{extn}{vector string of extensions to include}

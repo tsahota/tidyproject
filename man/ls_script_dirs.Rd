@@ -4,8 +4,12 @@
 \alias{ls_script_dirs}
 \title{recursively get all script dirs}
 \usage{
-ls_script_dirs(path = ".", dir_name = getOption("scripts.dir"), depth,
-  maxdepth = 10)
+ls_script_dirs(
+  path = ".",
+  dir_name = getOption("scripts.dir"),
+  depth,
+  maxdepth = 10
+)
 }
 \arguments{
 \item{path}{character. Script dirs are in a subdirectory n levels below}

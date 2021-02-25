@@ -4,8 +4,13 @@
 \alias{copy_script2}
 \title{Copy script to project directory}
 \usage{
-copy_script2(from, to = file.path(getOption("scripts.dir"), basename(from)),
-  stamp_copy = TRUE, overwrite = FALSE, comment_char = "#")
+copy_script2(
+  from,
+  to = file.path(getOption("scripts.dir"), basename(from)),
+  stamp_copy = TRUE,
+  overwrite = FALSE,
+  comment_char = "#"
+)
 }
 \arguments{
 \item{from}{character. file name or path of file to copy}

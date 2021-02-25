@@ -3,7 +3,6 @@
 \docType{package}
 \name{tidyproject}
 \alias{tidyproject}
-\alias{tidyproject-package}
 \title{Project and code management}
 \description{
 tidyproject is designed to manage tidy project directories and
