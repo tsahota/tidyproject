@@ -4,8 +4,12 @@
 \alias{code_snapshot_files}
 \title{Git commit of ctl files, SourceData and Scripts}
 \usage{
-code_snapshot_files(message = "created automatic snapshot", session = TRUE,
-  files_to_stage, ...)
+code_snapshot_files(
+  message = "created automatic snapshot",
+  session = TRUE,
+  files_to_stage,
+  ...
+)
 }
 \arguments{
 \item{message}{character. Description to be added to commit}

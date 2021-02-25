@@ -4,8 +4,13 @@
 \alias{list_dirs}
 \title{List directories}
 \usage{
-list_dirs(path = ".", full.names = TRUE, recursive = FALSE,
-  maxdepth = 1, pattern)
+list_dirs(
+  path = ".",
+  full.names = TRUE,
+  recursive = FALSE,
+  maxdepth = 1,
+  pattern
+)
 }
 \arguments{
 \item{path}{same as list.dirs()}

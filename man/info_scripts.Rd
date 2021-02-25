@@ -4,8 +4,14 @@
 \alias{info_scripts}
 \title{List information about scripts}
 \usage{
-info_scripts(files, fields = c("Description"), viewer = TRUE,
-  silent = FALSE, base_dirs = NULL, shorten_paths = TRUE)
+info_scripts(
+  files,
+  fields = c("Description"),
+  viewer = TRUE,
+  silent = FALSE,
+  base_dirs = NULL,
+  shorten_paths = TRUE
+)
 }
 \arguments{
 \item{files}{vector string of file names/paths}

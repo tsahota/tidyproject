@@ -4,8 +4,13 @@
 \alias{stage}
 \title{stage files in project staging area ready for import}
 \usage{
-stage(files, destination, additional_sub_dirs = c(), overwrite = FALSE,
-  silent = FALSE)
+stage(
+  files,
+  destination,
+  additional_sub_dirs = c(),
+  overwrite = FALSE,
+  silent = FALSE
+)
 }
 \arguments{
 \item{files}{character vector. path of files to stage}

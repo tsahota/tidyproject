@@ -155,10 +155,12 @@ search_keyword <- function(files, text) {
 
 #' List files in code library
 #'
+#' @param pattern optional character. filter the code library
 #' @export
 
-ls_code_library <- function() {
-    ls_scripts(extn = ".*", folder = getOption("code_library_path"), recursive = TRUE)
+ls_code_library <- function(pattern = ".") {
+  paths <- ls_scripts(extn = ".*", folder = getOption("code_library_path"), recursive = TRUE)
+  paths[grepl(pattern, paths)]
 }
 
 #' Show Code Library

@@ -4,9 +4,17 @@
 \alias{copy_script}
 \title{Copy script to project directory}
 \usage{
-copy_script(from, file_name = basename(from), dir = scripts_dir(proj_path),
-  dependencies = TRUE, stamp_copy = TRUE, overwrite = FALSE,
-  comment_char = "#", alt_paths, proj_path = ".")
+copy_script(
+  from,
+  file_name = basename(from),
+  dir = scripts_dir(proj_path),
+  dependencies = TRUE,
+  stamp_copy = TRUE,
+  overwrite = FALSE,
+  comment_char = "#",
+  alt_paths,
+  proj_path = "."
+)
 }
 \arguments{
 \item{from}{character. file name or path of file to copy}
