@@ -460,7 +460,9 @@ list_dirs <- function(path = ".", full.names = TRUE, recursive = FALSE, maxdepth
   
   if(maxdepth == 1 | !recursive) return(return_ready(dirs))
   
-  for(i in 2:maxdepth){
+  i <- 2
+  while(i <= maxdepth){
+  #for(i in 2:maxdepth){
     current_dirs <- sapply(dirs[[i-1]], function(path){
       list.dirs(path, full.names = TRUE, recursive = FALSE)
     })
@@ -471,6 +473,7 @@ list_dirs <- function(path = ".", full.names = TRUE, recursive = FALSE, maxdepth
     if(length(current_dirs) == 0) return(return_ready(dirs))
     
     dirs[[i]] <- current_dirs
+    i <- i + 1
   }
   
   return(return_ready(dirs))
