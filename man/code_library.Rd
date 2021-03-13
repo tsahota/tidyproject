@@ -17,12 +17,29 @@ code_library(
 
 \item{fields}{character vector of fields to extract}
 
-\item{viewer}{logical indicating if viewer should be used to display results (default=FALSE)}
+\item{viewer}{logical indicating if viewer should be used to display results
+(default=FALSE)}
 
-\item{silent}{logical indicating if messages should be silenced (default=FALSE)}
+\item{silent}{logical indicating if messages should be silenced
+(default=FALSE)}
 
-\item{return_info}{logical (default = FALSE). Return data.frame of results (FALSE= returns file paths)}
+\item{return_info}{logical (default = FALSE). Return data.frame of results
+(FALSE= returns file paths)}
 }
 \description{
 Show Code Library
+}
+\details{
+requires \code{getOption("code_library_path")} to be set
+}
+\examples{
+
+\dontrun{
+
+code_library()
+
+}
+}
+\seealso{
+\code{\link{ls_code_library}}, \code{\link{preview}}
 }

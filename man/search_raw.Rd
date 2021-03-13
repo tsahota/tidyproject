@@ -18,3 +18,21 @@ search_raw(files, text, search_title = TRUE, search_contents = TRUE)
 \description{
 Search for files matching raw text search
 }
+\examples{
+
+\dontrun{
+
+ls_scripts("Scripts") \%>\% search_raw("AUC")  ## finds all scripts containing string "AUC"
+
+## regex match find instances of AUC() function being used
+ls_scripts("Scripts") \%>\% search_raw("AUC\\\\(")
+
+## bring file(s) into staging area of project
+ls_scripts("Scripts") \%>\% search_raw("AUC\\\\(") \%>\% stage()
+
+}
+
+}
+\seealso{
+\code{\link{ls_scripts}}, \code{\link{ls_code_library}}, \code{\link{stage}}
+}

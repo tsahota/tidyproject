@@ -105,6 +105,23 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
 #' @param text string (can be regex) to search for
 #' @param search_title logical (default=TRUE). should matching occur in title
 #' @param search_contents logical (default=TRUE). should matching occur in file contents
+#' 
+#' @seealso \code{\link{ls_scripts}}, \code{\link{ls_code_library}}, \code{\link{stage}}
+#' 
+#' @examples 
+#' 
+#' \dontrun{
+#' 
+#' ls_scripts("Scripts") %>% search_raw("AUC")  ## finds all scripts containing string "AUC"
+#' 
+#' ## regex match find instances of AUC() function being used
+#' ls_scripts("Scripts") %>% search_raw("AUC\\(")
+#' 
+#' ## bring file(s) into staging area of project
+#' ls_scripts("Scripts") %>% search_raw("AUC\\(") %>% stage()
+#' 
+#' }
+#' 
 #' @export
 
 search_raw <- function(files, text, search_title=TRUE, search_contents=TRUE) {
@@ -155,7 +172,19 @@ search_keyword <- function(files, text) {
 
 #' List files in code library
 #'
-#' @param pattern optional character. filter the code library
+#' @param pattern optional character. filter the code library use regex
+#' 
+#' @seealso \code{\link{code_library}}, \code{\link{preview}}, \code{\link{stage}}, \code{\link{import}}
+#' 
+#' @examples 
+#' 
+#' \dontrun{
+#' 
+#' ls_code_library("Models/ADVAN2.mod") %>%
+#'   stage()
+#'   
+#' }
+#' 
 #' @export
 
 ls_code_library <- function(pattern = ".") {
@@ -167,9 +196,23 @@ ls_code_library <- function(pattern = ".") {
 #'
 #' @param extn vector string of extensions to include
 #' @param fields character vector of fields to extract
-#' @param viewer logical indicating if viewer should be used to display results (default=FALSE)
-#' @param silent logical indicating if messages should be silenced (default=FALSE)
-#' @param return_info logical (default = FALSE). Return data.frame of results (FALSE= returns file paths)
+#' @param viewer logical indicating if viewer should be used to display results
+#'   (default=FALSE)
+#' @param silent logical indicating if messages should be silenced
+#'   (default=FALSE)
+#' @param return_info logical (default = FALSE). Return data.frame of results
+#'   (FALSE= returns file paths)
+#'
+#' @details requires \code{getOption("code_library_path")} to be set
+#'
+#' @seealso \code{\link{ls_code_library}}, \code{\link{preview}}
+#' @examples
+#'
+#' \dontrun{
+#'
+#' code_library()
+#'
+#' }
 #' @export
 code_library <- function(extn = NULL, fields = "Description", viewer = TRUE, silent = FALSE, 
     return_info = FALSE) {
