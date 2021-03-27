@@ -399,7 +399,7 @@ stage <- function(files, destination, additional_sub_dirs = c(),
   
   ## send unmodified files into staging area for importation
   
-  files <- normalizePath(files)
+  files <- normalizePath(files, winslash = "/")
   
   ##########################  
   sub_dirs <- c("SourceData",
