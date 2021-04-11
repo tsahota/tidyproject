@@ -446,7 +446,7 @@ stage <- function(files, destination, additional_sub_dirs = c(),
   }
 
   ## analysis package code
-  if(is_package_type){
+  if(is_package_type()){
     destination <- gsub("localpackage/R", "R",destination)
     ## remove other files in localpackage
     subset_files <- !grepl("localpackage", destination)
