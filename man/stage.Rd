@@ -18,7 +18,7 @@ stage(
 \item{destination}{default empty.  Optional destination directory
 by default will be equivalent location in staging/}
 
-\item{additional_sub_dirs}{character vector. additional subdirectories 
+\item{additional_sub_dirs}{character vector. additional subdirectories
 not in standard tidyproject structure}
 
 \item{overwrite}{logical (default = FALSE).}

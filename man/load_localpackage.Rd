@@ -4,15 +4,17 @@
 \alias{load_localpackage}
 \title{Load local package}
 \usage{
-load_localpackage(..., fail_silently = FALSE)
+load_localpackage(...)
 }
 \arguments{
 \item{...}{arguments to be passed to devtools::load_all}
-
-\item{fail_silently}{logical. default FALSE. Should function fail silently}
 }
 \description{
-This function loads code stored in localpackage/R and data stored in
-localpackage/data.  It is a wrapper around devtools::document() and
-devtools::load_all().  See their documentation for more information.
+Equivalent to  devtools::document() followed by devtools::load_all().  This
+function operate on a localpackage/R directory if it exists, otherwise it
+will assume the base directory is the package directory
+}
+\details{
+if analysis directory is a package this will default to
+  devtools::document() followed by devtools::load_all()
 }
