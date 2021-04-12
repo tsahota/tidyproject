@@ -40,10 +40,10 @@ dir.create(pl, showWarnings = FALSE, recursive = TRUE)
 ## set default library config strategy
 ## define copy of toggle_libs from tidyproject source
 toggle_libs <- function(lib = c("project","project-user","user","global")){
-  current_lib_paths <- normalizePath(.libPaths())
+  current_lib_paths <- normalizePath(.libPaths(), winslash = "/")
   new_lib_paths <- current_lib_paths
   
-  current_wd <- normalizePath(getwd())
+  current_wd <- normalizePath(getwd(), winslash = "/")
   
   ## identify project/user/global libs
   match_project_libs <- grepl(current_wd, current_lib_paths)
@@ -52,7 +52,7 @@ toggle_libs <- function(lib = c("project","project-user","user","global")){
   project_lib_present <- length(project_libs) > 0
   default_project_lib <- proj_lib() #normalizePath(list.files(pattern = "ProjectLibrary", full.names = TRUE))
   
-  default_user_lib <- normalizePath(Sys.getenv("R_LIBS_USER"), mustWork = FALSE)
+  default_user_lib <- normalizePath(Sys.getenv("R_LIBS_USER"), mustWork = FALSE, winslash = "/")
   match_user_lib <- grepl(default_user_lib, current_lib_paths)
   user_lib_pos <- which(match_user_lib)
   user_lib_present <- any(grepl(default_user_lib, current_lib_paths))

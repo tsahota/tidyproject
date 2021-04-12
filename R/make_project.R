@@ -223,10 +223,10 @@ proj_lib <- function(base_dir = "."){
 #' @export
 
 toggle_libs <- function(lib = c("project","project-user","user","global")){
-  current_lib_paths <- normalizePath(.libPaths())
+  current_lib_paths <- normalizePath(.libPaths(), winslash = "/")
   new_lib_paths <- current_lib_paths
 
-  current_wd <- normalizePath(getwd())
+  current_wd <- normalizePath(getwd(), winslash = "/")
 
   ## identify project/user/global libs
   match_project_libs <- grepl(current_wd, current_lib_paths)
@@ -234,7 +234,7 @@ toggle_libs <- function(lib = c("project","project-user","user","global")){
   project_libs <- current_lib_paths[match_project_libs]
   project_lib_present <- length(project_libs) > 0
   default_project_lib <- proj_lib() #normalizePath(list.files(pattern = "ProjectLibrary", full.names = TRUE))
-  default_user_lib <- normalizePath(Sys.getenv("R_LIBS_USER"), mustWork = FALSE)
+  default_user_lib <- normalizePath(Sys.getenv("R_LIBS_USER"), mustWork = FALSE, winslash = "/")
   match_user_lib <- grepl(default_user_lib, current_lib_paths)
   user_lib_pos <- which(match_user_lib)
   user_lib_present <- any(grepl(default_user_lib, current_lib_paths))
@@ -366,8 +366,8 @@ relative_path <- function (path, relative_path){
   if(!file.exists_path) path <- file.path(getwd(), path)  ## if doesn't exist assume relative path
   if(!file.exists_relative_path) relative_path <- file.path(getwd(), relative_path)
 
-  mainPieces <- strsplit(normalizePath(path, mustWork = FALSE), .Platform$file.sep, fixed=TRUE)[[1]]
-  refPieces <- strsplit(normalizePath(relative_path, mustWork = FALSE), .Platform$file.sep, fixed=TRUE)[[1]]
+  mainPieces <- strsplit(normalizePath(path, mustWork = FALSE, winslash = "/"), .Platform$file.sep, fixed=TRUE)[[1]]
+  refPieces <- strsplit(normalizePath(relative_path, mustWork = FALSE, winslash = "/"), .Platform$file.sep, fixed=TRUE)[[1]]
 
   #if(!file.exists_path) unlink(path)
   #if(!file.exists_relative_path) unlink(relative_path)
