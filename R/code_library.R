@@ -82,16 +82,17 @@ info_scripts <- function(files, fields = c("Description"), viewer = TRUE, silent
         }
     }
     
-    d <- cbind(data.frame(FOLDER = d$FOLDER, NAME = d$NAME, stringsAsFactors = FALSE), 
-        res)
+    d <- cbind(data.frame(NAME = d$NAME, stringsAsFactors = FALSE), 
+               res,
+               data.frame(FOLDER = d$FOLDER, stringsAsFactors = FALSE))
     
     if (shorten_paths) {
-        dshort <- cbind(data.frame(FOLDER = short_path(d$FOLDER), NAME = d$NAME, stringsAsFactors = FALSE), 
-            res)
+      dshort <- d
+      dshort$FOLDER <- short_path(dshort$FOLDER)
     } else {
       dshort <- d
     }
-    
+
     if (!silent) {
         if (viewer) 
             get("View")(dshort, "available files")
@@ -247,8 +248,6 @@ code_library <- function(extn = NULL, fields = "Description", viewer = TRUE, sil
             e$message <- paste0(e$message, ".\n  Check getOption(\"code_library_path\") points to non-overlapping folders")
         stop(e)
     })
-    if (!silent) 
-        message("\nNOTE: Do not source scripts from the code library,\n copy them to your project with copy_script() or copy_file()")
     if (return_info) {
         if (silent) 
             return_ob <- invisible(info) else return_ob <- info
